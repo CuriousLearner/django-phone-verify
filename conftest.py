@@ -10,8 +10,6 @@ import functools
 
 # Third Party Stuff
 import pytest
-from unittest import mock
-
 
 class PartialMethodCaller:
     def __init__(self, obj, **partial_params):
@@ -36,7 +34,7 @@ def client():
 
             Usages:
             >>> import json
-            >>> url = reverse("api-login")
+            >>> url = reverse("phone-verify")
             >>> client.json.get(url)
             >>> client.json.post(url, data=json.dumps(payload))
             """
