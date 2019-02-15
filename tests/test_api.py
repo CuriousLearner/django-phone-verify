@@ -63,18 +63,17 @@ def test_phone_verification_with_incomplete_payload(client):
     }
     response = client.json.post(url, data=data)
     assert response.status_code == 400
-    assert response.data['errors'][0]['field'] == "session_code"
-    assert response.data['errors'][0]['message'] == "This field is required."
-    assert response.data['errors'][1]['field'] == "otp"
-    assert response.data['errors'][0]['message'] == "This field is required."
+    response_data = json.loads(json.dumps(response.data))
+    assert response_data['session_code'][0] == "This field is required."
+    assert response_data['otp'][0] == "This field is required."
 
     data = {
         'otp': OTP
     }
     response = client.json.post(url, data=data)
     assert response.status_code == 400
-    assert response.data['errors'][0]['field'] == "phone_number"
-    assert response.data['errors'][0]['message'] == "This field is required."
+    response_data = json.loads(json.dumps(response.data))
+    assert response_data['phone_number'][0] == "This field is required."
 
 
 def test_phone_verification_with_incorrect_payload(client):
@@ -90,9 +89,9 @@ def test_phone_verification_with_incorrect_payload(client):
         'session_code': 'wrong-session-code'
     }
     response = client.json.post(url, data=data)
+    response_data = json.loads(json.dumps(response.data))
     assert response.status_code == 400
-    assert response.data['error_type'] == "ValidationError"
-    assert response.data['errors'][0]['message'] == "Session Code mis-match"
+    assert response_data['non_field_errors'][0] == "Session Code mis-match"
 
     # Payload with wrong OTP
     data = {
@@ -102,8 +101,8 @@ def test_phone_verification_with_incorrect_payload(client):
     }
     response = client.json.post(url, data=data)
     assert response.status_code == 400
-    assert response.data['error_type'] == "ValidationError"
-    assert response.data['errors'][0]['message'] == "OTP is not valid"
+    response_data = json.loads(json.dumps(response.data))
+    assert response_data['non_field_errors'][0] == "OTP is not valid"
 
     # Payload with incorrect phone_number
     data = {
@@ -113,5 +112,5 @@ def test_phone_verification_with_incorrect_payload(client):
     }
     response = client.json.post(url, data=data)
     assert response.status_code == 400
-    assert response.data['error_type'] == "ValidationError"
-    assert response.data['errors'][0]['message'] == "OTP is not valid"
+    response_data = json.loads(json.dumps(response.data))
+    assert response_data['non_field_errors'][0] == "OTP is not valid"

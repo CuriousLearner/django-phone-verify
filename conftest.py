@@ -11,6 +11,9 @@ import functools
 # Third Party Stuff
 import pytest
 
+import django
+from django.conf import settings
+
 class PartialMethodCaller:
     def __init__(self, obj, **partial_params):
         self.obj = obj
@@ -41,3 +44,9 @@ def client():
             return PartialMethodCaller(obj=self, content_type='application/json;charset="utf-8"')
 
     return _Client()
+
+
+def pytest_configure():
+    from tests import test_settings
+    settings.configure(**test_settings.DJANGO_SETTINGS)
+    django.setup()
