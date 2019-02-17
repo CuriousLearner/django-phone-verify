@@ -15,9 +15,7 @@ logger = logging.getLogger(__name__)
 
 # iOS uses "session code" to parse the OTP and support copying on clipboard.
 DEFAULT_MESSAGE = "Welcome to {app}, use session code {otp} for authentication."
-DEFAULT_APP_NAME = 'PhoneAuth'
-DEFAULT_APP_BASE_URL = 'phoneauth://'
-DEFAULT_APP_PATH = 'verify'
+DEFAULT_APP_NAME = 'Phone Verify'
 
 
 class PhoneVerificationService(object):

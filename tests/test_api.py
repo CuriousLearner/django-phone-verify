@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 # Third party stuff
 import json
+import time
 import pytest
 from django.apps import apps
 from django.urls import reverse
@@ -114,3 +115,21 @@ def test_phone_verification_with_incorrect_payload(client):
     assert response.status_code == 400
     response_data = json.loads(json.dumps(response.data))
     assert response_data['non_field_errors'][0] == "OTP is not valid"
+
+
+def test_otp_expired(client):
+    verification = f.create_verification(
+        otp=OTP, phone_number=PHONE_NUMBER,
+        session_code=SESSION_CODE
+    )
+    time.sleep(2)
+    url = reverse('phone-verify')
+    data = {
+        'phone_number': PHONE_NUMBER,
+        'otp': OTP,
+        'session_code': SESSION_CODE
+    }
+    response = client.json.post(url, data=data)
+    assert response.status_code == 400
+    response_data = json.loads(json.dumps(response.data))
+    assert response_data['non_field_errors'][0] == "OTP has expired"

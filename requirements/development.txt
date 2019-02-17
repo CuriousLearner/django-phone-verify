@@ -4,7 +4,7 @@
 # -------------------------------------
 pytest==4.2.1
 pytest-django==3.4.4
-pytest-cov==2.6.0
+pytest-cov==2.6.1
 
 django-dynamic-fixture==2.0.0
 flake8-mypy==17.8.0

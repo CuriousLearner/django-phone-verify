@@ -22,9 +22,7 @@ DJANGO_SETTINGS = {
         },
         'TOKEN_LENGTH': 6,
         'MESSAGE': 'Welcome to {app}! Please use security code {otp} to proceed.',
-        'APP_NAME': 'FAKE',
-        'APP_BASE_URL': 'fake://',
-        'APP_PATH': 'verify',
-        'OTP_EXPIRATION_TIME': 3600  # In seconds only
+        'APP_NAME': 'Phone Verify',
+        'OTP_EXPIRATION_TIME': 1  # In seconds only
     }
 }
