@@ -1,6 +1,9 @@
 django-phone-verify
 ===================
 
+.. image:: https://travis-ci.org/CuriousLearner/django-phone-verify.svg?branch=master
+    :target: https://travis-ci.org/CuriousLearner/django-phone-verify
+
 A Django app to support phone number verification using security code / One-Time-Password (OTP) sent via SMS.
 
 Salient Features
