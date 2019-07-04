@@ -16,7 +16,9 @@ Salient Features
 - Provides interface for writing custom SMS sending backend for easy extensibility.
 - Does not mess-up with existing `AUTH_USER_MODEL` at all.
 - Can be used for a number of potential cases, and not just auth.
-- Provides ready endpoints for sending SMS and verification.
+- Provides ready endpoints for sending SMS and verification (See `api_endpoints.md`_).
+
+.. _api_endpoints.md: phone_verify/docs/api_endpoints.md
 
 Installation
 ------------
