@@ -14,7 +14,7 @@ __Parameters__
 
 Name         | Type    | Description
 -------------|---------|--------------------------------------
-phone_number | string | phone_number of the user. (should contain the county extension as given in example call)
+phone_number | string | phone_number of the user. (should contain the country extension as given in example call)
 
 
 __Example__
