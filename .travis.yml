@@ -1,0 +1,20 @@
+# For more information about the configurations used in this file, please
+# see the Travis CI documentation: https://docs.travis-ci.com
+
+language: python
+sudo: false
+python:
+  - '3.6.5'
+
+install:
+  - pip install -r requirements/development.txt
+
+script:
+  - flake8
+  - pytest --cov -v --tb=native
+  - ansible-playbook -i provisioner/hosts provisioner/site.yml --syntax-check
+
+notifications:
+  email:
+    on_success: change  # [always|never|change]
+    on_failure: always  # [always|never|change]
