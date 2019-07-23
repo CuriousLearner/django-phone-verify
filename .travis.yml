@@ -1,10 +1,13 @@
 # For more information about the configurations used in this file, please
 # see the Travis CI documentation: https://docs.travis-ci.com
 
+dist: xenial
 language: python
 sudo: false
 python:
-  - '3.6.5'
+  - '3.5'
+  - '3.6'
+  - '3.7'
 
 cache:
   directories:
