@@ -38,7 +38,7 @@ def test_phone_registration_sends_message(client, mocker):
 
 
 def test_otp_session_code_verification_api(client):
-    verification = f.create_verification(
+    f.create_verification(
         otp=OTP, phone_number=PHONE_NUMBER,
         session_code=SESSION_CODE
     )
@@ -54,7 +54,7 @@ def test_otp_session_code_verification_api(client):
 
 
 def test_phone_verification_with_incomplete_payload(client):
-    verification = f.create_verification(
+    f.create_verification(
         otp=OTP, phone_number=PHONE_NUMBER,
         session_code=SESSION_CODE
     )
@@ -78,7 +78,7 @@ def test_phone_verification_with_incomplete_payload(client):
 
 
 def test_phone_verification_with_incorrect_payload(client):
-    verification = f.create_verification(
+    f.create_verification(
         otp=OTP, phone_number=PHONE_NUMBER,
         session_code=SESSION_CODE
     )
@@ -118,7 +118,7 @@ def test_phone_verification_with_incorrect_payload(client):
 
 
 def test_otp_expired(client):
-    verification = f.create_verification(
+    f.create_verification(
         otp=OTP, phone_number=PHONE_NUMBER,
         session_code=SESSION_CODE
     )

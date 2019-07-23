@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 # Third Party Stuff
-import pytest
 from django_dynamic_fixture import G
 
 from django.apps import apps

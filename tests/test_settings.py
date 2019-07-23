@@ -14,7 +14,7 @@ DJANGO_SETTINGS = {
     # PHONE VERIFICATION
     "PHONE_VERIFICATION": {
         'BACKEND': 'phone_verify.backends.twilio.TwilioBackend',
-        'TWILIO_SANDBOX_TOKEN':'123456',
+        'TWILIO_SANDBOX_TOKEN': '123456',
         'OPTIONS': {
             'SID': 'fake',
             'SECRET': 'fake',

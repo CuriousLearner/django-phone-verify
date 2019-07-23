@@ -1,6 +1,5 @@
 # Third Party Stuff
 import rest_framework.response
-from django import http
 
 
 class Response(rest_framework.response.Response):
