@@ -5,8 +5,6 @@ dist: xenial
 language: python
 sudo: false
 python:
-  - '3.5'
-  - '3.6'
   - '3.7'
 
 cache:
@@ -21,7 +19,7 @@ install:
 
 script:
   - flake8
-  - pytest --cov -v --tb=native
+  - tox
 
 notifications:
   email:
