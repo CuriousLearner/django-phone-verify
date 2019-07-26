@@ -16,7 +16,7 @@ before_cache:
 
 install:
   - pip install tox-travis
-  - pip install -r requirements/development.txt
+  - pip install -r requirements/testing.txt
 
 script:
   - flake8
