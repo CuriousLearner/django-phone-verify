@@ -1,0 +1,28 @@
+# For more information about the configurations used in this file, please
+# see the Travis CI documentation: https://docs.travis-ci.com
+
+dist: xenial
+language: python
+sudo: false
+python:
+  - '3.7'
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log
+
+install:
+  - pip install tox-travis
+  - pip install -r requirements/testing.txt
+
+script:
+  - flake8
+  - tox
+
+notifications:
+  email:
+    on_success: change  # [always|never|change]
+    on_failure: always  # [always|never|change]
