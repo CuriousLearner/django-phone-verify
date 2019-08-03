@@ -18,7 +18,7 @@ Salient Features
 - Can be used for a number of potential cases, and not just auth.
 - Provides ready endpoints for sending SMS and verification (See `api_endpoints.md`_).
 
-.. _api_endpoints.md: phone_verify/docs/api_endpoints.md
+.. _api_endpoints.md: phone_verify/docs/api_endpoints.rst
 
 Installation
 ------------
@@ -60,6 +60,10 @@ Usage
             'APP_NAME': 'Phone Verify',
             'OTP_EXPIRATION_TIME': 3600  # In seconds only
         }
+
+- To explore more about how to use `Django Phone Verify`, have a look at `how_to_integrate.rst`_
+
+.. _how_to_integrate.rst: phone_verify/docs/how_to_integrate.rst
 
 Compatibility
 -------------
