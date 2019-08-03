@@ -23,7 +23,7 @@ Salient Features
 Installation
 ------------
 
-.. code::
+.. code-block:: shell
 
     pip install django-phone-verify
 
