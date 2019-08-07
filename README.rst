@@ -18,12 +18,12 @@ Salient Features
 - Can be used for a number of potential cases, and not just auth.
 - Provides ready endpoints for sending SMS and verification (See `api_endpoints.md`_).
 
-.. _api_endpoints.md: phone_verify/docs/api_endpoints.md
+.. _api_endpoints.md: phone_verify/docs/api_endpoints.rst
 
 Installation
 ------------
 
-.. code::
+.. code-block:: shell
 
     pip install django-phone-verify
 
@@ -32,34 +32,38 @@ Usage
 
 - Add app to `INSTALLED_APPS`
 
-    .. code::
+.. code-block:: python
 
-        # In settings.py:
+    # In settings.py:
 
-        # Add app to `INSTALLED_APPS`
-        INSTALLED_APPS = [
-            ...
-            'phone_verify',
-        ]
+    # Add app to `INSTALLED_APPS`
+    INSTALLED_APPS = [
+        ...
+        'phone_verify',
+    ]
 
 - Add settings for Phone Verify as you desire:
 
-    .. code ::
+.. code-block:: python
 
-        # Add settings for phone_verify to work
-        PHONE_VERIFICATION = {
-            'BACKEND': 'phone_verify.backends.twilio.TwilioBackend',
-            'TWILIO_SANDBOX_TOKEN':'123456',
-            'OPTIONS': {
-                'SID': 'fake',
-                'SECRET': 'fake',
-                'FROM': '+14755292729'
-            },
-            'TOKEN_LENGTH': 6,
-            'MESSAGE': 'Welcome to {app}! Please use security code {otp} to proceed.',
-            'APP_NAME': 'Phone Verify',
-            'OTP_EXPIRATION_TIME': 3600  # In seconds only
-        }
+    # Add settings for phone_verify to work
+    PHONE_VERIFICATION = {
+        'BACKEND': 'phone_verify.backends.twilio.TwilioBackend',
+        'TWILIO_SANDBOX_TOKEN':'123456',
+        'OPTIONS': {
+            'SID': 'fake',
+            'SECRET': 'fake',
+            'FROM': '+14755292729'
+        },
+        'TOKEN_LENGTH': 6,
+        'MESSAGE': 'Welcome to {app}! Please use security code {otp} to proceed.',
+        'APP_NAME': 'Phone Verify',
+        'OTP_EXPIRATION_TIME': 3600  # In seconds only
+    }
+
+- To explore more about how to use `Django Phone Verify`, have a look at `usage.rst`_
+
+.. _usage.rst: docs/usage.rst
 
 Compatibility
 -------------
