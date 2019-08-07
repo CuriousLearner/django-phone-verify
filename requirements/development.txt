@@ -3,5 +3,5 @@
 
 # Core Stuff
 # -------------------------------------
-Django==2.1.5
+Django==2.1.11
 djangorestframework==3.9.1
