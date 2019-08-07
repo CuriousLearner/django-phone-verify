@@ -8,10 +8,10 @@ It may be also used for extending doctest's context:
 # Standard Library
 import functools
 
+import django
+
 # Third Party Stuff
 import pytest
-
-import django
 from django.conf import settings
 
 
@@ -31,7 +31,6 @@ def client():
     from django.test import Client
 
     class _Client(Client):
-
         @property
         def json(self):
             """Add json method on the client for sending json type request.
@@ -42,12 +41,15 @@ def client():
             >>> client.json.get(url)
             >>> client.json.post(url, data=json.dumps(payload))
             """
-            return PartialMethodCaller(obj=self, content_type='application/json;charset="utf-8"')
+            return PartialMethodCaller(
+                obj=self, content_type='application/json;charset="utf-8"'
+            )
 
     return _Client()
 
 
 def pytest_configure():
     from tests import test_settings
+
     settings.configure(**test_settings.DJANGO_SETTINGS)
     django.setup()

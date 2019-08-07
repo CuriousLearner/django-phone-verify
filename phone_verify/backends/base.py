@@ -30,23 +30,25 @@ class BaseBackend(object):
         """
         Returns an unique random token
         """
-        token_length = django_settings.PHONE_VERIFICATION.get('TOKEN_LENGTH', DEFAULT_TOKEN_LENGTH)
-        return get_random_string(token_length, allowed_chars='0123456789')
+        token_length = django_settings.PHONE_VERIFICATION.get(
+            "TOKEN_LENGTH", DEFAULT_TOKEN_LENGTH
+        )
+        return get_random_string(token_length, allowed_chars="0123456789")
 
     @classmethod
     def generate_session_token(cls, token, phone_number):
         """
         Returns an unique random token for a particular device
         """
-        data = {
-            "device_%s_session_code" % (phone_number): token,
-        }
+        data = {"device_%s_session_code" % (phone_number): token}
         return jwt.encode(data, django_settings.SECRET_KEY).decode()
 
     @classmethod
     def token_expired(cls, stored_verification):
         time_difference = timezone.now() - stored_verification.created_at
-        if time_difference.seconds > django_settings.PHONE_VERIFICATION.get('OTP_EXPIRATION_TIME'):
+        if time_difference.seconds > django_settings.PHONE_VERIFICATION.get(
+            "OTP_EXPIRATION_TIME"
+        ):
             return True
         return False
 
@@ -69,11 +71,15 @@ class BaseBackend(object):
         SMSVerification.objects.filter(phone_number=number).delete()
 
         # Default otp generated of 6 digits
-        SMSVerification.objects.create(phone_number=number, otp=otp, session_code=session_code)
+        SMSVerification.objects.create(
+            phone_number=number, otp=otp, session_code=session_code
+        )
         return otp, session_code
 
     def validate_token(self, otp, phone_number):
-        stored_verification = SMSVerification.objects.filter(otp=otp, phone_number=phone_number).first()
+        stored_verification = SMSVerification.objects.filter(
+            otp=otp, phone_number=phone_number
+        ).first()
 
         # check otp exists
         if stored_verification is None:

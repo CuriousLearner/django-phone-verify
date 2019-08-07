@@ -25,10 +25,12 @@ class SMSVerificationSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        phone_number = attrs.get('phone_number', None)
-        otp, session_code = attrs.get('otp', None), attrs.get('session_code', None)
+        phone_number = attrs.get("phone_number", None)
+        otp, session_code = attrs.get("otp", None), attrs.get("session_code", None)
         backend = get_sms_backend(phone_number=phone_number)
-        verification, token_validatation = backend.validate_token(otp=otp, phone_number=phone_number)
+        verification, token_validatation = backend.validate_token(
+            otp=otp, phone_number=phone_number
+        )
 
         if verification is None:
             raise serializers.ValidationError(_("OTP is not valid"))

@@ -15,9 +15,9 @@ class TwilioBackend(BaseBackend):
         super(TwilioBackend, self).__init__(**options)
         # Lower case it just to be sure
         options = {key.lower(): value for key, value in options.items()}
-        self._sid = options.get('sid', None)
-        self._secret = options.get('secret', None)  # auth_token
-        self._from = options.get('from', None)
+        self._sid = options.get("sid", None)
+        self._secret = options.get("secret", None)  # auth_token
+        self._from = options.get("from", None)
 
         self.client = TwilioRestClient(self._sid, self._secret)
         self.exception_class = TwilioRestException
@@ -35,10 +35,10 @@ class TwilioSandboxBackend(BaseBackend):
         super(TwilioSandboxBackend, self).__init__(**options)
         # Lower case it just to be sure
         options = {key.lower(): value for key, value in options.items()}
-        self._sid = options.get('sid', None)
-        self._secret = options.get('secret', None)  # auth_token
-        self._from = options.get('from', None)
-        self._token = django_settings.PHONE_VERIFICATION.get('TWILIO_SANDBOX_TOKEN')
+        self._sid = options.get("sid", None)
+        self._secret = options.get("secret", None)  # auth_token
+        self._from = options.get("from", None)
+        self._token = django_settings.PHONE_VERIFICATION.get("TWILIO_SANDBOX_TOKEN")
 
         self.client = TwilioRestClient(self._sid, self._secret)
         self.exception_class = TwilioRestException
