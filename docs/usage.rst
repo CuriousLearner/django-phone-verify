@@ -1,4 +1,4 @@
-How to Integrate Django Phone Verify?
+How to Use Django Phone Verify?
 =====================================
 
 
@@ -13,7 +13,7 @@ Installation
 Configuration
 -------------
 
-- Add app to `INSTALLED_APPS`
+- Add app to *INSTALLED_APPS*:
 
 .. code-block:: python
 
@@ -44,7 +44,7 @@ Configuration
     }
 
 
-- Migrate the database
+- Migrate the database:
 
 .. code-block:: shell
 
@@ -59,15 +59,15 @@ Case 1: Verify phone number before/after user registration
 
 This case is suitable if you simply want to access the endpoints to register and verify a phone number (before or after the user registration).
 
-To access the endpoints available in `api_endpoints.rst`_, you just need to update your API's URLs:
+To access the endpoints available in `api_endpoints.rst`_, you just need to update your API's URLs.
 
-.. _api_endpoints.rst: api_endpoints.rst
+.. _api_endpoints.rst: ../phone_verify/docs/api_endpoints.rst
 
-- Add a default router
+- Add a default router:
 
 .. code-block:: python
 
-    # In api_urls.py
+    # In urls.py
 
     from rest_framework.routers import DefaultRouter
     from phone_verify.api import VerificationViewSet
@@ -77,22 +77,20 @@ To access the endpoints available in `api_endpoints.rst`_, you just need to upda
 
     urlpatterns = default_router.urls
 
-.. note:: It is recommended that you should verify the phone number of users before their registration.
+**NOTE**: It is recommended that you should verify the phone number of users before their registration.
 
 Case 2: Verify phone number at the time of user registration
 ************************************************************
 
-This is the case when you choose to integrate your user registration process with OTP verification.
+This is the case when you choose to integrate your user registration process with phone number verification.
 
-It can be achieved by overriding the default `verify` view of `phone_verify.api.VerificationViewSet`. Following a code example to achieve the same.
+**NOTE**: Here, you'll first register a phone number using ``/api/phone/register`` and then, will use the endpoint ``/api/phone/verify_and_register`` to create a user on successful verification of the phone number.
 
-.. note:: Here, you'll first register a phone number using `/api/phone/register` and then will use the modified functionality of endpoint `/api/phone/verify` to create a user on successfull verification of the phone number.
-
-- Add a default router in `api_urls` to redirect on one of your custom viewset:
+- Add a default router in *urls* to redirect on one of your custom viewset:
 
 .. code-block:: python
 
-    # In api_urls.py
+    # In urls.py
 
     from rest_framework.routers import DefaultRouter
     from yourapp.api import YourCustomViewSet
@@ -104,7 +102,7 @@ It can be achieved by overriding the default `verify` view of `phone_verify.api.
     urlpatterns = default_router.urls
 
 
-- Create YourCustomSerializer:
+- Create *YourCustomSerializer*:
 
 .. code-block:: python
 
@@ -121,11 +119,12 @@ It can be achieved by overriding the default `verify` view of `phone_verify.api.
         first_name = serializers.CharField(default="First")
         ...
 
+
     class YourCustomSerializer(UserSerializer, SMSVerificationSerializer):
         ...
 
 
-- Add a service to create users
+- Add a service to create users:
 
 .. code-block:: python
 
@@ -141,7 +140,7 @@ It can be achieved by overriding the default `verify` view of `phone_verify.api.
         return user
 
 
-- Create YourCustomViewSet:
+- Create *YourCustomViewSet*:
 
 .. code-block:: python
 
@@ -160,7 +159,12 @@ It can be achieved by overriding the default `verify` view of `phone_verify.api.
     class YourCustomViewSet(VerificationViewSet):
 
         @action(detail=False, methods=['POST'], permission_classes=[AllowAny], serializer_class=serializers.YourCustomSerializer)
-        def verify(self, request):
+        def verify_and_register(self, request):
+            """Function to verify phone number and register a user
+
+            Most of the code here is corresponding to the "verify" view already present in the package.
+
+            """
 
             serializer = phone_serializers.SMSVerificationSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -174,4 +178,4 @@ It can be achieved by overriding the default `verify` view of `phone_verify.api.
 
             return Response(serializer.data)
 
-.. note:: Using this method you may not use any other endpoint to register a user. Therefore it is recommended that registration/verification of phone numbers and user registration should be done independently.
+**NOTE**: Using the above method, we are coupling the phone verification and user registration process. One can also override the *verify* view to perform additional actions such as registering the user, registering a company with the verified phone number, etc.

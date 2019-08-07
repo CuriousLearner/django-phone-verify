@@ -61,9 +61,9 @@ Usage
         'OTP_EXPIRATION_TIME': 3600  # In seconds only
     }
 
-- To explore more about how to use `Django Phone Verify`, have a look at `how_to_integrate.rst`_
+- To explore more about how to use `Django Phone Verify`, have a look at `usage.rst`_
 
-.. _how_to_integrate.rst: phone_verify/docs/how_to_integrate.rst
+.. _usage.rst: docs/usage.rst
 
 Compatibility
 -------------
