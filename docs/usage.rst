@@ -178,4 +178,19 @@ This is the case when you choose to integrate your user registration process wit
 
             return Response(serializer.data)
 
-**NOTE**: Using the above method, we are coupling the phone verification and user registration process. One can also override the *verify* view to perform additional actions such as registering the user, registering a company with the verified phone number, etc.
+**NOTE**:
+
+1. Using the above method, we are coupling the phone verification and user registration process. One can also override the ``verify`` view to perform additional actions such as registering the user, registering a company with the verified phone number, etc.
+
+2. After inheriting ``VerificationViewSet``, in case you would like to override ``get_serializer_class``, then after specifying all your conditions, you must return ``self.serializer_class``. For example:
+
+.. code-block:: python
+
+    def get_serializer_class(self):
+        if self.action == 'verify_and_register':
+            return serializers.YourCustomSerializer
+        ...
+        else:
+            return self.serializer_class
+
+Otherwise, serializer classes for ``verify`` and ``register`` views will not be available.

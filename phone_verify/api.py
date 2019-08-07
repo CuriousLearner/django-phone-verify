@@ -11,16 +11,15 @@ from .services import send_otp_and_generate_session_code
 
 
 class VerificationViewSet(viewsets.GenericViewSet):
-    serializer_class = PhoneSerializer
 
-    @action(detail=False, methods=['POST'], permission_classes=[AllowAny])
+    @action(detail=False, methods=['POST'], permission_classes=[AllowAny], serializer_class=PhoneSerializer)
     def register(self, request):
         serializer = PhoneSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         session_code = send_otp_and_generate_session_code(str(serializer.validated_data['phone_number']))
         return response.Ok({'session_code': session_code})
 
-    @action(detail=False, methods=['POST'], permission_classes=[AllowAny])
+    @action(detail=False, methods=['POST'], permission_classes=[AllowAny], serializer_class=SMSVerificationSerializer)
     def verify(self, request):
         serializer = SMSVerificationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
