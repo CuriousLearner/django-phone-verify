@@ -24,7 +24,7 @@ Configuration
         'phone_verify',
     ]
 
-- Add settings for Phone Verify as you desire:
+- Add settings in your ``settings.py`` file:
 
 .. code-block:: python
 
@@ -50,6 +50,7 @@ Configuration
 
     python manage.py migrate
 
+This would create ``SMSVerification`` table, which is used to store ``phone_number``, ``session_code`` and ``otp``.
 
 Usage
 -----
