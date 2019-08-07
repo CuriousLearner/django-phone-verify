@@ -4,4 +4,4 @@
 # Core Stuff
 # -------------------------------------
 Django==2.1.5
-djangorestframework==3.9.0
+djangorestframework==3.9.1
