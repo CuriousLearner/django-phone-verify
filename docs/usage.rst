@@ -195,3 +195,5 @@ This is the case when you choose to integrate your user registration process wit
             return self.serializer_class
 
 Otherwise, serializer classes for ``verify`` and ``register`` views will not be available.
+
+3. Last OTP generated for a number can also be found at `/admin/phone_verify/smsverification/`.
