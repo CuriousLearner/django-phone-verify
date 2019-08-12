@@ -31,6 +31,10 @@ Send OTP on given phone\_number
 
 **Response**
 
+::
+
+    Status: 200 OK
+
 .. code:: json
 
     {
