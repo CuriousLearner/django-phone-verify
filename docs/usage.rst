@@ -196,4 +196,4 @@ This is the case when you choose to integrate your user registration process wit
 
 Otherwise, serializer classes for ``verify`` and ``register`` views will not be available.
 
-3. Last OTP generated for a number can also be found at `/admin/phone_verify/smsverification/`.
+3. Latest passcode generated for a number can also be found at `/admin/phone_verify/smsverification/`.
