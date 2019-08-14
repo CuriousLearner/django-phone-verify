@@ -1,7 +1,6 @@
 How to Use Django Phone Verify?
 =====================================
 
-``django-phone-verify`` provides few APIs which can be added to your list of API endpoints. It's functionality can be extended based on your usecase.
 
 Installation
 ------------
@@ -55,6 +54,8 @@ This would create ``SMSVerification`` table, which is used to store ``phone_numb
 
 Usage
 -----
+
+**NOTE**: ``django-phone-verify`` provides few APIs which can be added to your list of API endpoints. It's functionality can be extended further based on your usecase.
 
 Case 1: Verify phone number before/after user registration
 **********************************************************
