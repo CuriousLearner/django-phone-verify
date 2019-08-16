@@ -55,6 +55,8 @@ This would create ``SMSVerification`` table, which is used to store ``phone_numb
 Usage
 -----
 
+**NOTE**: ``django-phone-verify`` provides few APIs which can be added to your list of API endpoints. Its functionality can be extended further based on your use-case as explained below.
+
 Case 1: Verify phone number before/after user registration
 **********************************************************
 
