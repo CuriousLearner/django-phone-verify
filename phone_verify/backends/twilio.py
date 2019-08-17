@@ -67,5 +67,5 @@ class TwilioSandboxBackend(BaseBackend):
         """
         return self.generate_token()
 
-    def validate_token(self, otp, phone_number):
+    def validate_token(self, security_code, phone_number):
         return self.VALID

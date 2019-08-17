@@ -4,14 +4,14 @@ Authentication
 Phone Registration
 ==================
 
-Send OTP on given phone\_number
--------------------------------
+Send security\_code on given phone\_number
+------------------------------------------
 
 ::
 
     POST /api/phone/register
 
-**NOTE**: Hit again for resending the OTP.
+**NOTE**: Hit again for resending the security\_code.
 
 **Parameters**
 
@@ -37,8 +37,8 @@ Send OTP on given phone\_number
         "session_code": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpb3NfKzkxOTkxMTcxNTkyOV9zZXNzaW9uX2NvZGUiOiI3MTExNDYifQ.XSIBOsfA6kYd8NUE2MlvhdrOZszoWQdzunOGEU_Wr94"
     }
 
-Verify if OTP entered is correct
---------------------------------
+Verify if security\_code entered is correct
+-------------------------------------------
 
 ::
 
@@ -51,7 +51,7 @@ Verify if OTP entered is correct
 +=================+==========+================================================+
 | phone\_number   | string   | phone\_number of the user.                     |
 +-----------------+----------+------------------------------------------------+
-| otp             | string   | One-Time-Password (OTP) for the user           |
+| security\_code  | string   | Security code (security_code) for the user     |
 +-----------------+----------+------------------------------------------------+
 | session\_code   | string   | iOS session code to verify the phone\_number   |
 +-----------------+----------+------------------------------------------------+
@@ -62,7 +62,7 @@ Verify if OTP entered is correct
 
     {
         "phone_number": "+9180765XXX10",
-        "otp": "711146",
+        "security_code": "711146",
         "session_code": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpb3NfKzkxOTkxMTcxNTkyOV9zZXNzaW9uX2NvZGUiOiI3MTExNDYifQ.XSIBOsfA6kYd8NUE2MlvhdrOZszoWQdzunOGEU_Wr94"
     }
 
@@ -75,6 +75,6 @@ Verify if OTP entered is correct
 .. code:: json
 
     {
-        "message": "OTP is valid."
+        "message": "Security code is valid."
     }
 

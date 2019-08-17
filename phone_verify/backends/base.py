@@ -47,45 +47,45 @@ class BaseBackend(object):
     def token_expired(cls, stored_verification):
         time_difference = timezone.now() - stored_verification.created_at
         if time_difference.seconds > django_settings.PHONE_VERIFICATION.get(
-            "OTP_EXPIRATION_TIME"
+            "SECURITY_CODE_EXPIRATION_TIME"
         ):
             return True
         return False
 
-    def create_otp_and_session_token(self, number):
+    def create_security_code_and_session_token(self, number):
         """
-        Creates a temporary otp (OTP) inside the cache, this holds the phone number
+        Creates a temporary security_code inside the cache, this holds the phone number
         as value, so that we can later check if everything is correct.
 
         It also generates a session_code for the client to send in subsequent requests.
 
         :param number: Number of recipient
 
-        :return otp: string of sha otp
+        :return security_code: string of sha security_code
         :return session_code: string of session_code
         """
-        otp = self.generate_token()
-        session_code = self.generate_session_token(otp, number)
+        security_code = self.generate_token()
+        session_code = self.generate_session_token(security_code, number)
 
-        # Delete old OTPs for phone_number if already exists
+        # Delete old security_code(s) for phone_number if already exists
         SMSVerification.objects.filter(phone_number=number).delete()
 
-        # Default otp generated of 6 digits
+        # Default security_code generated of 6 digits
         SMSVerification.objects.create(
-            phone_number=number, otp=otp, session_code=session_code
+            phone_number=number, security_code=security_code, session_code=session_code
         )
-        return otp, session_code
+        return security_code, session_code
 
-    def validate_token(self, otp, phone_number):
+    def validate_token(self, security_code, phone_number):
         stored_verification = SMSVerification.objects.filter(
-            otp=otp, phone_number=phone_number
+            security_code=security_code, phone_number=phone_number
         ).first()
 
-        # check otp exists
+        # check security_code exists
         if stored_verification is None:
             return stored_verification, self.INVALID
 
-        # check otp is not expired
+        # check security_code is not expired
         if self.token_expired(stored_verification):
             return stored_verification, self.EXPIRED
         return stored_verification, self.VALID

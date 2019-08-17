@@ -31,7 +31,7 @@ class TimeStampedUUIDModel(UUIDModel):
 
 
 class SMSVerification(TimeStampedUUIDModel):
-    otp = models.CharField(_("OTP"), max_length=120)
+    security_code = models.CharField(_("Security Code"), max_length=120)
     phone_number = PhoneNumberField(_("Phone Number"))
     session_code = models.CharField(_("Device Session Code"), max_length=500)
 
@@ -40,7 +40,7 @@ class SMSVerification(TimeStampedUUIDModel):
         verbose_name = _("SMS Verification")
         verbose_name_plural = _("SMS Verifications")
         ordering = ("-modified_at",)
-        unique_together = ("otp", "phone_number", "session_code")
+        unique_together = ("security_code", "phone_number", "session_code")
 
     def __str__(self):
-        return "{}: {}".format(str(self.phone_number), self.otp)
+        return "{}: {}".format(str(self.phone_number), self.security_code)
