@@ -13,7 +13,9 @@ from .backends import get_sms_backend
 logger = logging.getLogger(__name__)
 
 # iOS uses "session code" to parse the security code and support copying on clipboard.
-DEFAULT_MESSAGE = "Welcome to {app}, use session code {security_code} for authentication."
+DEFAULT_MESSAGE = (
+    "Welcome to {app}, use session code {security_code} for authentication."
+)
 DEFAULT_APP_NAME = "Phone Verify"
 
 
@@ -41,13 +43,16 @@ class PhoneVerificationService(object):
 
     def _generate_message(self, security_code):
         return self.verification_message.format(
-            app=settings.PHONE_VERIFICATION.get("APP_NAME", DEFAULT_APP_NAME), security_code=security_code
+            app=settings.PHONE_VERIFICATION.get("APP_NAME", DEFAULT_APP_NAME),
+            security_code=security_code,
         )
 
 
 def send_security_code_and_generate_session_code(phone_number):
     sms_backend = get_sms_backend(phone_number)
-    security_code, session_code = sms_backend.create_security_code_and_session_token(phone_number)
+    security_code, session_code = sms_backend.create_security_code_and_session_token(
+        phone_number
+    )
     service = PhoneVerificationService(phone_number=phone_number)
     try:
         service.send_verification(phone_number, security_code)

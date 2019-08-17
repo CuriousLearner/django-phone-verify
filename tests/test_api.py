@@ -38,16 +38,28 @@ def test_phone_registration_sends_message(client, mocker):
 
 
 def test_security_code_session_code_verification_api(client):
-    f.create_verification(security_code=SECURITY_CODE, phone_number=PHONE_NUMBER, session_code=SESSION_CODE)
+    f.create_verification(
+        security_code=SECURITY_CODE,
+        phone_number=PHONE_NUMBER,
+        session_code=SESSION_CODE,
+    )
     url = reverse("phone-verify")
-    data = {"phone_number": PHONE_NUMBER, "security_code": SECURITY_CODE, "session_code": SESSION_CODE}
+    data = {
+        "phone_number": PHONE_NUMBER,
+        "security_code": SECURITY_CODE,
+        "session_code": SESSION_CODE,
+    }
     response = client.json.post(url, data=data)
     assert response.status_code == 200
     assert response.data["message"] == "Security code is valid."
 
 
 def test_phone_verification_with_incomplete_payload(client):
-    f.create_verification(security_code=SECURITY_CODE, phone_number=PHONE_NUMBER, session_code=SESSION_CODE)
+    f.create_verification(
+        security_code=SECURITY_CODE,
+        phone_number=PHONE_NUMBER,
+        session_code=SESSION_CODE,
+    )
     url = reverse("phone-verify")
     data = {"phone_number": PHONE_NUMBER}
     response = client.json.post(url, data=data)
@@ -64,7 +76,11 @@ def test_phone_verification_with_incomplete_payload(client):
 
 
 def test_phone_verification_with_incorrect_payload(client):
-    f.create_verification(security_code=SECURITY_CODE, phone_number=PHONE_NUMBER, session_code=SESSION_CODE)
+    f.create_verification(
+        security_code=SECURITY_CODE,
+        phone_number=PHONE_NUMBER,
+        session_code=SESSION_CODE,
+    )
     url = reverse("phone-verify")
     # Payload with wrong session code
     data = {
@@ -78,14 +94,22 @@ def test_phone_verification_with_incorrect_payload(client):
     assert response_data["non_field_errors"][0] == "Session Code mis-match"
 
     # Payload with wrong security code
-    data = {"phone_number": PHONE_NUMBER, "security_code": "999999", "session_code": SESSION_CODE}
+    data = {
+        "phone_number": PHONE_NUMBER,
+        "security_code": "999999",
+        "session_code": SESSION_CODE,
+    }
     response = client.json.post(url, data=data)
     assert response.status_code == 400
     response_data = json.loads(json.dumps(response.data))
     assert response_data["non_field_errors"][0] == "security_code is not valid"
 
     # Payload with incorrect phone_number
-    data = {"phone_number": "+13478379632", "security_code": SECURITY_CODE, "session_code": SESSION_CODE}
+    data = {
+        "phone_number": "+13478379632",
+        "security_code": SECURITY_CODE,
+        "session_code": SESSION_CODE,
+    }
     response = client.json.post(url, data=data)
     assert response.status_code == 400
     response_data = json.loads(json.dumps(response.data))
@@ -93,10 +117,18 @@ def test_phone_verification_with_incorrect_payload(client):
 
 
 def test_security_code_expired(client):
-    f.create_verification(security_code=SECURITY_CODE, phone_number=PHONE_NUMBER, session_code=SESSION_CODE)
+    f.create_verification(
+        security_code=SECURITY_CODE,
+        phone_number=PHONE_NUMBER,
+        session_code=SESSION_CODE,
+    )
     time.sleep(2)
     url = reverse("phone-verify")
-    data = {"phone_number": PHONE_NUMBER, "security_code": SECURITY_CODE, "session_code": SESSION_CODE}
+    data = {
+        "phone_number": PHONE_NUMBER,
+        "security_code": SECURITY_CODE,
+        "session_code": SESSION_CODE,
+    }
     response = client.json.post(url, data=data)
     assert response.status_code == 400
     response_data = json.loads(json.dumps(response.data))

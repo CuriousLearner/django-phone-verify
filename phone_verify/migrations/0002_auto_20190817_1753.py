@@ -5,19 +5,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('phone_verify', '0001_initial'),
-    ]
+    dependencies = [("phone_verify", "0001_initial")]
 
     operations = [
         migrations.RenameField(
-            model_name='SMSVerification',
-            old_name='otp',
-            new_name='security_code',
+            model_name="SMSVerification", old_name="otp", new_name="security_code"
         ),
         migrations.AlterField(
-            model_name='SMSVerification',
-            name='security_code',
-            field=models.CharField(max_length=120, verbose_name='Security Code'),
+            model_name="SMSVerification",
+            name="security_code",
+            field=models.CharField(max_length=120, verbose_name="Security Code"),
         ),
     ]

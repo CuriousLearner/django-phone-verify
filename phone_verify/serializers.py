@@ -26,7 +26,10 @@ class SMSVerificationSerializer(serializers.Serializer):
     def validate(self, attrs):
         attrs = super().validate(attrs)
         phone_number = attrs.get("phone_number", None)
-        security_code, session_code = attrs.get("security_code", None), attrs.get("session_code", None)
+        security_code, session_code = (
+            attrs.get("security_code", None),
+            attrs.get("session_code", None),
+        )
         backend = get_sms_backend(phone_number=phone_number)
         verification, token_validatation = backend.validate_token(
             security_code=security_code, phone_number=phone_number
