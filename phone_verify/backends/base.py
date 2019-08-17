@@ -87,6 +87,10 @@ class BaseBackend(object):
         if stored_verification is None:
             return stored_verification, self.OTP_INVALID
 
+        # check session code exists
+        if not stored_verification.session_code == session_code:
+            return stored_verification, self.SESSION_CODE_INVALID
+
         # check otp is not expired
         if self.token_expired(stored_verification):
             return stored_verification, self.OTP_EXPIRED
@@ -96,10 +100,6 @@ class BaseBackend(object):
             "VERIFY_OTP_ONLY_ONCE"
         ):
             return stored_verification, self.OTP_VERIFIED
-
-        # check session code exists
-        if not stored_verification.session_code == session_code:
-            return stored_verification, self.SESSION_CODE_INVALID
 
         # mark otp as verified
         stored_verification = SMSVerification.objects.filter(
