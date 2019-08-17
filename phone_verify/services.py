@@ -12,8 +12,8 @@ from .backends import get_sms_backend
 
 logger = logging.getLogger(__name__)
 
-# iOS uses "session code" to parse the OTP and support copying on clipboard.
-DEFAULT_MESSAGE = "Welcome to {app}, use session code {otp} for authentication."
+# iOS uses "session code" to parse the security code and support copying on clipboard.
+DEFAULT_MESSAGE = "Welcome to {app}, use session code {security_code} for authentication."
 DEFAULT_APP_NAME = "Phone Verify"
 
 
@@ -29,28 +29,28 @@ class PhoneVerificationService(object):
         if backend is None:
             self.backend = get_sms_backend(phone_number=phone_number)
 
-    def send_verification(self, number, otp):
+    def send_verification(self, number, security_code):
         """
         Send a verification text to the given number to verify.
 
         :param number: the phone number of recipient.
         """
-        message = self._generate_message(otp)
+        message = self._generate_message(security_code)
 
         self.backend.send_sms(number, message)
 
-    def _generate_message(self, otp):
+    def _generate_message(self, security_code):
         return self.verification_message.format(
-            app=settings.PHONE_VERIFICATION.get("APP_NAME", DEFAULT_APP_NAME), otp=otp
+            app=settings.PHONE_VERIFICATION.get("APP_NAME", DEFAULT_APP_NAME), security_code=security_code
         )
 
 
-def send_otp_and_generate_session_code(phone_number):
+def send_security_code_and_generate_session_code(phone_number):
     sms_backend = get_sms_backend(phone_number)
-    otp, session_code = sms_backend.create_otp_and_session_token(phone_number)
+    security_code, session_code = sms_backend.create_security_code_and_session_token(phone_number)
     service = PhoneVerificationService(phone_number=phone_number)
     try:
-        service.send_verification(phone_number, otp)
+        service.send_verification(phone_number, security_code)
     except service.backend.exception_class as exc:
         logger.error(
             "Error in sending verification code to {phone_number}: "

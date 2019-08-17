@@ -21,21 +21,21 @@ class PhoneSerializer(serializers.Serializer):
 class SMSVerificationSerializer(serializers.Serializer):
     phone_number = PhoneNumberField(required=True)
     session_code = serializers.CharField(required=True)
-    otp = serializers.CharField(required=True)
+    security_code = serializers.CharField(required=True)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
         phone_number = attrs.get("phone_number", None)
-        otp, session_code = attrs.get("otp", None), attrs.get("session_code", None)
+        security_code, session_code = attrs.get("security_code", None), attrs.get("session_code", None)
         backend = get_sms_backend(phone_number=phone_number)
         verification, token_validatation = backend.validate_token(
-            otp=otp, phone_number=phone_number
+            security_code=security_code, phone_number=phone_number
         )
 
         if verification is None:
-            raise serializers.ValidationError(_("OTP is not valid"))
+            raise serializers.ValidationError(_("security_code is not valid"))
         elif not verification.session_code == session_code:
             raise serializers.ValidationError(_("Session Code mis-match"))
         elif token_validatation == backend.EXPIRED:
-            raise serializers.ValidationError(_("OTP has expired"))
+            raise serializers.ValidationError(_("security_code has expired"))
         return attrs

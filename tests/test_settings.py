@@ -13,8 +13,8 @@ DJANGO_SETTINGS = {
         "TWILIO_SANDBOX_TOKEN": "123456",
         "OPTIONS": {"SID": "fake", "SECRET": "fake", "FROM": "+14755292729"},
         "TOKEN_LENGTH": 6,
-        "MESSAGE": "Welcome to {app}! Please use security code {otp} to proceed.",
+        "MESSAGE": "Welcome to {app}! Please use security code {security_code} to proceed.",
         "APP_NAME": "Phone Verify",
-        "OTP_EXPIRATION_TIME": 1,  # In seconds only
+        "SECURITY_CODE_EXPIRATION_TIME": 1,  # In seconds only
     },
 }

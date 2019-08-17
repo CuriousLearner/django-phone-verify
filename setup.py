@@ -14,7 +14,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     license="GPLv3",
-    description="A Django app to support phone number verification using OTP sent via SMS.",
+    description="A Django app to support phone number verification using security code sent via SMS.",
     long_description=README,
     url="https://github.com/CuriousLearner/django-phone-verify",
     author="Sanyam Khurana",
