@@ -4,7 +4,7 @@ django-phone-verify
 .. image:: https://travis-ci.org/CuriousLearner/django-phone-verify.svg?branch=master
     :target: https://travis-ci.org/CuriousLearner/django-phone-verify
 
-A Django app to support phone number verification using security code / One-Time-Password (OTP) sent via SMS.
+A Django app to support phone number verification using security code sent via SMS.
 
 Salient Features
 ----------------
@@ -56,10 +56,10 @@ Usage
             'FROM': '+14755292729'
         },
         'TOKEN_LENGTH': 6,
-        'MESSAGE': 'Welcome to {app}! Please use security code {otp} to proceed.',
+        'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
         'APP_NAME': 'Phone Verify',
-        'OTP_EXPIRATION_TIME': 3600,  # In seconds only
-        'VERIFY_OTP_ONLY_ONCE': True,  # If False, then an OTP can be used multiple times for verification
+        'SECURITY_CODE_EXPIRATION_TIME': 3600  # In seconds only
+        'VERIFY_SECURITY_CODE_ONLY_ONCE': True,  # If False, then a security code can be used multiple times for verification
     }
 
 - To explore more about how to use `Django Phone Verify`, have a look at `usage.rst`_

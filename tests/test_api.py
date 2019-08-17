@@ -14,7 +14,7 @@ from . import factories as f
 
 pytestmark = pytest.mark.django_db
 
-OTP = "123456"
+SECURITY_CODE = "123456"
 PHONE_NUMBER = "+13478379634"
 SESSION_CODE = "phone-auth-session-code"
 
@@ -38,26 +38,38 @@ def test_phone_registration_sends_message(client, mocker):
     )
 
 
-def test_otp_session_code_verification_api(client):
-    f.create_verification(otp=OTP, phone_number=PHONE_NUMBER, session_code=SESSION_CODE)
+def test_security_code_session_code_verification_api(client):
+    f.create_verification(
+        security_code=SECURITY_CODE,
+        phone_number=PHONE_NUMBER,
+        session_code=SESSION_CODE,
+    )
     url = reverse("phone-verify")
-    data = {"phone_number": PHONE_NUMBER, "otp": OTP, "session_code": SESSION_CODE}
+    data = {
+        "phone_number": PHONE_NUMBER,
+        "security_code": SECURITY_CODE,
+        "session_code": SESSION_CODE,
+    }
     response = client.json.post(url, data=data)
     assert response.status_code == 200
-    assert response.data["message"] == "OTP is valid."
+    assert response.data["message"] == "Security code is valid."
 
 
 def test_phone_verification_with_incomplete_payload(client):
-    f.create_verification(otp=OTP, phone_number=PHONE_NUMBER, session_code=SESSION_CODE)
+    f.create_verification(
+        security_code=SECURITY_CODE,
+        phone_number=PHONE_NUMBER,
+        session_code=SESSION_CODE,
+    )
     url = reverse("phone-verify")
     data = {"phone_number": PHONE_NUMBER}
     response = client.json.post(url, data=data)
     assert response.status_code == 400
     response_data = json.loads(json.dumps(response.data))
     assert response_data["session_code"][0] == "This field is required."
-    assert response_data["otp"][0] == "This field is required."
+    assert response_data["security_code"][0] == "This field is required."
 
-    data = {"otp": OTP}
+    data = {"security_code": SECURITY_CODE}
     response = client.json.post(url, data=data)
     assert response.status_code == 400
     response_data = json.loads(json.dumps(response.data))
@@ -65,12 +77,16 @@ def test_phone_verification_with_incomplete_payload(client):
 
 
 def test_phone_verification_with_incorrect_payload(client):
-    f.create_verification(otp=OTP, phone_number=PHONE_NUMBER, session_code=SESSION_CODE)
+    f.create_verification(
+        security_code=SECURITY_CODE,
+        phone_number=PHONE_NUMBER,
+        session_code=SESSION_CODE,
+    )
     url = reverse("phone-verify")
     # Payload with wrong session code
     data = {
         "phone_number": PHONE_NUMBER,
-        "otp": OTP,
+        "security_code": SECURITY_CODE,
         "session_code": "wrong-session-code",
     }
     response = client.json.post(url, data=data)
@@ -78,49 +94,65 @@ def test_phone_verification_with_incorrect_payload(client):
     assert response.status_code == 400
     assert response_data["non_field_errors"][0] == "Session Code mis-match"
 
-    # Payload with wrong OTP
-    data = {"phone_number": PHONE_NUMBER, "otp": "999999", "session_code": SESSION_CODE}
+    # Payload with wrong security code
+    data = {
+        "phone_number": PHONE_NUMBER,
+        "security_code": "999999",
+        "session_code": SESSION_CODE,
+    }
     response = client.json.post(url, data=data)
     assert response.status_code == 400
     response_data = json.loads(json.dumps(response.data))
-    assert response_data["non_field_errors"][0] == "OTP is not valid"
+    assert response_data["non_field_errors"][0] == "Security code is not valid"
 
     # Payload with incorrect phone_number
-    data = {"phone_number": "+13478379632", "otp": OTP, "session_code": SESSION_CODE}
+    data = {
+        "phone_number": "+13478379632",
+        "security_code": SECURITY_CODE,
+        "session_code": SESSION_CODE,
+    }
     response = client.json.post(url, data=data)
     assert response.status_code == 400
     response_data = json.loads(json.dumps(response.data))
-    assert response_data["non_field_errors"][0] == "OTP is not valid"
+    assert response_data["non_field_errors"][0] == "Security code is not valid"
 
 
-def test_otp_expired(client):
-    f.create_verification(otp=OTP, phone_number=PHONE_NUMBER, session_code=SESSION_CODE)
+def test_security_code_expired(client):
+    f.create_verification(
+        security_code=SECURITY_CODE,
+        phone_number=PHONE_NUMBER,
+        session_code=SESSION_CODE,
+    )
     time.sleep(2)
     url = reverse("phone-verify")
-    data = {"phone_number": PHONE_NUMBER, "otp": OTP, "session_code": SESSION_CODE}
+    data = {
+        "phone_number": PHONE_NUMBER,
+        "security_code": SECURITY_CODE,
+        "session_code": SESSION_CODE,
+    }
     response = client.json.post(url, data=data)
     assert response.status_code == 400
     response_data = json.loads(json.dumps(response.data))
-    assert response_data["non_field_errors"][0] == "OTP has expired"
+    assert response_data["non_field_errors"][0] == "Security code has expired"
 
 
-def test_verified_otp(client):
+def test_verified_security_code(client):
     f.create_verification(
-        otp=OTP, phone_number=PHONE_NUMBER, session_code=SESSION_CODE, is_verified=True
+        security_code=SECURITY_CODE, phone_number=PHONE_NUMBER, session_code=SESSION_CODE, is_verified=True
     )
     url = reverse("phone-verify")
-    data = {"phone_number": PHONE_NUMBER, "otp": OTP, "session_code": SESSION_CODE}
+    data = {"phone_number": PHONE_NUMBER, "security_code": SECURITY_CODE, "session_code": SESSION_CODE}
 
-    # OTP verification is restricted to one time
-    settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]["VERIFY_OTP_ONLY_ONCE"] = True
+    # Security code verification is restricted to one time
+    settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]["VERIFY_SECURITY_CODE_ONLY_ONCE"] = True
     response = client.json.post(url, data=data)
     response_data = json.loads(json.dumps(response.data))
     assert response.status_code == 400
-    assert response_data["non_field_errors"][0] == "OTP is already verified"
+    assert response_data["non_field_errors"][0] == "Security code is already verified"
 
-    # OTP verification is not restricted to one time
-    settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]["VERIFY_OTP_ONLY_ONCE"] = False
+    # Security code verification is not restricted to one time
+    settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]["VERIFY_SECURITY_CODE_ONLY_ONCE"] = False
     response = client.json.post(url, data=data)
     response_data = json.loads(json.dumps(response.data))
     assert response.status_code == 200
-    assert response.data["message"] == "OTP is valid."
+    assert response.data["message"] == "Security code is valid."

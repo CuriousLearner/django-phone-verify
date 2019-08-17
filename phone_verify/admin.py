@@ -9,11 +9,11 @@ from .models import SMSVerification
 
 @admin.register(SMSVerification)
 class SMSVerificationAdmin(admin.ModelAdmin):
-    list_display = ("id", "otp", "phone_number", "is_verified", "created_at")
+    list_display = ("id", "security_code", "phone_number", "is_verified", "created_at")
     search_fields = ("phone_number",)
     ordering = ("phone_number",)
     readonly_fields = (
-        "otp",
+        "security_code",
         "phone_number",
         "session_code",
         "is_verified",

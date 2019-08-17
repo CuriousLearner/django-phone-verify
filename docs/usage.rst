@@ -38,9 +38,9 @@ Configuration
             'FROM': '+14755292729'
         },
         'TOKEN_LENGTH': 6,
-        'MESSAGE': 'Welcome to {app}! Please use security code {otp} to proceed.',
+        'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
         'APP_NAME': 'Phone Verify',
-        'OTP_EXPIRATION_TIME': 3600  # In seconds only
+        'SECURITY_CODE_EXPIRATION_TIME': 3600  # In seconds only
     }
 
 
@@ -50,7 +50,7 @@ Configuration
 
     python manage.py migrate
 
-This would create ``SMSVerification`` table, which is used to store ``phone_number``, ``session_code`` and ``otp``.
+This would create ``SMSVerification`` table, which is used to store ``phone_number``, ``session_code`` and ``security_code``.
 
 Usage
 -----
@@ -197,3 +197,5 @@ This is the case when you choose to integrate your user registration process wit
             return self.serializer_class
 
 Otherwise, serializer classes for ``verify`` and ``register`` views will not be available.
+
+3. Latest ``security_code`` generated for a ``phone_number`` can also be found at `/admin/phone_verify/smsverification/` URL.

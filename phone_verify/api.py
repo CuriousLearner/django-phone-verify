@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny
 
 from .base import response
 from .serializers import PhoneSerializer, SMSVerificationSerializer
-from .services import send_otp_and_generate_session_code
+from .services import send_security_code_and_generate_session_code
 
 
 class VerificationViewSet(viewsets.GenericViewSet):
@@ -20,7 +20,7 @@ class VerificationViewSet(viewsets.GenericViewSet):
     def register(self, request):
         serializer = PhoneSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        session_code = send_otp_and_generate_session_code(
+        session_code = send_security_code_and_generate_session_code(
             str(serializer.validated_data["phone_number"])
         )
         return response.Ok({"session_code": session_code})
@@ -34,4 +34,4 @@ class VerificationViewSet(viewsets.GenericViewSet):
     def verify(self, request):
         serializer = SMSVerificationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        return response.Ok({"message": "OTP is valid."})
+        return response.Ok({"message": "Security code is valid."})
