@@ -12,9 +12,11 @@ DEFAULT_TOKEN_LENGTH = 6
 
 
 class BaseBackend(object):
-    VALID = 0
-    INVALID = 1
-    EXPIRED = 2
+    OTP_VALID = 0
+    OTP_INVALID = 1
+    OTP_EXPIRED = 2
+    OTP_VERIFIED = 3
+    SESSION_CODE_INVALID = 4
 
     def __init__(self, **settings):
         self.exception_class = None
@@ -40,7 +42,7 @@ class BaseBackend(object):
         """
         Returns an unique random token for a particular device
         """
-        data = {"device_%s_session_code" % (phone_number): token}
+        data = {"device_%s_session_code" % phone_number: token}
         return jwt.encode(data, django_settings.SECRET_KEY).decode()
 
     @classmethod
@@ -72,20 +74,36 @@ class BaseBackend(object):
 
         # Default otp generated of 6 digits
         SMSVerification.objects.create(
-            phone_number=number, otp=otp, session_code=session_code
+            phone_number=number, otp=otp, session_code=session_code, is_verified=False
         )
         return otp, session_code
 
-    def validate_token(self, otp, phone_number):
+    def validate_token(self, otp, phone_number, session_code):
         stored_verification = SMSVerification.objects.filter(
             otp=otp, phone_number=phone_number
         ).first()
 
         # check otp exists
         if stored_verification is None:
-            return stored_verification, self.INVALID
+            return stored_verification, self.OTP_INVALID
 
         # check otp is not expired
         if self.token_expired(stored_verification):
-            return stored_verification, self.EXPIRED
-        return stored_verification, self.VALID
+            return stored_verification, self.OTP_EXPIRED
+
+        # check otp is not verified
+        if stored_verification.is_verified and django_settings.PHONE_VERIFICATION.get(
+            "VERIFY_OTP_ONLY_ONCE"
+        ):
+            return stored_verification, self.OTP_VERIFIED
+
+        # check session code exists
+        if not stored_verification.session_code == session_code:
+            return stored_verification, self.SESSION_CODE_INVALID
+
+        # mark otp as verified
+        stored_verification = SMSVerification.objects.filter(
+            otp=otp, phone_number=phone_number, session_code=session_code
+        ).update(is_verified=True)
+
+        return stored_verification, self.OTP_VALID

@@ -34,6 +34,7 @@ class SMSVerification(TimeStampedUUIDModel):
     otp = models.CharField(_("OTP"), max_length=120)
     phone_number = PhoneNumberField(_("Phone Number"))
     session_code = models.CharField(_("Device Session Code"), max_length=500)
+    is_verified = models.BooleanField(_("OTP is Verified"), default=True)
 
     class Meta:
         db_table = "sms_verification"

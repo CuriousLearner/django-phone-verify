@@ -58,7 +58,8 @@ Usage
         'TOKEN_LENGTH': 6,
         'MESSAGE': 'Welcome to {app}! Please use security code {otp} to proceed.',
         'APP_NAME': 'Phone Verify',
-        'OTP_EXPIRATION_TIME': 3600  # In seconds only
+        'OTP_EXPIRATION_TIME': 3600,  # In seconds only
+        'VERIFY_OTP_ONLY_ONCE': True,  # If False, then an OTP can be used multiple times for verification
     }
 
 - To explore more about how to use `Django Phone Verify`, have a look at `usage.rst`_

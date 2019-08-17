@@ -9,6 +9,7 @@ import pytest
 from django.apps import apps
 from django.urls import reverse
 
+from . import test_settings as settings
 from . import factories as f
 
 pytestmark = pytest.mark.django_db
@@ -101,3 +102,25 @@ def test_otp_expired(client):
     assert response.status_code == 400
     response_data = json.loads(json.dumps(response.data))
     assert response_data["non_field_errors"][0] == "OTP has expired"
+
+
+def test_verified_otp(client):
+    f.create_verification(
+        otp=OTP, phone_number=PHONE_NUMBER, session_code=SESSION_CODE, is_verified=True
+    )
+    url = reverse("phone-verify")
+    data = {"phone_number": PHONE_NUMBER, "otp": OTP, "session_code": SESSION_CODE}
+
+    # OTP verification is restricted to one time
+    settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]["VERIFY_OTP_ONLY_ONCE"] = True
+    response = client.json.post(url, data=data)
+    response_data = json.loads(json.dumps(response.data))
+    assert response.status_code == 400
+    assert response_data["non_field_errors"][0] == "OTP is already verified"
+
+    # OTP verification is not restricted to one time
+    settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]["VERIFY_OTP_ONLY_ONCE"] = False
+    response = client.json.post(url, data=data)
+    response_data = json.loads(json.dumps(response.data))
+    assert response.status_code == 200
+    assert response.data["message"] == "OTP is valid."

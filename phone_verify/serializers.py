@@ -29,13 +29,16 @@ class SMSVerificationSerializer(serializers.Serializer):
         otp, session_code = attrs.get("otp", None), attrs.get("session_code", None)
         backend = get_sms_backend(phone_number=phone_number)
         verification, token_validatation = backend.validate_token(
-            otp=otp, phone_number=phone_number
+            otp=otp, phone_number=phone_number, session_code=session_code
         )
 
         if verification is None:
             raise serializers.ValidationError(_("OTP is not valid"))
-        elif not verification.session_code == session_code:
+        elif token_validatation == backend.SESSION_CODE_INVALID:
             raise serializers.ValidationError(_("Session Code mis-match"))
-        elif token_validatation == backend.EXPIRED:
+        elif token_validatation == backend.OTP_EXPIRED:
             raise serializers.ValidationError(_("OTP has expired"))
+        elif token_validatation == backend.OTP_VERIFIED:
+            raise serializers.ValidationError(_("OTP is already verified"))
+
         return attrs
