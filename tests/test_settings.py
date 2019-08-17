@@ -16,6 +16,6 @@ DJANGO_SETTINGS = {
         "MESSAGE": "Welcome to {app}! Please use security code {otp} to proceed.",
         "APP_NAME": "Phone Verify",
         "OTP_EXPIRATION_TIME": 1,  # In seconds only
-        "VERIFY_OTP_ONLY_ONCE": True,
+        "VERIFY_OTP_ONLY_ONCE": False,
     },
 }
