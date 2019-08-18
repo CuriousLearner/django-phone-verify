@@ -74,7 +74,7 @@ class BaseBackend(object):
 
         # Default security_code generated of 6 digits
         SMSVerification.objects.create(
-            phone_number=number, security_code=security_code, session_code=session_code, is_verified=False
+            phone_number=number, security_code=security_code, session_code=session_code
         )
         return security_code, session_code
 

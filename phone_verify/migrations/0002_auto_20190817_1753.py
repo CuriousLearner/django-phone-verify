@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='smsverification',
             name='is_verified',
-            field=models.BooleanField(default=True, verbose_name='Security Code Verified'),
+            field=models.BooleanField(default=False, verbose_name='Security Code Verified'),
         ),
     ]

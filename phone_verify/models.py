@@ -34,7 +34,7 @@ class SMSVerification(TimeStampedUUIDModel):
     security_code = models.CharField(_("Security Code"), max_length=120)
     phone_number = PhoneNumberField(_("Phone Number"))
     session_code = models.CharField(_("Device Session Code"), max_length=500)
-    is_verified = models.BooleanField(_("Security Code Verified"), default=True)
+    is_verified = models.BooleanField(_("Security Code Verified"), default=False)
 
     class Meta:
         db_table = "sms_verification"
