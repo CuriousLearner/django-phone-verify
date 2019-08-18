@@ -12,9 +12,11 @@ DEFAULT_TOKEN_LENGTH = 6
 
 
 class BaseBackend(object):
-    VALID = 0
-    INVALID = 1
-    EXPIRED = 2
+    SECURITY_CODE_VALID = 0
+    SECURITY_CODE_INVALID = 1
+    SECURITY_CODE_EXPIRED = 2
+    SECURITY_CODE_VERIFIED = 3
+    SESSION_CODE_INVALID = 4
 
     def __init__(self, **settings):
         self.exception_class = None
@@ -40,7 +42,7 @@ class BaseBackend(object):
         """
         Returns an unique random token for a particular device
         """
-        data = {"device_%s_session_code" % (phone_number): token}
+        data = {"device_%s_session_code" % phone_number: token}
         return jwt.encode(data, django_settings.SECRET_KEY).decode()
 
     @classmethod
@@ -76,16 +78,32 @@ class BaseBackend(object):
         )
         return security_code, session_code
 
-    def validate_token(self, security_code, phone_number):
+    def validate_token(self, security_code, phone_number, session_code):
         stored_verification = SMSVerification.objects.filter(
             security_code=security_code, phone_number=phone_number
         ).first()
 
         # check security_code exists
         if stored_verification is None:
-            return stored_verification, self.INVALID
+            return stored_verification, self.SECURITY_CODE_INVALID
+
+        # check session code exists
+        if not stored_verification.session_code == session_code:
+            return stored_verification, self.SESSION_CODE_INVALID
 
         # check security_code is not expired
         if self.token_expired(stored_verification):
-            return stored_verification, self.EXPIRED
-        return stored_verification, self.VALID
+            return stored_verification, self.SECURITY_CODE_EXPIRED
+
+        # check security_code is not verified
+        if stored_verification.is_verified and django_settings.PHONE_VERIFICATION.get(
+            "VERIFY_SECURITY_CODE_ONLY_ONCE"
+        ):
+            return stored_verification, self.SECURITY_CODE_VERIFIED
+
+        # mark security_code as verified
+        stored_verification = SMSVerification.objects.filter(
+            security_code=security_code, phone_number=phone_number, session_code=session_code
+        ).update(is_verified=True)
+
+        return stored_verification, self.SECURITY_CODE_VALID

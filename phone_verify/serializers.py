@@ -32,13 +32,16 @@ class SMSVerificationSerializer(serializers.Serializer):
         )
         backend = get_sms_backend(phone_number=phone_number)
         verification, token_validatation = backend.validate_token(
-            security_code=security_code, phone_number=phone_number
+            security_code=security_code, phone_number=phone_number, session_code=session_code
         )
 
         if verification is None:
-            raise serializers.ValidationError(_("security_code is not valid"))
-        elif not verification.session_code == session_code:
+            raise serializers.ValidationError(_("Security code is not valid"))
+        elif token_validatation == backend.SESSION_CODE_INVALID:
             raise serializers.ValidationError(_("Session Code mis-match"))
-        elif token_validatation == backend.EXPIRED:
-            raise serializers.ValidationError(_("security_code has expired"))
+        elif token_validatation == backend.SECURITY_CODE_EXPIRED:
+            raise serializers.ValidationError(_("Security code has expired"))
+        elif token_validatation == backend.SECURITY_CODE_VERIFIED:
+            raise serializers.ValidationError(_("Security code is already verified"))
+
         return attrs

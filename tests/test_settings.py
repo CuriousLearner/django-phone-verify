@@ -16,5 +16,6 @@ DJANGO_SETTINGS = {
         "MESSAGE": "Welcome to {app}! Please use security code {security_code} to proceed.",
         "APP_NAME": "Phone Verify",
         "SECURITY_CODE_EXPIRATION_TIME": 1,  # In seconds only
+        "VERIFY_SECURITY_CODE_ONLY_ONCE": False,
     },
 }

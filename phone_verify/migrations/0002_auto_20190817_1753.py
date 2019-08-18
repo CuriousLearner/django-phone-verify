@@ -16,4 +16,9 @@ class Migration(migrations.Migration):
             name="security_code",
             field=models.CharField(max_length=120, verbose_name="Security Code"),
         ),
+        migrations.AddField(
+            model_name='smsverification',
+            name='is_verified',
+            field=models.BooleanField(default=False, verbose_name='Security Code Verified'),
+        ),
     ]

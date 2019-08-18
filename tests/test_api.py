@@ -9,6 +9,7 @@ import pytest
 from django.apps import apps
 from django.urls import reverse
 
+from . import test_settings as settings
 from . import factories as f
 
 pytestmark = pytest.mark.django_db
@@ -102,7 +103,7 @@ def test_phone_verification_with_incorrect_payload(client):
     response = client.json.post(url, data=data)
     assert response.status_code == 400
     response_data = json.loads(json.dumps(response.data))
-    assert response_data["non_field_errors"][0] == "security_code is not valid"
+    assert response_data["non_field_errors"][0] == "Security code is not valid"
 
     # Payload with incorrect phone_number
     data = {
@@ -113,7 +114,7 @@ def test_phone_verification_with_incorrect_payload(client):
     response = client.json.post(url, data=data)
     assert response.status_code == 400
     response_data = json.loads(json.dumps(response.data))
-    assert response_data["non_field_errors"][0] == "security_code is not valid"
+    assert response_data["non_field_errors"][0] == "Security code is not valid"
 
 
 def test_security_code_expired(client):
@@ -132,4 +133,26 @@ def test_security_code_expired(client):
     response = client.json.post(url, data=data)
     assert response.status_code == 400
     response_data = json.loads(json.dumps(response.data))
-    assert response_data["non_field_errors"][0] == "security_code has expired"
+    assert response_data["non_field_errors"][0] == "Security code has expired"
+
+
+def test_verified_security_code(client):
+    f.create_verification(
+        security_code=SECURITY_CODE, phone_number=PHONE_NUMBER, session_code=SESSION_CODE, is_verified=True
+    )
+    url = reverse("phone-verify")
+    data = {"phone_number": PHONE_NUMBER, "security_code": SECURITY_CODE, "session_code": SESSION_CODE}
+
+    # Security code verification is restricted to one time
+    settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]["VERIFY_SECURITY_CODE_ONLY_ONCE"] = True
+    response = client.json.post(url, data=data)
+    response_data = json.loads(json.dumps(response.data))
+    assert response.status_code == 400
+    assert response_data["non_field_errors"][0] == "Security code is already verified"
+
+    # Security code verification is not restricted to one time
+    settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]["VERIFY_SECURITY_CODE_ONLY_ONCE"] = False
+    response = client.json.post(url, data=data)
+    response_data = json.loads(json.dumps(response.data))
+    assert response.status_code == 200
+    assert response.data["message"] == "Security code is valid."
