@@ -58,7 +58,7 @@ Usage
         'TOKEN_LENGTH': 6,
         'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
         'APP_NAME': 'Phone Verify',
-        'SECURITY_CODE_EXPIRATION_TIME': 3600  # In seconds only
+        'SECURITY_CODE_EXPIRATION_TIME': 3600,  # In seconds only
         'VERIFY_SECURITY_CODE_ONLY_ONCE': True,  # If False, then a security code can be used multiple times for verification
     }
 
