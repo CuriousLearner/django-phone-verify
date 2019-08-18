@@ -14,11 +14,11 @@ Salient Features
 - Comes with Twilio already integrated.
 - Set expiration time on tokens.
 - Provides interface for writing custom SMS sending backend for easy extensibility.
-- Does not mess-up with existing `AUTH_USER_MODEL` at all.
+- Does not mess-up with existing ``AUTH_USER_MODEL`` at all.
 - Can be used for a number of potential cases, and not just auth.
-- Provides ready endpoints for sending SMS and verification (See `api_endpoints.md`_).
+- Provides ready endpoints for sending SMS and verification (See `api_endpoints.rst`_).
 
-.. _api_endpoints.md: phone_verify/docs/api_endpoints.rst
+.. _api_endpoints.rst: phone_verify/docs/api_endpoints.rst
 
 Installation
 ------------
@@ -39,28 +39,29 @@ Usage
     # Add app to `INSTALLED_APPS`
     INSTALLED_APPS = [
         ...
-        'phone_verify',
+        "phone_verify",
     ]
 
 - Add settings for Phone Verify as you desire:
 
 .. code-block:: python
 
+    # In settings.py
     # Add settings for phone_verify to work
-    PHONE_VERIFICATION = {
-        'BACKEND': 'phone_verify.backends.twilio.TwilioBackend',
-        'TWILIO_SANDBOX_TOKEN':'123456',
-        'OPTIONS': {
-            'SID': 'fake',
-            'SECRET': 'fake',
-            'FROM': '+14755292729'
+    "PHONE_VERIFICATION" = {
+        "BACKEND": "phone_verify.backends.twilio.TwilioBackend",
+        "TWILIO_SANDBOX_TOKEN": "123456",
+        "OPTIONS": {
+            "SID": "fake",
+            "SECRET": "fake",
+            "FROM": "+14755292729"
         },
-        'TOKEN_LENGTH': 6,
-        'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
-        'APP_NAME': 'Phone Verify',
-        'SECURITY_CODE_EXPIRATION_TIME': 3600,  # In seconds only
-        'VERIFY_SECURITY_CODE_ONLY_ONCE': True,  # If False, then a security code can be used multiple times for verification
-    }
+        "TOKEN_LENGTH": 6,
+        "MESSAGE": "Welcome to {app}! Please use security code {security_code} to proceed.",
+        "APP_NAME": "Phone Verify",
+        "SECURITY_CODE_EXPIRATION_TIME": 3600,  # In seconds only
+        "VERIFY_SECURITY_CODE_ONLY_ONCE": False,  # If False, then a security code can be used multiple times for verification
+    },
 
 - To explore more about how to use `Django Phone Verify`, have a look at `usage.rst`_
 
