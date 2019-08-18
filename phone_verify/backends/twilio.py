@@ -56,16 +56,5 @@ class TwilioSandboxBackend(BaseBackend):
         """
         return self._token
 
-    def create_temporary_token(self, number):
-        """
-        Creates a temporary token inside the cache, this holds the phone number
-        as value, so that we can later check if everything is correct.
-
-        :param number: Number of recipient
-
-        :return token: string of SHA token
-        """
-        return self.generate_security_code()
-
     def validate_security_code(self, security_code, phone_number, session_token):
         return self.VALID

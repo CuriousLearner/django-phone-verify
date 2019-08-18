@@ -27,8 +27,8 @@ Installation
 
     pip install django-phone-verify
 
-Usage
------
+Configuration
+-------------
 
 - Add app to `INSTALLED_APPS`
 
@@ -62,6 +62,9 @@ Usage
         "SECURITY_CODE_EXPIRATION_TIME": 3600,  # In seconds only
         "VERIFY_SECURITY_CODE_ONLY_ONCE": False,  # If False, then a security code can be used multiple times for verification
     },
+
+Usage
+-----
 
 - To explore more about how to use `Django Phone Verify`, have a look at `usage.rst`_
 
