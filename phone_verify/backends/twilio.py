@@ -50,7 +50,7 @@ class TwilioSandboxBackend(BaseBackend):
         for number in numbers:
             self.send_sms(to=number, body=message, from_=self._from)
 
-    def generate_token(self):
+    def generate_security_code(self):
         """
         Returns an fixed token
         """
@@ -65,7 +65,7 @@ class TwilioSandboxBackend(BaseBackend):
 
         :return token: string of SHA token
         """
-        return self.generate_token()
+        return self.generate_security_code()
 
-    def validate_token(self, security_code, phone_number):
+    def validate_security_code(self, security_code, phone_number, session_token):
         return self.VALID

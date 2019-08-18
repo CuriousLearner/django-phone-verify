@@ -25,6 +25,9 @@ class PhoneVerificationService(object):
     except AttributeError:
         raise ImproperlyConfigured("Please define PHONE_VERIFICATION in settings")
 
+    # TODO: Check if the settings are properly configured.
+    # Specially for breaking changes such as addition of `VERIFY_SECURITY_CODE_ONLY_ONCE`
+
     verification_message = phone_settings.get("MESSAGE", DEFAULT_MESSAGE)
 
     def __init__(self, phone_number, backend=None):
@@ -48,9 +51,9 @@ class PhoneVerificationService(object):
         )
 
 
-def send_security_code_and_generate_session_code(phone_number):
+def send_security_code_and_generate_session_token(phone_number):
     sms_backend = get_sms_backend(phone_number)
-    security_code, session_code = sms_backend.create_security_code_and_session_token(
+    security_code, session_token = sms_backend.create_security_code_and_session_token(
         phone_number
     )
     service = PhoneVerificationService(phone_number=phone_number)
@@ -61,4 +64,4 @@ def send_security_code_and_generate_session_code(phone_number):
             "Error in sending verification code to {phone_number}: "
             "{error}".format(phone_number=phone_number, error=exc)
         )
-    return session_code
+    return session_token

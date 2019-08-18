@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny
 
 from .base import response
 from .serializers import PhoneSerializer, SMSVerificationSerializer
-from .services import send_security_code_and_generate_session_code
+from .services import send_security_code_and_generate_session_token
 
 
 class VerificationViewSet(viewsets.GenericViewSet):
@@ -20,10 +20,10 @@ class VerificationViewSet(viewsets.GenericViewSet):
     def register(self, request):
         serializer = PhoneSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        session_code = send_security_code_and_generate_session_code(
+        session_token = send_security_code_and_generate_session_token(
             str(serializer.validated_data["phone_number"])
         )
-        return response.Ok({"session_code": session_code})
+        return response.Ok({"session_token": session_token})
 
     @action(
         detail=False,

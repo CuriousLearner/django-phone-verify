@@ -15,7 +15,7 @@ class SMSVerificationAdmin(admin.ModelAdmin):
     readonly_fields = (
         "security_code",
         "phone_number",
-        "session_code",
+        "session_token",
         "is_verified",
         "created_at",
         "modified_at",

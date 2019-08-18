@@ -50,7 +50,7 @@ Configuration
 
     python manage.py migrate
 
-This would create ``SMSVerification`` table, which is used to store ``phone_number``, ``session_code`` and ``security_code``.
+This would create ``SMSVerification`` table, which is used to store ``phone_number``, ``session_token`` and ``security_code``.
 
 Usage
 -----
