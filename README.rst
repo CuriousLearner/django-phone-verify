@@ -66,7 +66,7 @@ Configuration
 Usage
 -----
 
-- To explore more about how to use `Django Phone Verify`, have a look at `usage.rst`_
+- To explore more about how to use, integrate and leverage existing functionality of `Django Phone Verify`, have a look at `usage.rst`_
 
 .. _usage.rst: docs/usage.rst
 
