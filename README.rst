@@ -48,7 +48,7 @@ Configuration
 
     # In settings.py
     # Add settings for phone_verify to work
-    "PHONE_VERIFICATION" = {
+    PHONE_VERIFICATION = {
         "BACKEND": "phone_verify.backends.twilio.TwilioBackend",
         "TWILIO_SANDBOX_TOKEN": "123456",
         "OPTIONS": {
@@ -78,7 +78,7 @@ Compatibility
 Contributing
 ------------
 
-No code is bug-free and I'm sure this app will have bugs. If you find any bugs, please create an issue on Github.
+No code is bug-free and I'm sure this app will have bugs. If you find any bugs, please create an issue on GitHub.
 
 Licence
 -------
@@ -126,7 +126,7 @@ Added
 Changed
 """""""
 
-- Convert `*.md` docs to rSt Markup.
+- Convert `*.md` docs to reST Markup.
 - Fix issue with installing required package dependecies via ``install_requires``.
 
 [0.1.1]
