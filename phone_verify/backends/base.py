@@ -97,7 +97,8 @@ class BaseBackend(metaclass=ABCMeta):
 
         :param security_code: Security code entered for verification
         :param phone_number: Phone number to be verified
-:param session_token: Session token to identify the device
+        :param session_token: Session token to identify the device
+
         :return stored_verification: Contains the verification object
         corresponding to the phone_number if found, else None.
         :return status: Status for the stored_verification object.

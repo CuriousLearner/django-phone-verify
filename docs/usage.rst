@@ -13,7 +13,7 @@ Installation
 Configuration
 -------------
 
-- Add app to *INSTALLED_APPS*:
+- Add app to ``INSTALLED_APPS``:
 
 .. code-block:: python
 
