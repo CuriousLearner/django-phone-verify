@@ -57,7 +57,7 @@ Verify if security\_code entered is correct
 +-----------------+----------+------------------------------------------------+
 | security\_code  | string   | Security code (security_code) for the user     |
 +-----------------+----------+------------------------------------------------+
-| session\_code   | string   | iOS session code to verify the phone\_number   |
+| session\_token  | string   | iOS session token to verify the phone\_number  |
 +-----------------+----------+------------------------------------------------+
 
 **Request**

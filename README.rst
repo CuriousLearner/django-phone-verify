@@ -75,7 +75,65 @@ Compatibility
 - Django 2.1+
 - Django REST Framework 3.9+
 
+Contributing
+------------
+
+No code is bug-free and I'm sure this app will have bugs. If you find any bugs, please create an issue on Github.
+
 Licence
 -------
 
 GPLv3
+
+Release Notes
+--------------
+
+[dev] -- Unreleased ...
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Added
+"""""
+
+- Support for One-Time Passwords (OTP) using ``VERIFY_SECURITY_CODE_ONLY_ONCE`` as ``True`` in the settings.
+- Script to support makemigrations for development.
+- ``BaseBackend`` status now have ``SECURITY_CODE_VERIFIED`` and ``SESSION_TOKEN_INVALID`` status to support new states.
+
+Changed
+"""""""
+
+- Response for ``/api/phone/register`` contains key ``session_token`` instead of ``session_code``.
+- Request payload for ``/api/phone/verify`` now expects ``session_token`` key instead of ``session_code``.
+- Response for ``/api/phone/verify`` now sends additional response of ``Security code is already verified`` in case ``VERIFY_SECURITY_CODE_ONLY_ONCE`` is set to ``True``.
+- Rename ``otp`` to ``security_code`` in code and docs to be more consistent.
+- Rename ``BaseBackend`` status from ``VALID``, ``INVALID``, ``EXPIRED`` to ``SECURITY_CODE_VALID``, ``SECURITY_CODE_INVALID``, and ``SECURITY_CODE_EXPIRED`` respectively.
+- Rename ``session_code`` to ``session_token`` to be consistent in code and naming across the app.
+- Rename service ``send_otp_and_generate_session_code`` to ``send_security_code_and_generate_session_token``.
+- Rename method ``BaseBackend.generate_token`` to ``BaseBackend.generate_security_code``.
+- Rename method ``create_otp_and_session_token`` to ``create_security_code_and_session_token``.
+- Rename method ``BaseBackend.validate_token`` to ``validate_security_code`` with an additional parameter of ``session_token``.
+
+[0.2.0]
+^^^^^^^
+
+Added
+"""""
+
+- ``pre-commit-config`` to maintain code quality using black and other useful tools.
+- Docs for integration and usage in `usage.rst`_.
+- Tox for testing on `py{37}-django{20,21,22}`.
+- Travis CI for testing builds.
+
+Changed
+"""""""
+
+- Convert `*.md` docs to rSt Markup.
+- Fix issue with installing required package dependecies via ``install_requires``.
+
+[0.1.1]
+^^^^^^^
+
+Added
+"""""
+
+-
+- Intial app setup.
