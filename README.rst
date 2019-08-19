@@ -18,7 +18,7 @@ Salient Features
 - Can be used for a number of potential cases, and not just auth.
 - Provides ready endpoints for sending SMS and verification (See `api_endpoints.rst`_).
 
-.. _api_endpoints.rst: phone_verify/docs/api_endpoints.rst
+.. _api_endpoints.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/phone_verify/docs/api_endpoints.rst
 
 Installation
 ------------
@@ -68,7 +68,7 @@ Usage
 
 - To explore more about how to use, integrate and leverage existing functionality of `Django Phone Verify`, have a look at `usage.rst`_
 
-.. _usage.rst: docs/usage.rst
+.. _usage.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/usage.rst
 
 Compatibility
 -------------
