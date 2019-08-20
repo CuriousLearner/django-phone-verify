@@ -47,7 +47,7 @@ class BaseBackend(metaclass=ABCMeta):
         Returns an unique random JWT token using Django's `SECRET_KEY`
         for identifying a particular device in subsequent calls.
         """
-        data = {"device_%s_session_code" % phone_number: security_code}
+        data = {"device_%s_session_token" % phone_number: security_code}
         return jwt.encode(data, django_settings.SECRET_KEY).decode()
 
     @classmethod
@@ -93,7 +93,7 @@ class BaseBackend(metaclass=ABCMeta):
     def validate_security_code(self, security_code, phone_number, session_token):
         """
         A utitilty method to verify if the `security_code` entered is valid for
-        a given `phone_number` along with the `session_code` used.
+        a given `phone_number` along with the `session_token` used.
 
         :param security_code: Security code entered for verification
         :param phone_number: Phone number to be verified

@@ -61,7 +61,7 @@ Configuration
         "APP_NAME": "Phone Verify",
         "SECURITY_CODE_EXPIRATION_TIME": 3600,  # In seconds only
         "VERIFY_SECURITY_CODE_ONLY_ONCE": False,  # If False, then a security code can be used multiple times for verification
-    },
+    }
 
 Usage
 -----

@@ -52,9 +52,9 @@ class TwilioSandboxBackend(BaseBackend):
 
     def generate_security_code(self):
         """
-        Returns an fixed token
+        Returns an fixed security code
         """
         return self._token
 
     def validate_security_code(self, security_code, phone_number, session_token):
-        return self.VALID
+        return self.SECURITY_CODE_VALID
