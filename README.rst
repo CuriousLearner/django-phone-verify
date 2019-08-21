@@ -4,18 +4,35 @@ django-phone-verify
 .. image:: https://travis-ci.org/CuriousLearner/django-phone-verify.svg?branch=master
     :target: https://travis-ci.org/CuriousLearner/django-phone-verify
 
-A Django app to support phone number verification using security code sent via SMS.
+.. image:: https://pypip.in/license/django-phone-verify/badge.svg
+    :target: https://pypi.python.org/pypi/django-phone-verify/
+    :alt: License
+
+.. image:: https://img.shields.io/badge/Made%20with-Python-1f425f.svg
+   :target: https://www.python.org/
+
+.. image:: https://img.shields.io/badge/Maintained%3F-yes-green.svg
+   :target: https://GitHub.com/CuriousLearner/django-phone-verify/graphs/commit-activity
+
+.. image:: https://badge.fury.io/py/django-phone-verify.svg
+   :target: https://pypi.python.org/pypi/django-phone-verify/
+
+.. image:: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
+   :target: http://makeapullrequest.com
+
+
+A Django app to support phone number verification using the security code sent via SMS.
 
 Salient Features
 ----------------
 
 - Let's you verify phone numbers via SMS.
-- Extensibility to provide different length of tokens.
+- Extensibility to provide tokens with varying length.
 - Comes with Twilio already integrated.
 - Set expiration time on tokens.
-- Provides interface for writing custom SMS sending backend for easy extensibility.
+- Provides an interface for writing custom SMS sending backend for easy extensibility.
 - Does not mess-up with existing ``AUTH_USER_MODEL`` at all.
-- Can be used for a number of potential cases, and not just auth.
+- Can be used for a number of potential use-cases, and not just auth.
 - Provides ready endpoints for sending SMS and verification (See `api_endpoints.rst`_).
 
 .. _api_endpoints.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/phone_verify/docs/api_endpoints.rst
@@ -127,7 +144,7 @@ Changed
 """""""
 
 - Convert `*.md` docs to reST Markup.
-- Fix issue with installing required package dependecies via ``install_requires``.
+- Fix issue with installing required package dependencies via ``install_requires``.
 
 [0.1.1]
 ^^^^^^^
@@ -136,4 +153,4 @@ Added
 """""
 
 -
-- Intial app setup.
+- Initial app setup.
