@@ -153,5 +153,7 @@ Changed
 Added
 """""
 
--
-- Initial app setup.
+- README and documentation of API endpoints.
+- `setup.cfg` to manage coverage.
+- `phone_verify` app including backends, requirements, tests.
+- Intial app setup.
