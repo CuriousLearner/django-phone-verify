@@ -2,7 +2,6 @@
 from __future__ import absolute_import
 
 # Third Party Stuff
-from django.conf import settings as django_settings
 from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client as TwilioRestClient
 
@@ -38,7 +37,7 @@ class TwilioSandboxBackend(BaseBackend):
         self._sid = options.get("sid", None)
         self._secret = options.get("secret", None)  # auth_token
         self._from = options.get("from", None)
-        self._token = django_settings.PHONE_VERIFICATION.get("TWILIO_SANDBOX_TOKEN")
+        self._token = options.get("twilio_sandbox_token", None)
 
         self.client = TwilioRestClient(self._sid, self._secret)
         self.exception_class = TwilioRestException
