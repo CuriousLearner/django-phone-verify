@@ -58,7 +58,7 @@ class NexmoSandboxBackend(BaseBackend):
 
     def generate_security_code(self):
         """
-        Returns an fixed security code
+        Returns a fixed security code
         """
         return self._token
 
