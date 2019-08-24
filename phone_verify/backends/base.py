@@ -34,7 +34,7 @@ class BaseBackend(metaclass=ABCMeta):
     @classmethod
     def generate_security_code(cls):
         """
-        Returns an unique random `security_code` for given `TOKEN_LENGTH` in the settings.
+        Returns a unique random `security_code` for given `TOKEN_LENGTH` in the settings.
         """
         token_length = django_settings.PHONE_VERIFICATION.get(
             "TOKEN_LENGTH", DEFAULT_TOKEN_LENGTH
@@ -44,7 +44,7 @@ class BaseBackend(metaclass=ABCMeta):
     @classmethod
     def generate_session_token(cls, security_code, phone_number):
         """
-        Returns an unique random JWT token using Django's `SECRET_KEY`
+        Returns a unique random JWT token using Django's `SECRET_KEY`
         for identifying a particular device in subsequent calls.
         """
         data = {"device_%s_session_token" % phone_number: security_code}
