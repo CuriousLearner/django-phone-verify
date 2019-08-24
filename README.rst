@@ -118,6 +118,7 @@ Added
 Changed
 """""""
 
+- Fix signature for ``send_bulk_sms`` method in ``TwilioBackend`` and ``TwilioSandboxBackend``.
 - Response for ``/api/phone/register`` contains key ``session_token`` instead of ``session_code``.
 - Request payload for ``/api/phone/verify`` now expects ``session_token`` key instead of ``session_code``.
 - Response for ``/api/phone/verify`` now sends additional response of ``Security code is already verified`` in case ``VERIFY_SECURITY_CODE_ONLY_ONCE`` is set to ``True``.
