@@ -51,7 +51,6 @@ class PhoneVerificationService(object):
     def _check_required_settings(self):
         required_settings = {
             "BACKEND",
-            "TWILIO_SANDBOX_TOKEN",
             "OPTIONS",
             "TOKEN_LENGTH",
             "MESSAGE",
