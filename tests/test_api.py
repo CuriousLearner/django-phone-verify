@@ -92,7 +92,7 @@ def test_phone_verification_with_incorrect_payload(client):
     response = client.json.post(url, data=data)
     response_data = json.loads(json.dumps(response.data))
     assert response.status_code == 400
-    assert response_data["non_field_errors"][0] == "Session Code mis-match"
+    assert response_data["non_field_errors"][0] == "Session Token mis-match"
 
     # Payload with wrong security code
     data = {
