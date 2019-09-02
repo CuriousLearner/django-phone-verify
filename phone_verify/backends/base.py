@@ -34,7 +34,7 @@ class BaseBackend(metaclass=ABCMeta):
     @classmethod
     def generate_security_code(cls):
         """
-        Returns a unique random `security_code` for given `TOKEN_LENGTH` in the settings.
+        Returns a unique random ``security_code`` for given ``TOKEN_LENGTH`` in the settings.
         """
         token_length = django_settings.PHONE_VERIFICATION.get(
             "TOKEN_LENGTH", DEFAULT_TOKEN_LENGTH
@@ -44,7 +44,7 @@ class BaseBackend(metaclass=ABCMeta):
     @classmethod
     def generate_session_token(cls, security_code, phone_number):
         """
-        Returns a unique random JWT token using Django's `SECRET_KEY`
+        Returns a unique random JWT token using Django's ``SECRET_KEY``
         for identifying a particular device in subsequent calls.
         """
         data = {"device_%s_session_token" % phone_number: security_code}
@@ -53,7 +53,7 @@ class BaseBackend(metaclass=ABCMeta):
     @classmethod
     def check_security_code_expiry(cls, stored_verification):
         """
-        Returns True if the `security_code` for the `stored_verification` is expired.
+        Returns True if the ``security_code`` for the ``stored_verification`` is expired.
         """
         time_difference = timezone.now() - stored_verification.created_at
         if time_difference.seconds > django_settings.PHONE_VERIFICATION.get(
@@ -64,10 +64,10 @@ class BaseBackend(metaclass=ABCMeta):
 
     def create_security_code_and_session_token(self, number):
         """
-        Creates a temporary `security_code` and `session_token` inside the DB.
+        Creates a temporary ``security_code`` and ``session_token`` inside the DB.
 
-        `security_code` is the code that user would enter to verify their phone_number.
-        `session_token` is used to verify if the subsequent call for verification is
+        ``security_code`` is the code that user would enter to verify their phone_number.
+        ``session_token`` is used to verify if the subsequent call for verification is
         by the same device that initiated a phone number verification in the
         first place.
 
@@ -92,8 +92,8 @@ class BaseBackend(metaclass=ABCMeta):
 
     def validate_security_code(self, security_code, phone_number, session_token):
         """
-        A utitilty method to verify if the `security_code` entered is valid for
-        a given `phone_number` along with the `session_token` used.
+        A utility method to verify if the ``security_code`` entered is valid for
+        a given ``phone_number`` along with the ``session_token`` used.
 
         :param security_code: Security code entered for verification
         :param phone_number: Phone number to be verified
