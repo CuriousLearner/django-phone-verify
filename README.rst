@@ -83,7 +83,7 @@ Configuration
 Usage
 -----
 
-- To explore more about how to use, integrate and leverage existing functionality of `Django Phone Verify`, have a look at `usage.rst`_
+- To explore more about how to use, integrate and leverage existing functionality of ``Django Phone Verify``, have a look at `usage.rst`_
 
 .. _usage.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/usage.rst
 
@@ -144,7 +144,7 @@ Added
 Changed
 """""""
 
-- Convert `*.md` docs to reST Markup.
+- Convert ``*.md`` docs to reST Markup.
 - Fix issue with installing required package dependencies via ``install_requires``.
 
 [0.1.1]
