@@ -22,6 +22,7 @@ setup(
     install_requires=[
         "django>=2.1.5",
         "djangorestframework>=3.9.0",
+        "PyJWT>=1.7.1",
         "python-dotenv>=0.10.0",
         "phonenumbers>=8.10.2",
         "django-phonenumber-field>=2.1.0",
