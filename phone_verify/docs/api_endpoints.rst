@@ -38,7 +38,7 @@ Send security\_code on given phone\_number
 .. code:: json
 
     {
-        "session_code": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpb3NfKzkxOTkxMTcxNTkyOV9zZXNzaW9uX2NvZGUiOiI3MTExNDYifQ.XSIBOsfA6kYd8NUE2MlvhdrOZszoWQdzunOGEU_Wr94"
+        "session_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpb3NfKzkxOTkxMTcxNTkyOV9zZXNzaW9uX2NvZGUiOiI3MTExNDYifQ.XSIBOsfA6kYd8NUE2MlvhdrOZszoWQdzunOGEU_Wr94"
     }
 
 Verify if security\_code entered is correct
@@ -57,7 +57,7 @@ Verify if security\_code entered is correct
 +-----------------+----------+------------------------------------------------+
 | security\_code  | string   | Security code (security_code) for the user     |
 +-----------------+----------+------------------------------------------------+
-| session\_code   | string   | iOS session code to verify the phone\_number   |
+| session\_token  | string   | iOS session token to verify the phone\_number  |
 +-----------------+----------+------------------------------------------------+
 
 **Request**
@@ -67,7 +67,7 @@ Verify if security\_code entered is correct
     {
         "phone_number": "+9180765XXX10",
         "security_code": "711146",
-        "session_code": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpb3NfKzkxOTkxMTcxNTkyOV9zZXNzaW9uX2NvZGUiOiI3MTExNDYifQ.XSIBOsfA6kYd8NUE2MlvhdrOZszoWQdzunOGEU_Wr94"
+        "session_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpb3NfKzkxOTkxMTcxNTkyOV9zZXNzaW9uX2NvZGUiOiI3MTExNDYifQ.XSIBOsfA6kYd8NUE2MlvhdrOZszoWQdzunOGEU_Wr94"
     }
 
 **Response**
@@ -81,4 +81,3 @@ Verify if security\_code entered is correct
     {
         "message": "Security code is valid."
     }
-

@@ -2,7 +2,6 @@
 from __future__ import absolute_import
 
 # Third Party Stuff
-from django.conf import settings as django_settings
 from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client as TwilioRestClient
 
@@ -27,7 +26,7 @@ class TwilioBackend(BaseBackend):
 
     def send_bulk_sms(self, numbers, message):
         for number in numbers:
-            self.send_sms(to=number, body=message, from_=self._from)
+            self.send_sms(number=number, message=message)
 
 
 class TwilioSandboxBackend(BaseBackend):
@@ -38,7 +37,7 @@ class TwilioSandboxBackend(BaseBackend):
         self._sid = options.get("sid", None)
         self._secret = options.get("secret", None)  # auth_token
         self._from = options.get("from", None)
-        self._token = django_settings.PHONE_VERIFICATION.get("TWILIO_SANDBOX_TOKEN")
+        self._token = options.get("twilio_sandbox_token")
 
         self.client = TwilioRestClient(self._sid, self._secret)
         self.exception_class = TwilioRestException
@@ -48,24 +47,13 @@ class TwilioSandboxBackend(BaseBackend):
 
     def send_bulk_sms(self, numbers, message):
         for number in numbers:
-            self.send_sms(to=number, body=message, from_=self._from)
+            self.send_sms(number=number, message=message)
 
-    def generate_token(self):
+    def generate_security_code(self):
         """
-        Returns an fixed token
+        Returns a fixed security code
         """
         return self._token
 
-    def create_temporary_token(self, number):
-        """
-        Creates a temporary token inside the cache, this holds the phone number
-        as value, so that we can later check if everything is correct.
-
-        :param number: Number of recipient
-
-        :return token: string of SHA token
-        """
-        return self.generate_token()
-
-    def validate_token(self, security_code, phone_number):
-        return self.VALID
+    def validate_security_code(self, security_code, phone_number, session_token):
+        return self.SECURITY_CODE_VALID

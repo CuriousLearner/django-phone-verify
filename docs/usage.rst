@@ -13,7 +13,7 @@ Installation
 Configuration
 -------------
 
-- Add app to *INSTALLED_APPS*:
+- Add app to ``INSTALLED_APPS``:
 
 .. code-block:: python
 
@@ -31,11 +31,11 @@ Configuration
     # Settings for phone_verify
     PHONE_VERIFICATION = {
         'BACKEND': 'phone_verify.backends.twilio.TwilioBackend',
-        'TWILIO_SANDBOX_TOKEN':'123456',
         'OPTIONS': {
             'SID': 'fake',
             'SECRET': 'fake',
-            'FROM': '+14755292729'
+            'FROM': '+14755292729',
+            'TWILIO_SANDBOX_TOKEN':'123456',
         },
         'TOKEN_LENGTH': 6,
         'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
@@ -50,7 +50,7 @@ Configuration
 
     python manage.py migrate
 
-This would create ``SMSVerification`` table, which is used to store ``phone_number``, ``session_code`` and ``security_code``.
+This would create ``SMSVerification`` table, which is used to store ``phone_number``, ``session_token`` and ``security_code``.
 
 Usage
 -----
@@ -198,4 +198,4 @@ This is the case when you choose to integrate your user registration process wit
 
 Otherwise, serializer classes for ``verify`` and ``register`` views will not be available.
 
-3. Latest ``security_code`` generated for a ``phone_number`` can also be found at `/admin/phone_verify/smsverification/` URL.
+3. Latest ``security_code`` generated for a ``phone_number`` can be found at ``/admin/phone_verify/smsverification/`` URL.

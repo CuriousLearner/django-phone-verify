@@ -20,25 +20,27 @@ class PhoneSerializer(serializers.Serializer):
 
 class SMSVerificationSerializer(serializers.Serializer):
     phone_number = PhoneNumberField(required=True)
-    session_code = serializers.CharField(required=True)
+    session_token = serializers.CharField(required=True)
     security_code = serializers.CharField(required=True)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
         phone_number = attrs.get("phone_number", None)
-        security_code, session_code = (
+        security_code, session_token = (
             attrs.get("security_code", None),
-            attrs.get("session_code", None),
+            attrs.get("session_token", None),
         )
         backend = get_sms_backend(phone_number=phone_number)
-        verification, token_validatation = backend.validate_token(
-            security_code=security_code, phone_number=phone_number, session_code=session_code
+        verification, token_validatation = backend.validate_security_code(
+            security_code=security_code,
+            phone_number=phone_number,
+            session_token=session_token,
         )
 
         if verification is None:
             raise serializers.ValidationError(_("Security code is not valid"))
-        elif token_validatation == backend.SESSION_CODE_INVALID:
-            raise serializers.ValidationError(_("Session Code mis-match"))
+        elif token_validatation == backend.SESSION_TOKEN_INVALID:
+            raise serializers.ValidationError(_("Session Token mis-match"))
         elif token_validatation == backend.SECURITY_CODE_EXPIRED:
             raise serializers.ValidationError(_("Security code has expired"))
         elif token_validatation == backend.SECURITY_CODE_VERIFIED:
