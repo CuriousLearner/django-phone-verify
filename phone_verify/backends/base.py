@@ -92,7 +92,7 @@ class BaseBackend(metaclass=ABCMeta):
 
     def validate_security_code(self, security_code, phone_number, session_token):
         """
-        A utitilty method to verify if the `security_code` entered is valid for
+        A utility method to verify if the `security_code` entered is valid for
         a given `phone_number` along with the `session_token` used.
 
         :param security_code: Security code entered for verification

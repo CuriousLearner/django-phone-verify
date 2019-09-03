@@ -16,7 +16,7 @@ pytestmark = pytest.mark.django_db
 
 SECURITY_CODE = "123456"
 PHONE_NUMBER = "+13478379634"
-SESSION_TOKEN = "phone-auth-session-code"
+SESSION_TOKEN = "phone-auth-session-token"
 
 
 def test_phone_registration_sends_message(client, mocker):
@@ -83,16 +83,16 @@ def test_phone_verification_with_incorrect_payload(client):
         session_token=SESSION_TOKEN,
     )
     url = reverse("phone-verify")
-    # Payload with wrong session code
+    # Payload with wrong session token
     data = {
         "phone_number": PHONE_NUMBER,
         "security_code": SECURITY_CODE,
-        "session_token": "wrong-session-code",
+        "session_token": "wrong-session-token",
     }
     response = client.json.post(url, data=data)
     response_data = json.loads(json.dumps(response.data))
     assert response.status_code == 400
-    assert response_data["non_field_errors"][0] == "Session Code mis-match"
+    assert response_data["non_field_errors"][0] == "Session Token mis-match"
 
     # Payload with wrong security code
     data = {

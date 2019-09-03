@@ -26,7 +26,7 @@ A Django app to support phone number verification using the security code sent v
 Salient Features
 ----------------
 
-- Let's you verify phone numbers via SMS.
+- Lets you verify phone numbers via SMS.
 - Extensibility to provide tokens with varying length.
 - Comes with Twilio already integrated.
 - Set expiration time on tokens.
@@ -83,7 +83,7 @@ Configuration
 Usage
 -----
 
-- To explore more about how to use, integrate and leverage existing functionality of `Django Phone Verify`, have a look at `usage.rst`_
+- To explore more about how to use, integrate and leverage existing functionality of ``Django Phone Verify``, have a look at `usage.rst`_
 
 .. _usage.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/usage.rst
 
@@ -128,7 +128,7 @@ Changed
 - Rename service ``send_otp_and_generate_session_code`` to ``send_security_code_and_generate_session_token``.
 - Rename method ``BaseBackend.generate_token`` to ``BaseBackend.generate_security_code``.
 - Rename method ``create_otp_and_session_token`` to ``create_security_code_and_session_token``.
-- Rename method ``BaseBackend.validate_token`` to ``validate_security_code`` with an additional parameter of ``session_token``.
+- Rename method ``BaseBackend.validate_token`` to ``BaseBackend.validate_security_code`` with an additional parameter of ``session_token``.
 
 [0.2.0]
 ^^^^^^^
@@ -144,7 +144,7 @@ Added
 Changed
 """""""
 
-- Convert `*.md` docs to reST Markup.
+- Convert ``*.md`` docs to reST Markup.
 - Fix issue with installing required package dependencies via ``install_requires``.
 
 [0.1.1]
@@ -153,5 +153,7 @@ Changed
 Added
 """""
 
--
-- Initial app setup.
+- README and documentation of API endpoints.
+- ``setup.cfg`` to manage coverage.
+- ``phone_verify`` app including backends, requirements, tests.
+- Intial app setup.

@@ -31,6 +31,7 @@ class PhoneVerificationService(object):
     verification_message = phone_settings.get("MESSAGE", DEFAULT_MESSAGE)
 
     def __init__(self, phone_number, backend=None):
+        self._check_required_settings()
         if backend is None:
             self.backend = get_sms_backend(phone_number=phone_number)
 
@@ -49,6 +50,24 @@ class PhoneVerificationService(object):
             app=settings.PHONE_VERIFICATION.get("APP_NAME", DEFAULT_APP_NAME),
             security_code=security_code,
         )
+
+    def _check_required_settings(self):
+        required_settings = {
+            "BACKEND",
+            "OPTIONS",
+            "TOKEN_LENGTH",
+            "MESSAGE",
+            "APP_NAME",
+            "SECURITY_CODE_EXPIRATION_TIME",
+            "VERIFY_SECURITY_CODE_ONLY_ONCE",
+        }
+        user_settings = set(settings.PHONE_VERIFICATION.keys())
+        if not required_settings.issubset(user_settings):
+            raise ImproperlyConfigured(
+                "Please specify following settings in settings.py: {}".format(
+                    ", ".join(required_settings - user_settings)
+                )
+            )
 
 
 def send_security_code_and_generate_session_token(phone_number):

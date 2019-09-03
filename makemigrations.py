@@ -23,8 +23,12 @@ DJANGO_SETTINGS = {
     # PHONE VERIFICATION
     "PHONE_VERIFICATION": {
         "BACKEND": "phone_verify.backends.twilio.TwilioBackend",
-        "TWILIO_SANDBOX_TOKEN": "123456",
-        "OPTIONS": {"SID": "fake", "SECRET": "fake", "FROM": "+14755292729"},
+        "OPTIONS": {
+            "SID": "fake",
+            "SECRET": "fake",
+            "FROM": "+14755292729",
+            "TWILIO_SANDBOX_TOKEN": "123456",
+        },
         "TOKEN_LENGTH": 6,
         "MESSAGE": "Welcome to {app}! Please use security code {security_code} to proceed.",
         "APP_NAME": "Phone Verify",
