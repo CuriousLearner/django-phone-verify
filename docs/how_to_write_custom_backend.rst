@@ -42,7 +42,7 @@ You can write your own backend for any service of your choice, instead of ``Twil
     class NexmoBackend(BaseBackend):
 
         def __init__(self, **options):
-            super(NexmoBackend, self).__init__(**options)
+            super().__init__(**options)
 
             # Lower case it just to be sure
             options = {key.lower(): value for key, value in options.items()}
@@ -62,7 +62,7 @@ Initialize your class constructor with ``options`` dictionary which contains all
     ...
 
     def __init__(self, **options):
-        super(NexmoBackend, self).__init__(**options)
+        super().__init__(**options)
 
         # Lower case it just to be sure
         options = {key.lower(): value for key, value in options.items()}
@@ -118,7 +118,7 @@ The above steps will remain same if you wish to create a sandbox utility for you
     class NexmoSandboxBackend(BaseBackend):
 
         def __init__(self, **options):
-            super(NexmoBackend, self).__init__(**options)
+            super().__init__(**options)
 
             # Lower case it just to be sure
             options = {key.lower(): value for key, value in options.items()}

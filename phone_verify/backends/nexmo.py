@@ -11,7 +11,7 @@ from .base import BaseBackend
 class NexmoBackend(BaseBackend):
 
     def __init__(self, **options):
-        super(NexmoBackend, self).__init__(**options)
+        super().__init__(**options)
 
         # Lower case it just to be sure
         options = {key.lower(): value for key, value in options.items()}
@@ -35,7 +35,7 @@ class NexmoBackend(BaseBackend):
 
 class NexmoSandboxBackend(BaseBackend):
     def __init__(self, **options):
-        super(NexmoSandboxBackend, self).__init__(**options)
+        super().__init__(**options)
         # Lower case it just to be sure
         options = {key.lower(): value for key, value in options.items()}
         self._key = options.get("key", None)

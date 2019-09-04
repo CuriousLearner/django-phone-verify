@@ -25,9 +25,6 @@ class PhoneVerificationService(object):
     except AttributeError:
         raise ImproperlyConfigured("Please define PHONE_VERIFICATION in settings")
 
-    # TODO: Check if the settings are properly configured.
-    # Specially for breaking changes such as addition of `VERIFY_SECURITY_CODE_ONLY_ONCE`
-
     verification_message = phone_settings.get("MESSAGE", DEFAULT_MESSAGE)
 
     def __init__(self, phone_number, backend=None):
