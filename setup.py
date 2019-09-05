@@ -10,7 +10,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name="django-phone-verify",
-    version="0.2.0",
+    version="1.0.0",
     packages=find_packages(),
     include_package_data=True,
     license="GPLv3",
@@ -22,6 +22,7 @@ setup(
     install_requires=[
         "django>=2.1.5",
         "djangorestframework>=3.9.0",
+        "PyJWT>=1.7.1",
         "python-dotenv>=0.10.0",
         "phonenumbers>=8.10.2",
         "django-phonenumber-field>=2.1.0",
@@ -29,7 +30,7 @@ setup(
     ],
     classifiers=[
         "Environment :: Web Environment",
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Framework :: Django",
         "Framework :: Django :: 2.1",
         "Intended Audience :: Developers",
