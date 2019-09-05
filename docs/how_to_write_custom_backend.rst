@@ -19,7 +19,7 @@ You can write your own backend for any service of your choice, instead of ``Twil
             'KEY': 'Fake Key',
             'SECRET': 'Fake secret',
             'FROM': '+1232328372987',
-            'NEXMO_SANDBOX_TOKEN': '123456', # Optional for sandbox utility
+            'SANDBOX_TOKEN': '123456', # Optional for sandbox utility
         },
         'TOKEN_LENGTH': 6,
         'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
@@ -106,7 +106,7 @@ The above steps will remain same if you wish to create a sandbox utility for you
 
 1. Create a custom sandbox class for your service. Let's say ``NexmoSandboxBackend``. Again, it must inherit from ``BaseBackend``.
 
-2. Define your class's constructor same as above. Just fetch ``NEXMO_SANDBOX_TOKEN`` from the settings as well. Also, override ``send_sms`` and ``send_bulk_sms`` for your service same as above.
+2. Define your class's constructor same as above. Just fetch ``SANDBOX_TOKEN`` from the settings as well. Also, override ``send_sms`` and ``send_bulk_sms`` for your service same as above.
 
 .. code-block:: python
 
@@ -125,7 +125,7 @@ The above steps will remain same if you wish to create a sandbox utility for you
             self._key = options.get("key", None)
             self._secret = options.get("secret", None)
             self._from = options.get("from", None)
-            self._token = options.get("nexmo_sandbox_token", None) # Fetch sandbox token for your service.
+            self._token = options.get("sandbox_token", None) # Fetch sandbox token for your service.
 
             # Create a Nexmo Client object
             self.client = nexmo.Client(key=self._key, secret=self._secret)
@@ -183,7 +183,7 @@ Now your Sandbox class is ready to be used. To use this class, give path to this
             'KEY': 'Fake Key',
             'SECRET': 'Fake secret',
             'FROM': '+1232328372987',
-            'NEXMO_SANDBOX_TOKEN': '123456', # Optional for sandbox utility
+            'SANDBOX_TOKEN': '123456', # Optional for sandbox utility
         },
         'TOKEN_LENGTH': 6,
         'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',

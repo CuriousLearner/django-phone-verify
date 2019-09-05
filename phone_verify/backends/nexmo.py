@@ -41,7 +41,7 @@ class NexmoSandboxBackend(BaseBackend):
         self._key = options.get("key", None)
         self._secret = options.get("secret", None)
         self._from = options.get("from", None)
-        self._token = options.get("nexmo_sandbox_token", None)
+        self._token = options.get("sandbox_token", None)
 
         self.client = nexmo.Client(key=self._key, secret=self._secret)
 
