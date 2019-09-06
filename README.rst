@@ -4,6 +4,9 @@ django-phone-verify
 .. image:: https://travis-ci.org/CuriousLearner/django-phone-verify.svg?branch=master
     :target: https://travis-ci.org/CuriousLearner/django-phone-verify
 
+.. image:: https://coveralls.io/repos/github/CuriousLearner/django-phone-verify/badge.svg?branch=master
+    :target: https://coveralls.io/github/CuriousLearner/django-phone-verify?branch=master
+
 .. image:: https://pypip.in/license/django-phone-verify/badge.svg
     :target: https://pypi.python.org/pypi/django-phone-verify/
     :alt: License

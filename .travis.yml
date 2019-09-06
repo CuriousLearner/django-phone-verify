@@ -16,11 +16,13 @@ before_cache:
 
 install:
   - pip install tox-travis
+  - pip install coveralls
   - pip install -r requirements/testing.txt
 
 script:
   - flake8
   - tox
+  - coveralls
 
 notifications:
   email:
