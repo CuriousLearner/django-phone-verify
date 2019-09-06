@@ -71,7 +71,7 @@ Configuration
             "SID": "fake",
             "SECRET": "fake",
             "FROM": "+14755292729",
-            "TWILIO_SANDBOX_TOKEN": "123456",
+            "SANDBOX_TOKEN": "123456",
         },
         "TOKEN_LENGTH": 6,
         "MESSAGE": "Welcome to {app}! Please use security code {security_code} to proceed.",
@@ -118,6 +118,7 @@ Added
 Changed
 """""""
 
+- Rename ``TWILIO_SANDBOX_TOKEN`` to ``SANDBOX_TOKEN``.
 - Fix signature for ``send_bulk_sms`` method in ``TwilioBackend`` and ``TwilioSandboxBackend``.
 - Response for ``/api/phone/register`` contains key ``session_token`` instead of ``session_code``.
 - Request payload for ``/api/phone/verify`` now expects ``session_token`` key instead of ``session_code``.
