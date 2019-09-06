@@ -114,6 +114,7 @@ Release Notes
 Added
 """""
 
+- Add coverage report through ``coveralls``.
 - Support for One-Time Passwords (OTP) using ``VERIFY_SECURITY_CODE_ONLY_ONCE`` as ``True`` in the settings.
 - Script to support makemigrations for development.
 - ``BaseBackend`` status now have ``SECURITY_CODE_VERIFIED`` and ``SESSION_TOKEN_INVALID`` status to support new states.
