@@ -1,7 +1,7 @@
 How to write custom backend?
 ============================
 
-You can write your own backend for any service of your choice, instead of ``Twilio`` and ``Nexmo``, which are already provided by ``django-phone-verify``.
+In case you want to use anything other than the provided backends (``phone_verify.backends.nexmo.NexmoBackend`` and ``phone_verify.backends.twilio.TwilioBackend``), you can write a custom backend by extending ``phone_verify.backends.base.BaseBackend`` as shown below.
 
 **Note**: For this tutorial, we will consider writing backend for ``Nexmo``. The steps will remain same for any other service.
 
@@ -13,13 +13,13 @@ You can write your own backend for any service of your choice, instead of ``Twil
 
     # Settings for phone_verify
     PHONE_VERIFICATION = {
-        'BACKEND': 'nexmo.NexmoBackend', # Path to the custom backend class which we will be creating in further steps
+        'BACKEND': 'nexmo.NexmoBackend',  # Path to the custom backend class which we will be creating in further steps
         'OPTIONS': {
             # define options required for your service
             'KEY': 'Fake Key',
             'SECRET': 'Fake secret',
             'FROM': '+1232328372987',
-            'SANDBOX_TOKEN': '123456', # Optional for sandbox utility
+            'SANDBOX_TOKEN': '123456',  # Optional for sandbox utility
         },
         'TOKEN_LENGTH': 6,
         'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
@@ -30,7 +30,7 @@ You can write your own backend for any service of your choice, instead of ``Twil
 
 **Note**: You may use a client for your service(if available) to send sms or you may directly use the APIs for that service. Since, ``NEXMO`` has a client called ``nexmo``, we will be leveraging its functionality.
 
-3. Create a class ``NexmoBackend`` within ``nexmo.py``. You must inherit your custom class with ``BaseBackend``.
+3. Create a class ``NexmoBackend`` within ``nexmo.py``. You must inherit your custom class with ``phone_verify.backends.base.BaseBackend``.
 
 .. code-block:: python
 
@@ -55,7 +55,7 @@ You can write your own backend for any service of your choice, instead of ``Twil
 
 Initialize your class constructor with ``options`` dictionary which contains all the settings specific to your service defined in ``settings.py``. We have fetched each setting from ``options`` in above piece of code. Apart from it, we have created a client for our service by providing it the necessary settings.
 
-4. Override ``send_sms`` method of ``BaseBackend`` class to implement functionality for sending sms. It must have two positional parameters ``number`` and ``message`` respectively.
+4. Override ``send_sms`` method of ``phone_verify.backends.base.BaseBackend`` class to implement functionality for sending sms. It must have two positional parameters ``number`` and ``message`` respectively.
 
 .. code-block:: python
 
@@ -81,7 +81,7 @@ Initialize your class constructor with ``options`` dictionary which contains all
             'text': message,
         })
 
-5. For sending bulk messages, you must override ``send_bulk_sms`` method of ``BaseBackend`` class. It must have two positional parameters ``numbers`` and ``message`` respectively.
+5. For sending bulk messages, you must override ``send_bulk_sms`` method of ``phone_verify.backends.base.BaseBackend`` class. It must have two positional parameters ``numbers`` and ``message`` respectively.
 
 .. code-block:: python
 
@@ -104,9 +104,9 @@ How to create custom Sandbox Service
 
 The above steps will remain same if you wish to create a sandbox utility for your service. We'll create a new class with keeping above steps in mind. Apart from it, we will need to override a few more methods and tweak our ``__init__`` method a bit.
 
-1. Create a custom sandbox class for your service. Let's say ``NexmoSandboxBackend``. Again, it must inherit from ``BaseBackend``.
+1. Create a custom sandbox class for your service, ``NexmoSandboxBackend`` inherited from ``phone_verify.backends.base.BaseBackend``.
 
-2. Define your class's constructor same as above. Just fetch ``SANDBOX_TOKEN`` from the settings as well. Also, override ``send_sms`` and ``send_bulk_sms`` for your service same as above.
+2. The constructor for your sandbox environment can get the ``SANDBOX_TOKEN`` from settings as shown. This enables you to keep the token constant for testing purposes. You can then override ``send_sms`` and ``send_bulk_sms`` for the service as done in case of creating actual custom backend.
 
 .. code-block:: python
 
@@ -125,7 +125,7 @@ The above steps will remain same if you wish to create a sandbox utility for you
             self._key = options.get("key", None)
             self._secret = options.get("secret", None)
             self._from = options.get("from", None)
-            self._token = options.get("sandbox_token", None) # Fetch sandbox token for your service.
+            self._token = options.get("sandbox_token", None)  # Fetch sandbox token for your service.
 
             # Create a Nexmo Client object
             self.client = nexmo.Client(key=self._key, secret=self._secret)
@@ -171,19 +171,19 @@ The above steps will remain same if you wish to create a sandbox utility for you
 
 It must have ``security_code``, ``phone_number`` and ``session_token`` as its positional parameters.
 
-Now your Sandbox class is ready to be used. To use this class, give path to this class in your ``PHONE_VERIFY`` settings ``BACKEND`` key.
+In order to use this new custom backend class, it should be replaced in the ``BACKEND`` key under ``PHONE_VERIFICATION`` settings as shown below.
 
 .. code-block:: python
 
    # Settings for phone_verify
     PHONE_VERIFICATION = {
-        'BACKEND': 'nexmo.NexmoSandboxBackend', # Path to the custom sandbox class
+        'BACKEND': 'nexmo.NexmoSandboxBackend',  # Path to the custom sandbox class
         'OPTIONS': {
             # define options required for your service
             'KEY': 'Fake Key',
             'SECRET': 'Fake secret',
             'FROM': '+1232328372987',
-            'SANDBOX_TOKEN': '123456', # Optional for sandbox utility
+            'SANDBOX_TOKEN': '123456',  # Optional for sandbox utility
         },
         'TOKEN_LENGTH': 6,
         'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
