@@ -28,7 +28,7 @@ In case you want to use anything other than the provided backends (``phone_verif
         'VERIFY_SECURITY_CODE_ONLY_ONCE': True,  # If False, then a security code can be used multiple times for verification
     }
 
-**Note**: You may use a client for your service(if available) to send sms or you may directly use the APIs for that service. Since, ``NEXMO`` has a client called ``nexmo``, we will be leveraging its functionality.
+**Note**: You may use a client for your service(if available) to send SMS or you may directly use the APIs for that service. Since, ``Nexmo`` has a client called ``nexmo``, we will be leveraging its functionality.
 
 3. Create a class ``NexmoBackend`` within ``nexmo.py``. You must inherit your custom class with ``phone_verify.backends.base.BaseBackend``.
 
@@ -55,7 +55,7 @@ In case you want to use anything other than the provided backends (``phone_verif
 
 Initialize your class constructor with ``options`` dictionary which contains all the settings specific to your service defined in ``settings.py``. We have fetched each setting from ``options`` in above piece of code. Apart from it, we have created a client for our service by providing it the necessary settings.
 
-4. Override ``send_sms`` method of ``phone_verify.backends.base.BaseBackend`` class to implement functionality for sending sms. It must have two positional parameters ``number`` and ``message`` respectively.
+4. Override ``send_sms`` method of ``phone_verify.backends.base.BaseBackend`` class to implement functionality for sending SMS. It must have two positional parameters ``number`` and ``message`` respectively.
 
 .. code-block:: python
 
@@ -74,7 +74,7 @@ Initialize your class constructor with ``options`` dictionary which contains all
         self.client = nexmo.Client(key=self._key, secret=self._secret)
 
     def send_sms(self, number, message):
-        # Implement your service's send sms functionality
+        # Implement your service's SMS sending functionality
         self.client.send_message({
             'from': self._from,
             'to': number,
@@ -88,7 +88,7 @@ Initialize your class constructor with ``options`` dictionary which contains all
     ...
 
     def send_sms(self, number, message):
-        # Implement your service's send sms functionality
+        # Implement your service's SMS sending functionality
         self.client.send_message({
             'from': self._from,
             'to': number,
@@ -99,8 +99,8 @@ Initialize your class constructor with ``options`` dictionary which contains all
         for number in numbers:
             self.send_sms(self, number=number, message=message)
 
-How to create custom Sandbox Service
-------------------------------------
+How to create custom Sandbox Service?
+-------------------------------------
 
 The above steps will remain same if you wish to create a sandbox utility for your service. We'll create a new class with keeping above steps in mind. Apart from it, we will need to override a few more methods and tweak our ``__init__`` method a bit.
 
@@ -131,7 +131,7 @@ The above steps will remain same if you wish to create a sandbox utility for you
             self.client = nexmo.Client(key=self._key, secret=self._secret)
 
         def send_sms(self, number, message):
-            # Implement your service's send sms functionality
+            # Implement your service's SMS sending functionality
             self.client.send_message({
                 'from': self._from,
                 'to': number,
