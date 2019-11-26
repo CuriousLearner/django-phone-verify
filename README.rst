@@ -109,6 +109,12 @@ GPLv3
 
 Release Notes
 --------------
+[1.0.1]
+^^^^^^^
+
+Changed
+"""""""
+- Updated ``base.validate_security_code`` to use ``save()`` instead of ``update()`` allowing Django to emit its ``post_save()`` signal.
 
 [dev] -- Unreleased ...
 ^^^^^^^^^^^^^^^^^^^^^^^
