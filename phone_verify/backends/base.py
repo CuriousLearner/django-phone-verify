@@ -24,7 +24,7 @@ class BaseBackend(metaclass=ABCMeta):
         self.exception_class = None
 
     @abstractmethod
-    def send_sms(self, numbers, message):
+    def send_sms(self, number, message):
         raise NotImplementedError()
 
     @abstractmethod

@@ -12,12 +12,11 @@ from django.urls import reverse
 from . import test_settings as settings
 from . import factories as f
 
-pytestmark = pytest.mark.django_db
+PYTESTMARK = pytest.mark.django_db
 
 SECURITY_CODE = "123456"
 PHONE_NUMBER = "+13478379634"
 SESSION_TOKEN = "phone-auth-session-token"
-
 
 def test_phone_registration_sends_message(client, mocker):
     url = reverse("phone-register")
@@ -32,8 +31,8 @@ def test_phone_registration_sends_message(client, mocker):
     assert response.status_code == 200
     assert twilio_api.called
     assert "session_token" in response.data
-    SMSVerification = apps.get_model("phone_verify", "SMSVerification")
-    assert SMSVerification.objects.get(
+    sms_verification = apps.get_model("phone_verify", "SMSVerification")
+    assert sms_verification.objects.get(
         session_token=response.data["session_token"], phone_number=phone_number
     )
 
