@@ -21,7 +21,7 @@ DEFAULT_APP_NAME = "Phone Verify"
 
 class PhoneVerificationService(object):
     try:
-        phone_settings = settings.PHONE_VERIFICATION
+        phone_settings = settings.PHONE_VERIFICATION['DEFAULT']
     except AttributeError:
         raise ImproperlyConfigured("Please define PHONE_VERIFICATION in settings")
 
@@ -44,7 +44,7 @@ class PhoneVerificationService(object):
 
     def _generate_message(self, security_code):
         return self.verification_message.format(
-            app=settings.PHONE_VERIFICATION.get("APP_NAME", DEFAULT_APP_NAME),
+            app=settings.PHONE_VERIFICATION['DEFAULT'].get("APP_NAME", DEFAULT_APP_NAME),
             security_code=security_code,
         )
 
@@ -58,7 +58,7 @@ class PhoneVerificationService(object):
             "SECURITY_CODE_EXPIRATION_TIME",
             "VERIFY_SECURITY_CODE_ONLY_ONCE",
         }
-        user_settings = set(settings.PHONE_VERIFICATION.keys())
+        user_settings = set(settings.PHONE_VERIFICATION['DEFAULT'].keys())
         if not required_settings.issubset(user_settings):
             raise ImproperlyConfigured(
                 "Please specify following settings in settings.py: {}".format(
