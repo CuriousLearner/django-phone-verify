@@ -57,7 +57,7 @@ class BaseBackend(metaclass=ABCMeta):
         """
         time_difference = timezone.now() - stored_verification.created_at
         if time_difference.seconds > django_settings.PHONE_VERIFICATION['DEFAULT'].get(
-            "SECURITY_CODE_EXPIRATION_TIME"
+                "SECURITY_CODE_EXPIRATION_TIME"
         ):
             return True
         return False
@@ -127,7 +127,7 @@ class BaseBackend(metaclass=ABCMeta):
 
         # check security_code is not verified
         if stored_verification.is_verified and django_settings.PHONE_VERIFICATION['DEFAULT'].get(
-            "VERIFY_SECURITY_CODE_ONLY_ONCE"
+                "VERIFY_SECURITY_CODE_ONLY_ONCE"
         ):
             return stored_verification, self.SECURITY_CODE_VERIFIED
 

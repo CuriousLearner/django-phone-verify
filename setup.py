@@ -27,6 +27,7 @@ setup(
         "phonenumbers>=8.10.2",
         "django-phonenumber-field>=2.1.0",
         "twilio>=6.21.0",
+        "kavenegar>=1.1.2",
     ],
     classifiers=[
         "Environment :: Web Environment",
