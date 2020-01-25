@@ -13,8 +13,8 @@ def get_sms_backend(phone_number):
     if not backend:
         backend_import = DEFAULT_SERVICE
 
-        if settings.PHONE_VERIFICATION['DEFAULT'].get("BACKEND", None):
-            backend_import = settings.PHONE_VERIFICATION['DEFAULT']["BACKEND"]
+        if settings.PHONE_VERIFICATION.get("BACKEND", None):
+            backend_import = settings.PHONE_VERIFICATION["BACKEND"]
 
         backend_cls = import_string(backend_import)
-        return backend_cls(**settings.PHONE_VERIFICATION['DEFAULT']["OPTIONS"])
+        return backend_cls(**settings.PHONE_VERIFICATION["OPTIONS"])

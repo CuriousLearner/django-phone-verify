@@ -23,14 +23,27 @@ def test_phone_registration_sends_message(client, mocker):
     url = reverse("phone-register")
     phone_number = PHONE_NUMBER
     data = {"phone_number": phone_number}
-    twilio_api = mocker.patch(
+    api = mocker.patch(
         "phone_verify.services.PhoneVerificationService.send_verification"
     )
 
     response = client.post(url, data)
 
     assert response.status_code == 200
-    assert twilio_api.called
+    assert api.called
+    assert "session_token" in response.data
+    sms_verification = apps.get_model("phone_verify", "SMSVerification")
+    assert sms_verification.objects.get(
+        session_token=response.data["session_token"], phone_number=phone_number
+    )
+
+    settings.DJANGO_SETTINGS["PHONE_VERIFICATION"][
+        "BACKEND"
+    ] = 'phone_verify.backends.kavenegar.KavenegarBackend'
+    response = client.post(url, data)
+
+    assert response.status_code == 200
+    assert api.called
     assert "session_token" in response.data
     sms_verification = apps.get_model("phone_verify", "SMSVerification")
     assert sms_verification.objects.get(
@@ -151,7 +164,7 @@ def test_verified_security_code(client):
     }
 
     # Security code verification is restricted to one time
-    settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]['DEFAULT'][
+    settings.DJANGO_SETTINGS["PHONE_VERIFICATION"][
         "VERIFY_SECURITY_CODE_ONLY_ONCE"
     ] = True
     response = client.json.post(url, data=data)
@@ -160,7 +173,7 @@ def test_verified_security_code(client):
     assert response_data["non_field_errors"][0] == "Security code is already verified"
 
     # Security code verification is not restricted to one time
-    settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]['DEFAULT'][
+    settings.DJANGO_SETTINGS["PHONE_VERIFICATION"][
         "VERIFY_SECURITY_CODE_ONLY_ONCE"
     ] = False
     response = client.json.post(url, data=data)

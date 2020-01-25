@@ -36,7 +36,7 @@ class BaseBackend(metaclass=ABCMeta):
         """
         Returns a unique random `security_code` for given `TOKEN_LENGTH` in the settings.
         """
-        token_length = django_settings.PHONE_VERIFICATION['DEFAULT'].get(
+        token_length = django_settings.PHONE_VERIFICATION.get(
             "TOKEN_LENGTH", DEFAULT_TOKEN_LENGTH
         )
         return get_random_string(token_length, allowed_chars="0123456789")
@@ -56,7 +56,7 @@ class BaseBackend(metaclass=ABCMeta):
         Returns True if the `security_code` for the `stored_verification` is expired.
         """
         time_difference = timezone.now() - stored_verification.created_at
-        if time_difference.seconds > django_settings.PHONE_VERIFICATION['DEFAULT'].get(
+        if time_difference.seconds > django_settings.PHONE_VERIFICATION.get(
                 "SECURITY_CODE_EXPIRATION_TIME"
         ):
             return True
@@ -126,7 +126,7 @@ class BaseBackend(metaclass=ABCMeta):
             return stored_verification, self.SECURITY_CODE_EXPIRED
 
         # check security_code is not verified
-        if stored_verification.is_verified and django_settings.PHONE_VERIFICATION['DEFAULT'].get(
+        if stored_verification.is_verified and django_settings.PHONE_VERIFICATION.get(
                 "VERIFY_SECURITY_CODE_ONLY_ONCE"
         ):
             return stored_verification, self.SECURITY_CODE_VERIFIED
