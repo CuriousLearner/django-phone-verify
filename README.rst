@@ -83,7 +83,7 @@ Configuration
         "VERIFY_SECURITY_CODE_ONLY_ONCE": False,  # If False, then a security code can be used multiple times for verification
     }
 
-- In case of using Kavenegar as your backend service, you have to replace ``BACKEND`` with ``phone_verify.backends.kavenegar.KavenegarBackend`` and locate your ``API-KEY` in ``SECRET`` and ``SENDER`` in ``FROM``, extra fields could be omitted.
+- In case of using Kavenegar as your backend service, you have to replace ``BACKEND`` with ``phone_verify.backends.kavenegar.KavenegarBackend`` and locate your ``API-KEY`` in ``SECRET`` and ``SENDER`` in ``FROM``, extra fields could be omitted.
 Usage
 -----
 
