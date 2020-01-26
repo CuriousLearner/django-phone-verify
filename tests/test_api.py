@@ -23,14 +23,14 @@ def test_phone_registration_sends_message(client, mocker):
     url = reverse("phone-register")
     phone_number = PHONE_NUMBER
     data = {"phone_number": phone_number}
-    api = mocker.patch(
-        "phone_verify.services.PhoneVerificationService.send_verification"
+    twilio_api = mocker.patch(
+        "twilio.rest.Client"
     )
 
     response = client.post(url, data)
 
     assert response.status_code == 200
-    assert api.called
+    assert twilio_api.called
     assert "session_token" in response.data
     sms_verification = apps.get_model("phone_verify", "SMSVerification")
     assert sms_verification.objects.get(
@@ -40,10 +40,13 @@ def test_phone_registration_sends_message(client, mocker):
     settings.DJANGO_SETTINGS["PHONE_VERIFICATION"][
         "BACKEND"
     ] = 'phone_verify.backends.kavenegar.KavenegarBackend'
+    kavenegar_api = mocker.patch(
+        "kavenegar.KavenegarAPI"
+    )
     response = client.post(url, data)
 
     assert response.status_code == 200
-    assert api.called
+    assert kavenegar_api.called
     assert "session_token" in response.data
     sms_verification = apps.get_model("phone_verify", "SMSVerification")
     assert sms_verification.objects.get(

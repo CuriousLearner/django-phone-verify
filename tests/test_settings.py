@@ -21,6 +21,5 @@ DJANGO_SETTINGS = {
         "APP_NAME": "Phone Verify",
         "SECURITY_CODE_EXPIRATION_TIME": 1,  # In seconds only
         "VERIFY_SECURITY_CODE_ONLY_ONCE": False,
-
     },
 }
