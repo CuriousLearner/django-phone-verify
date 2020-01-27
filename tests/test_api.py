@@ -17,41 +17,29 @@ pytestmark = pytest.mark.django_db
 SECURITY_CODE = "123456"
 PHONE_NUMBER = "+13478379634"
 SESSION_TOKEN = "phone-auth-session-token"
+BACKEND_SERVICES = [
+    ("twilio.rest.Client", "phone_verify.backends.twilio.TwilioBackend"),
+    ("kavenegar.KavenegarAPI", 'phone_verify.backends.kavenegar.KavenegarBackend')
+]
 
 
 def test_phone_registration_sends_message(client, mocker):
     url = reverse("phone-register")
     phone_number = PHONE_NUMBER
     data = {"phone_number": phone_number}
-    twilio_api = mocker.patch(
-        "twilio.rest.Client"
-    )
 
-    response = client.post(url, data)
+    for backend_service, backend in BACKEND_SERVICES:
+        settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]["BACKEND"] = backend
+        api = mocker.patch(backend_service)
+        response = client.post(url, data)
 
-    assert response.status_code == 200
-    assert twilio_api.called
-    assert "session_token" in response.data
-    sms_verification = apps.get_model("phone_verify", "SMSVerification")
-    assert sms_verification.objects.get(
-        session_token=response.data["session_token"], phone_number=phone_number
-    )
-
-    settings.DJANGO_SETTINGS["PHONE_VERIFICATION"][
-        "BACKEND"
-    ] = 'phone_verify.backends.kavenegar.KavenegarBackend'
-    kavenegar_api = mocker.patch(
-        "kavenegar.KavenegarAPI"
-    )
-    response = client.post(url, data)
-
-    assert response.status_code == 200
-    assert kavenegar_api.called
-    assert "session_token" in response.data
-    sms_verification = apps.get_model("phone_verify", "SMSVerification")
-    assert sms_verification.objects.get(
-        session_token=response.data["session_token"], phone_number=phone_number
-    )
+        assert response.status_code == 200
+        assert api.called
+        assert "session_token" in response.data
+        SMSVerification = apps.get_model("phone_verify", "SMSVerification")
+        assert SMSVerification.objects.get(
+            session_token=response.data["session_token"], phone_number=phone_number
+        )
 
 
 def test_security_code_session_token_verification_api(client):
