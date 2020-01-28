@@ -202,9 +202,10 @@ Otherwise, serializer classes for ``verify`` and ``register`` views will not be 
 3. Latest ``security_code`` generated for a ``phone_number`` can be found at ``/admin/phone_verify/smsverification/`` URL.
 
 
-Case 3: Create a user model and login the user once their phone number gets verified
-*************************************************************************************
-This case is suitable if you want to allow users to login to your django project using its amazing authentication backend.
+Case 3: Create a user model & login the user once their phone number gets verified
+**********************************************************************************
+
+This case is suitable if you want to allow users to login to your django project using the authentication backend.
 
 .. code-block:: python
     # In models.py
@@ -229,7 +230,7 @@ This case is suitable if you want to allow users to login to your django project
 
 
     def login_otp_user(request):
-        """ Custom Login view for users that are logging in using verified phone numbers """
+        """ Custom Login view for users that are logging in using verified phone numbers"""
         phone_number = request.POST['phone_number']
 
         try:
@@ -251,7 +252,6 @@ This case is suitable if you want to allow users to login to your django project
 
     # In signals.py
     from django.contrib.auth import get_user_model
-    from allauth.utils import generate_unique_username  # This function is used to create a random username that is unique
     from phone_verify.models import SMSVerification
     from django.db.models.signals import post_save
     from django.db import IntegrityError
@@ -268,34 +268,8 @@ This case is suitable if you want to allow users to login to your django project
             # Get the Custom User model
             User = get_user_model()
 
-            # Generate random username for this user
-            # txts iterable is simply used to create random usernames. You can literally add all numbers, alphabets etc.
-            username = generate_unique_username(txts=[
-                '1234567890randomabcdefabsdcjhbfhjvdfvfdghiihfdbvhfebhjvr',
-                'quiywgduhdsbchyo1234567890webdoewbcweihceirbiheveirhbvhevb',
-                'abcd_randomusersghdvcghsdc167890234345@differentemail.com'
-            ])
-
             # Generate a random password
             password = User.objects.make_random_password()
 
             #  Create and Populate a user
-            user = User.objects.create_user(username=username, password=password)
-
-            try:
-                # Update phone_number field from users.user model
-                # It is important to have this so that the username and password can be fetched
-                # when the user tries to login later.
-                user.phone_number = instance.phone_number
-
-                # Update the newly created user instance
-                user.save()
-
-
-            except IntegrityError as e:
-                # This means that this number has been registered already
-                # Delete the user instance that was just created
-                user.delete()
-                raise e
-
-
+            user = User.objects.create_user(phone_number=instance.phone_number, password=password)

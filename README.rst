@@ -114,7 +114,7 @@ Release Notes
 
 Changed
 """""""
-- Updated ``base.validate_security_code`` to use ``save()`` instead of ``update()`` allowing Django to emit its ``post_save()`` signal.
+- Update ``backends.base.validate_security_code`` to use ``save()`` instead of ``update()`` to allow Django to emit its ``post_save()`` signal.
 
 [dev] -- Unreleased ...
 ^^^^^^^^^^^^^^^^^^^^^^^
