@@ -4,7 +4,7 @@ pytest==5.3.1
 pytest-django==3.7.0
 pytest-cov==2.6.1
 
-django-dynamic-fixture==2.0.0
+django-dynamic-fixture==3.0.2
 flake8-mypy==17.8.0
 pytest-mock==1.10.0
 tox==3.13.2
