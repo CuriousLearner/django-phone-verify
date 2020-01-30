@@ -142,34 +142,19 @@ The above steps will remain same if you wish to create a sandbox utility for you
             for number in numbers:
                 self.send_sms(self, number=number, message=message)
 
-3. Override ``generate_security_code`` as defined below:
+        def generate_security_code(self):
+            """
+            Returns a fixed security code
+            """
+            return self._token
 
-.. code-block:: python
+        def validate_security_code(self, security_code, phone_number, session_token):
+            """
+            Always validate security code for testing purposes
+            """
+            return self.SECURITY_CODE_VALID
 
-    ...
-
-    def generate_security_code(self):
-        """
-        Returns a fixed security code
-        """
-        return self._token
-
-4. Override ``validate_security_code`` as defined below:
-
-.. code-block:: python
-
-    ...
-
-    def generate_security_code(self):
-        """
-        Returns a fixed security code
-        """
-        return self._token
-
-    def validate_security_code(self, security_code, phone_number, session_token):
-        return self.SECURITY_CODE_VALID
-
-It must have ``security_code``, ``phone_number`` and ``session_token`` as its positional parameters.
+We have also overriden the ``generate_security_code`` and ``validate_security_code`` methods of ``BaseBackend`` class. The ``validate_security_code`` method must have ``security_code``, ``phone_number`` and ``session_token`` as its positional parameters.
 
 In order to use this new custom backend class, it should be replaced in the ``BACKEND`` key under ``PHONE_VERIFICATION`` settings as shown below.
 
