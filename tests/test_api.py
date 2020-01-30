@@ -11,16 +11,13 @@ from django.urls import reverse
 
 from . import test_settings as settings
 from . import factories as f
+from . import BACKEND_SERVICES
 
 pytestmark = pytest.mark.django_db
 
 SECURITY_CODE = "123456"
 PHONE_NUMBER = "+13478379634"
 SESSION_TOKEN = "phone-auth-session-token"
-BACKEND_SERVICES = [
-    ("twilio.rest.Client", "phone_verify.backends.twilio.TwilioBackend"),
-    ("kavenegar.KavenegarAPI", 'phone_verify.backends.kavenegar.KavenegarBackend')
-]
 
 
 def test_phone_registration_sends_message(client, mocker):
@@ -28,13 +25,13 @@ def test_phone_registration_sends_message(client, mocker):
     phone_number = PHONE_NUMBER
     data = {"phone_number": phone_number}
 
-    for backend_service, backend in BACKEND_SERVICES:
+    for backend, backend_service in BACKEND_SERVICES:
         settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]["BACKEND"] = backend
         api = mocker.patch(backend_service)
         response = client.post(url, data)
 
         assert response.status_code == 200
-        assert api.called
+        assert api.assert_called_once
         assert "session_token" in response.data
         SMSVerification = apps.get_model("phone_verify", "SMSVerification")
         assert SMSVerification.objects.get(
