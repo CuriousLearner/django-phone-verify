@@ -3,7 +3,7 @@
 
 # Core Stuff
 # -------------------------------------
-Django==2.1.11
+Django==2.2.10
 djangorestframework==3.9.1
 
 # Code quality
