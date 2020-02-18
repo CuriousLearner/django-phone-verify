@@ -91,6 +91,8 @@ Usage
 
 .. _usage.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/usage.rst
 
+**Note**: ``Django Phone Verfiy`` also provides ``Nexmo`` as a backend service other than ``Twilio``. To switch to ``Nexmo``, replace ``BACKEND`` within your ``PHONE_VERIFICATION`` setting with ``phone_verify.backends.nexmo.NexmoBackend`` and define ``KEY`` within ``OPTIONS`` of ``PHONE_VERIFICATION`` setting, with your nexmo API key, in place of already available ``SID``.
+
 Compatibility
 -------------
 - Django 2.1+
@@ -108,6 +110,15 @@ GPLv3
 
 Release Notes
 --------------
+
+[dev] -- Unreleased ...
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Added
+"""""
+
+- Support ``Nexmo`` as a backend service alongwith ``Twilio``.
+- Add docs for writing custom backend.
 
 [1.0.0]
 ^^^^^^^
