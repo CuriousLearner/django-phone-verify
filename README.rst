@@ -113,18 +113,17 @@ Release Notes
 [dev] -- Unreleased ...
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Changed
-"""""""
-- Update ``backends.base.validate_security_code`` to use ``save()`` instead of ``update()`` to allow Django to emit its ``post_save()`` signal.
-
-[dev] -- Unreleased ...
-^^^^^^^^^^^^^^^^^^^^^^^
-
 Added
 """""
 
 - Support ``Nexmo`` as a backend service alongwith ``Twilio``.
 - Add docs for writing custom backend.
+
+
+Changed
+"""""""
+- Update ``backends.base.validate_security_code`` to use ``save()`` instead of ``update()`` to allow Django to emit its ``post_save()`` signal.
+
 
 [1.0.0]
 ^^^^^^^

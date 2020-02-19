@@ -201,75 +201,26 @@ Otherwise, serializer classes for ``verify`` and ``register`` views will not be 
 
 3. Latest ``security_code`` generated for a ``phone_number`` can be found at ``/admin/phone_verify/smsverification/`` URL.
 
-
-Case 3: Create a user model & login the user once their phone number gets verified
-**********************************************************************************
-
-This case is suitable if you want to allow users to login to your django project using the authentication backend.
+4. ``phone_verify.models.SMSVerification`` emits ``post_save`` signal on its creation and updation. Suppose you want to send an email, informing the user that his/her phone number has been successfully verified. We can implement that by creating a receiver which would listen to ``post_save`` signal of ``SMSVerification`` model. For example:
 
 .. code-block:: python
-    # In models.py
-    from django.db import models
-    from django.contrib.auth.models import AbstractUser
-
-
-    # Create a custom user model by extending AbstractUser
-    # so that all inbuilt Django authentication functionality can be retained
-    class User(AbstractUser):
-        """ Extends the Django User model so that additional model fields can be added or removed
-        without affecting Django's Auth functionality
-        """
-        # Additional User fields can be added in here
-        phone_number = models.CharField(null=True, blank=True, max_length=20, unique=True)
-
-
-    #  In views.py
-    from django.contrib.auth import get_user_model, login
-    from django.http import HttpResponse
-    from django.core.exceptions import ObjectDoesNotExist
-
-
-    def login_otp_user(request):
-        """ Custom Login view for users that are logging in using verified phone numbers"""
-        phone_number = request.POST['phone_number']
-
-        try:
-            # Get the associated User model instance
-            user = get_user_model().objects.get(phone_number=phone_number)
-
-            # Login this user
-            login(request, user, 'django.contrib.auth.backends.ModelBackend')
-
-            return HttpResponse(
-                dumps({
-                    'status': '200',
-                }), content_type="application/json"
-            )
-
-        except ObjectDoesNotExist as e:
-            raise e
-
 
     # In signals.py
-    from django.contrib.auth import get_user_model
     from phone_verify.models import SMSVerification
     from django.db.models.signals import post_save
-    from django.db import IntegrityError
+    from django.dispatch import receiver
+    from django.core.mail import send_mail
 
-    # create_user_creds function will get fired when a new entry is created or the model instance is updated
+
+    # `send_phone_verify_email` function will get fired when a new entry is created or the model instance is updated
     @receiver(post_save, sender=SMSVerification)
-    def create_user_creds(sender, instance, **kwargs):
-        """ Creates an entry in the User model by creating a randomly generated username and password.
-        And associates that User with their verified phone number
-        """
+    def send_phone_verify_email(sender, instance, **kwargs):
         # Check if the instance is verified or not.
         if instance.is_verified:
-
-            # Get the Custom User model
-            User = get_user_model()
-
-            # Generate a random password
-            password = User.objects.make_random_password()
-
-            #  Create and Populate a user
-            user = User.objects.create_user(phone_number=instance.phone_number, password=password)
+            send_mail(
+                'Subject here',
+                'Here is the message.',
+                'from@example.com',
+                ['to@example.com'],
+                fail_silently=False,
+            )
