@@ -120,6 +120,11 @@ Added
 - Support ``Nexmo`` as a backend service alongwith ``Twilio``.
 - Add docs for writing custom backend.
 
+Changed
+"""""""
+
+- Update ``backends.base.BaseBackend.validate_security_code`` to use ``save()`` instead of ``update()`` to allow Django to emit its ``post_save()`` signal.
+
 [1.0.0]
 ^^^^^^^
 
