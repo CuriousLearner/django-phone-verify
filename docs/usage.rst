@@ -201,7 +201,7 @@ Otherwise, serializer classes for ``verify`` and ``register`` views will not be 
 
 3. Latest ``security_code`` generated for a ``phone_number`` can be found at ``/admin/phone_verify/smsverification/`` URL.
 
-4. ``phone_verify.models.SMSVerification`` emits ``post_save`` signal on its creation and updation. Suppose you want to send an email, informing the user that his/her phone number has been successfully verified. We can implement that by creating a receiver which would listen to ``post_save`` signal of ``SMSVerification`` model. For example:
+4. Django's ``post_save`` signal can be leveraged through its usage in ``phone_verify.models.SMSVerification`` function. Additional functionality can be hooked via the ``post_save`` signal by creating the following receiver.
 
 .. code-block:: python
 
@@ -214,13 +214,13 @@ Otherwise, serializer classes for ``verify`` and ``register`` views will not be 
 
     # `send_phone_verify_email` function will get fired when a new entry is created or the model instance is updated
     @receiver(post_save, sender=SMSVerification)
-    def send_phone_verify_email(sender, instance, **kwargs):
-        # Check if the instance is verified or not.
-        if instance.is_verified:
+    def send_phone_verify_email(sender, instance=None, created=None, **kwargs):
+        # Check if the instance is created or not
+        if created:
             send_mail(
-                'Subject here',
-                'Here is the message.',
-                'from@example.com',
-                ['to@example.com'],
+                subject='Subject here',
+                message='Here is the message.',
+                from_email='from@example.com',
+                recipient_list=['to@example.com'],
                 fail_silently=False,
             )
