@@ -132,10 +132,7 @@ class BaseBackend(metaclass=ABCMeta):
             return stored_verification, self.SECURITY_CODE_VERIFIED
 
         # mark security_code as verified
-        stored_verification = SMSVerification.objects.filter(
-            security_code=security_code,
-            phone_number=phone_number,
-            session_token=session_token,
-        ).update(is_verified=True)
+        stored_verification.is_verified = True
+        stored_verification.save()
 
         return stored_verification, self.SECURITY_CODE_VALID
