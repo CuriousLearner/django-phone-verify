@@ -7,6 +7,7 @@ from twilio.rest import Client as TwilioRestClient
 
 # Local
 from .base import BaseBackend
+from phone_verify.models import SMSVerification
 
 
 class TwilioBackend(BaseBackend):
@@ -56,4 +57,4 @@ class TwilioSandboxBackend(BaseBackend):
         return self._token
 
     def validate_security_code(self, security_code, phone_number, session_token):
-        return self.SECURITY_CODE_VALID
+        return SMSVerification.objects.none(), self.SECURITY_CODE_VALID
