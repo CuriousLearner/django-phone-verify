@@ -47,5 +47,17 @@ def test_twilio_sandbox_backend(client, mocker):
 
     mock_twilio_messages.create.assert_called_once_with(to=phone_number, body=message, from_=from_number)
 
+    url = reverse("phone-verify")
+    data = {
+        "phone_number": phone_number,
+        "session_token": SESSION_TOKEN,
+        "security_code": SECURITY_CODE
+    }
+
+    response = client.post(url, data)
+    assert response.status_code == 200
+    response_data = {"message": "Security code is valid."}
+    assert response.data == response_data
+
     # Assign back the Backend as defined in settings
     test_settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]["BACKEND"] = "phone_verify.backends.twilio.TwilioBackend"

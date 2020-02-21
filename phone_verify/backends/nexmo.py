@@ -6,6 +6,7 @@ import nexmo
 
 # Local
 from .base import BaseBackend
+from ..models import SMSVerification
 
 
 class NexmoBackend(BaseBackend):
@@ -63,4 +64,4 @@ class NexmoSandboxBackend(BaseBackend):
         return self._token
 
     def validate_security_code(self, security_code, phone_number, session_token):
-        return self.SECURITY_CODE_VALID
+        return SMSVerification.objects.none(), self.SECURITY_CODE_VALID
