@@ -113,6 +113,7 @@ The above steps will remain same if you wish to create a sandbox utility for you
     # Third Party Stuff
     import nexmo
     from phone_verify.backends.base import BaseBackend
+    from phone_verify.models import SMSVerification
 
 
     class NexmoSandboxBackend(BaseBackend):
@@ -152,9 +153,9 @@ The above steps will remain same if you wish to create a sandbox utility for you
             """
             Always validate security code for testing purposes
             """
-            return self.SECURITY_CODE_VALID
+            return SMSVerification.objects.none(), self.SECURITY_CODE_VALID
 
-We have also overriden the ``generate_security_code`` and ``validate_security_code`` methods of ``BaseBackend`` class. The ``validate_security_code`` method must have ``security_code``, ``phone_number`` and ``session_token`` as its positional parameters.
+We have also overriden the ``generate_security_code`` and ``validate_security_code`` methods of ``BaseBackend`` class. The ``validate_security_code`` method must have ``security_code``, ``phone_number`` and ``session_token`` as its positional parameters. We returned an empty SMSVerification object to keep the return arguments uniform with the acutal base class method.
 
 In order to use this new custom backend class, it should be replaced in the ``BACKEND`` key under ``PHONE_VERIFICATION`` settings as shown below.
 
