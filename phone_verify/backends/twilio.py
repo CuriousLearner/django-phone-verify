@@ -7,7 +7,7 @@ from twilio.rest import Client as TwilioRestClient
 
 # Local
 from .base import BaseBackend
-from ..models import SMSVerification
+from phone_verify.models import SMSVerification
 
 
 class TwilioBackend(BaseBackend):

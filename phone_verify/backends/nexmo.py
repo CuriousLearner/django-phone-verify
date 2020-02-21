@@ -6,7 +6,7 @@ import nexmo
 
 # Local
 from .base import BaseBackend
-from ..models import SMSVerification
+from phone_verify.models import SMSVerification
 
 
 class NexmoBackend(BaseBackend):
