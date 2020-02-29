@@ -10,7 +10,6 @@ from phone_verify.models import SMSVerification
 
 
 class NexmoBackend(BaseBackend):
-
     def __init__(self, **options):
         super().__init__(**options)
 
@@ -23,11 +22,7 @@ class NexmoBackend(BaseBackend):
         self.client = nexmo.Client(key=self._key, secret=self._secret)
 
     def send_sms(self, number, message):
-        self.client.send_message({
-            'from': self._from,
-            'to': number,
-            'text': message,
-        })
+        self.client.send_message({"from": self._from, "to": number, "text": message})
 
     def send_bulk_sms(self, numbers, message):
         for number in numbers:
@@ -47,11 +42,7 @@ class NexmoSandboxBackend(BaseBackend):
         self.client = nexmo.Client(key=self._key, secret=self._secret)
 
     def send_sms(self, number, message):
-        self.client.send_message({
-            'from': self._from,
-            'to': number,
-            'text': message,
-        })
+        self.client.send_message({"from": self._from, "to": number, "text": message})
 
     def send_bulk_sms(self, numbers, message):
         for number in numbers:
