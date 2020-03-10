@@ -6,13 +6,19 @@ It may be also used for extending doctest's context:
 """
 
 # Standard Library
+import copy
 import functools
-
-import django
 
 # Third Party Stuff
 import pytest
+import django
 from django.conf import settings
+
+from tests import test_settings
+
+backends = {"twilio.TwilioBackend", "nexmo.NexmoBackend", "kavenegar.KavenegarBackend"}
+sandbox_backends = {"twilio.TwilioSandboxBackend", "nexmo.NexmoSandboxBackend"}
+all_backends = list(backends) + list(sandbox_backends)
 
 
 class PartialMethodCaller:
@@ -46,6 +52,20 @@ def client():
             )
 
     return _Client()
+
+
+@pytest.fixture(params=all_backends)
+def backend(request):
+    phone_verification_settings = copy.deepcopy(
+        test_settings.DJANGO_SETTINGS.get("PHONE_VERIFICATION")
+    )
+    phone_verification_settings["BACKEND"] = f"phone_verify.backends.{request.param}"
+    if (
+        request.param == "nexmo.NexmoSandboxBackend"
+        or request.param == "nexmo.NexmoBackend"
+    ):
+        phone_verification_settings["OPTIONS"]["KEY"] = "fake"
+    return phone_verification_settings
 
 
 def pytest_configure():

@@ -2,20 +2,19 @@
 
 # Third Party Stuff
 import pytest
-from . import test_settings as settings
+from django.test import override_settings
 
 # phone_verify Stuff
 from phone_verify.services import PhoneVerificationService
-from . import BACKEND_SERVICES
 
 pytestmark = pytest.mark.django_db
 
 
-def test_message_generation_and_sending_service(client, mocker):
-    for backend, backend_service in BACKEND_SERVICES:
-        settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]["BACKEND"] = backend
-        api = mocker.patch(backend_service)
+def test_message_generation_and_sending_service(client, mocker, backend):
+    with override_settings(PHONE_VERIFICATION=backend):
         service = PhoneVerificationService(phone_number="+13478379634")
+        backend_service = backend.get("BACKEND")
+        mock_api = mocker.patch(f"{backend_service}.send_sms")
         service.send_verification("+13478379634", "123456")
 
-        assert api.assert_called_once
+        assert mock_api.called
