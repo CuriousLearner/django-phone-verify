@@ -2,53 +2,51 @@
 from __future__ import absolute_import
 
 # Third Party Stuff
-from twilio.base.exceptions import TwilioRestException
-from twilio.rest import Client as TwilioRestClient
+import nexmo
 
 # Local
 from .base import BaseBackend
 from phone_verify.models import SMSVerification
 
 
-class TwilioBackend(BaseBackend):
+class NexmoBackend(BaseBackend):
     def __init__(self, **options):
-        super(TwilioBackend, self).__init__(**options)
+        super().__init__(**options)
+
         # Lower case it just to be sure
         options = {key.lower(): value for key, value in options.items()}
-        self._sid = options.get("sid", None)
-        self._secret = options.get("secret", None)  # auth_token
+        self._key = options.get("key", None)
+        self._secret = options.get("secret", None)
         self._from = options.get("from", None)
 
-        self.client = TwilioRestClient(self._sid, self._secret)
-        self.exception_class = TwilioRestException
+        self.client = nexmo.Client(key=self._key, secret=self._secret)
 
     def send_sms(self, number, message):
-        self.client.messages.create(to=number, body=message, from_=self._from)
+        self.client.send_message({"from": self._from, "to": number, "text": message})
 
     def send_bulk_sms(self, numbers, message):
         for number in numbers:
-            self.send_sms(number=number, message=message)
+            self.send_sms(self, number=number, message=message)
 
 
-class TwilioSandboxBackend(BaseBackend):
+class NexmoSandboxBackend(BaseBackend):
     def __init__(self, **options):
-        super(TwilioSandboxBackend, self).__init__(**options)
+        super().__init__(**options)
         # Lower case it just to be sure
         options = {key.lower(): value for key, value in options.items()}
-        self._sid = options.get("sid", None)
-        self._secret = options.get("secret", None)  # auth_token
+        self._key = options.get("key", None)
+        self._secret = options.get("secret", None)
         self._from = options.get("from", None)
-        self._token = options.get("sandbox_token")
+        self._token = options.get("sandbox_token", None)
 
-        self.client = TwilioRestClient(self._sid, self._secret)
-        self.exception_class = TwilioRestException
+        self.client = nexmo.Client(key=self._key, secret=self._secret)
 
     def send_sms(self, number, message):
-        self.client.messages.create(to=number, body=message, from_=self._from)
+        self.client.send_message({"from": self._from, "to": number, "text": message})
 
     def send_bulk_sms(self, numbers, message):
         for number in numbers:
-            self.send_sms(number=number, message=message)
+            self.send_sms(self, number=number, message=message)
 
     def generate_security_code(self):
         """
