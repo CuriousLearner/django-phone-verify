@@ -20,7 +20,7 @@ class KavenegarBackend(BaseBackend):
         self.exception_class = APIException, HTTPException
 
     def send_sms(self, number, message):
-        params = {'receptor': number, 'template': '', 'token': message, 'type': 'sms'}
+        params = {'sender': self.sender, 'receptor': number, 'message': message, }
         self.client.sms_send(params)
 
     def send_bulk_sms(self, numbers, message):
