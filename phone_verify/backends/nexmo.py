@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 # Third Party Stuff
 import nexmo
+from nexmo.errors import ClientError
 
 # Local
 from .base import BaseBackend
@@ -20,6 +21,7 @@ class NexmoBackend(BaseBackend):
         self._from = options.get("from", None)
 
         self.client = nexmo.Client(key=self._key, secret=self._secret)
+        self.exception_class = ClientError
 
     def send_sms(self, number, message):
         self.client.send_message({"from": self._from, "to": number, "text": message})
@@ -40,6 +42,7 @@ class NexmoSandboxBackend(BaseBackend):
         self._token = options.get("sandbox_token", None)
 
         self.client = nexmo.Client(key=self._key, secret=self._secret)
+        self.exception_class = ClientError
 
     def send_sms(self, number, message):
         self.client.send_message({"from": self._from, "to": number, "text": message})
