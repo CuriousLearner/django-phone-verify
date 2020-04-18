@@ -28,7 +28,7 @@ class NexmoBackend(BaseBackend):
 
     def send_bulk_sms(self, numbers, message):
         for number in numbers:
-            self.send_sms(self, number=number, message=message)
+            self.send_sms(number=number, message=message)
 
 
 class NexmoSandboxBackend(BaseBackend):
@@ -49,7 +49,7 @@ class NexmoSandboxBackend(BaseBackend):
 
     def send_bulk_sms(self, numbers, message):
         for number in numbers:
-            self.send_sms(self, number=number, message=message)
+            self.send_sms(number=number, message=message)
 
     def generate_security_code(self):
         """
