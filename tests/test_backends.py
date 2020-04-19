@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils.module_loading import import_string
 
 from conftest import sandbox_backends
+from phone_verify.backends.base import BaseBackend
 
 PHONE_NUMBER = "+13478379634"
 SECURITY_CODE = "123456"
@@ -117,3 +118,20 @@ def test_send_bulk_sms(client, mocker, backend):
                 mocker.call(number=numbers[2], message=message),
             ]
         )
+
+
+class TestBaseBackend(BaseBackend):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+def test_base_backend_abstract_methods(mocker):
+    abstract_methods = BaseBackend.__abstractmethods__
+    TestBaseBackend.__abstractmethods__ = frozenset()
+    cls_obj = TestBaseBackend()
+
+    for method in abstract_methods:
+        with pytest.raises(NotImplementedError):
+            # This might fail in case, we have methods having different
+            # number of arguments
+            getattr(cls_obj, method)(mocker.Mock(), mocker.Mock())
