@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from django.apps import apps
-
 # Third Party Stuff
+from django.apps import apps
 from django_dynamic_fixture import G
 
 
