@@ -108,7 +108,23 @@ Licence
 GPLv3
 
 Release Notes
---------------
+-------------
+
+[dev] -- Unreleased ...
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Added
+"""""
+
+- Tests added to provide 100% coverage on the package.
+- Add ``nexmo.errors.ClientError`` as exception class in ``phone_verify.backends.nexmo.NexmoBackend`` & ``phone_verify.backends.nexmo.NexmoSandboxBackend``.
+
+Changed
+"""""""
+
+- Remove the ``security_code`` from JWT ``session_token`` to avoid leaking information.
+- Add nonce in ``session_token`` to generate unique tokens for each ``phone_number``.
+- Fixes signature of ``phone_verify.backends.nexmo.NexmoBackend.send_sms`` method.
 
 [1.1.0]
 ^^^^^^^
