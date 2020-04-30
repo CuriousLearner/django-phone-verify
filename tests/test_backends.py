@@ -1,9 +1,12 @@
 import pytest
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.test import override_settings
 from django.urls import reverse
+from django.utils.module_loading import import_string
 
-from tests import test_settings
 from conftest import sandbox_backends
+from phone_verify.backends.base import BaseBackend
 
 PHONE_NUMBER = "+13478379634"
 SECURITY_CODE = "123456"
@@ -33,9 +36,7 @@ def test_backends(client, mocker, backend):
             return_value=SECURITY_CODE,
         )
         message = "Welcome to Phone Verify! Please use security code 123456 to proceed."
-        from_number = test_settings.DJANGO_SETTINGS["PHONE_VERIFICATION"]["OPTIONS"][
-            "FROM"
-        ]
+        from_number = settings.PHONE_VERIFICATION["OPTIONS"]["FROM"]
 
         backend_cls = _get_backend_cls(backend)
 
@@ -94,3 +95,56 @@ def test_backends(client, mocker, backend):
             assert response.status_code == 200
             response_data = {"message": "Security code is valid."}
             assert response.data == response_data
+
+
+def test_error_raised_when_no_backend_specified(client, backend):
+    with override_settings(PHONE_VERIFICATION=backend):
+        settings.PHONE_VERIFICATION["BACKEND"] = None
+        url = reverse("phone-register")
+        phone_number = PHONE_NUMBER
+        data = {"phone_number": phone_number}
+        with pytest.raises(ImproperlyConfigured) as exc:
+            client.post(url, data)
+            assert (
+                exc.info
+                == "Please specify BACKEND in PHONE_VERIFICATION within your settings"
+            )
+
+
+def test_send_bulk_sms(client, mocker, backend):
+    with override_settings(PHONE_VERIFICATION=backend):
+        backend_import = settings.PHONE_VERIFICATION["BACKEND"]
+        backend_cls = import_string(backend_import)
+        cls_obj = backend_cls(**settings.PHONE_VERIFICATION["OPTIONS"])
+
+        mock_send_sms = mocker.patch(f"{backend_import}.send_sms")
+        numbers = ["+13478379634", "+13478379633", "+13478379632"]
+        message = "Fake message"
+
+        cls_obj.send_bulk_sms(numbers, message)
+        assert mock_send_sms.called
+        assert mock_send_sms.call_count == 3
+        mock_send_sms.assert_has_calls(
+            [
+                mocker.call(number=numbers[0], message=message),
+                mocker.call(number=numbers[1], message=message),
+                mocker.call(number=numbers[2], message=message),
+            ]
+        )
+
+
+class TestBaseBackend(BaseBackend):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+def test_base_backend_abstract_methods(mocker):
+    abstract_methods = BaseBackend.__abstractmethods__
+    TestBaseBackend.__abstractmethods__ = frozenset()
+    cls_obj = TestBaseBackend()
+
+    for method in abstract_methods:
+        with pytest.raises(NotImplementedError):
+            # This might fail in case, we have methods having different
+            # number of arguments
+            getattr(cls_obj, method)(mocker.Mock(), mocker.Mock())
