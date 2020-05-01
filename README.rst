@@ -125,7 +125,7 @@ Changed
 - Method signature changed for ``phone_verify.backends.BaseBackend.generate_session_token``. It now accepts only ``phone_number`` instead of combination of ``phone_number`` and ``security_code``.
 - Remove the ``security_code`` from JWT ``session_token`` to avoid leaking information.
 - Add nonce in ``session_token`` to generate unique tokens for each ``phone_number``.
-- Fixes signature of ``phone_verify.backends.nexmo.NexmoBackend.send_sms`` method.
+- Fixes call to ``phone_verify.backends.nexmo.NexmoBackend.send_sms`` method.
 
 [1.1.0]
 ^^^^^^^
