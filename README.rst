@@ -113,6 +113,8 @@ Release Notes
 [dev] -- Unreleased ...
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+**NOTE**: Previous version of this library provided the ``security_code`` in the JWT ``session_token``. You would have to re-verify ``phone_numbers`` in *this* version to ensure they are authentically verified.
+
 Added
 """""
 
