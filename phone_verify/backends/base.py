@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import random
 from abc import ABCMeta, abstractmethod
 
 # Third Party Stuff
@@ -42,12 +43,12 @@ class BaseBackend(metaclass=ABCMeta):
         return get_random_string(token_length, allowed_chars="0123456789")
 
     @classmethod
-    def generate_session_token(cls, security_code, phone_number):
+    def generate_session_token(cls, phone_number):
         """
-        Returns a unique random JWT token using Django's `SECRET_KEY`
-        for identifying a particular device in subsequent calls.
+        Returns a unique session_token for
+        identifying a particular device in subsequent calls.
         """
-        data = {"device_%s_session_token" % phone_number: security_code}
+        data = {"phone_number": phone_number, "nonce": random.random()}
         return jwt.encode(data, django_settings.SECRET_KEY).decode()
 
     @classmethod
@@ -77,7 +78,7 @@ class BaseBackend(metaclass=ABCMeta):
         :return session_token: string of session_token
         """
         security_code = self.generate_security_code()
-        session_token = self.generate_session_token(security_code, number)
+        session_token = self.generate_session_token(number)
 
         # Delete old security_code(s) for phone_number if already exists
         SMSVerification.objects.filter(phone_number=number).delete()

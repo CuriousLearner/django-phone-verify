@@ -108,7 +108,26 @@ Licence
 GPLv3
 
 Release Notes
---------------
+-------------
+
+[dev] -- Unreleased ...
+^^^^^^^^^^^^^^^^^^^^^^^
+
+**NOTE**: Previous version of this library provided the ``security_code`` in the JWT ``session_token``. You would have to re-verify ``phone_numbers`` in *this* version to ensure they are authentically verified.
+
+Added
+"""""
+
+- Tests added to provide 100% coverage on the package.
+- Add ``nexmo.errors.ClientError`` as exception class in ``phone_verify.backends.nexmo.NexmoBackend`` & ``phone_verify.backends.nexmo.NexmoSandboxBackend``.
+
+Changed
+"""""""
+
+- Method signature changed for ``phone_verify.backends.BaseBackend.generate_session_token``. It now accepts only ``phone_number`` instead of combination of ``phone_number`` and ``security_code``.
+- Remove the ``security_code`` from JWT ``session_token`` to avoid leaking information.
+- Add nonce in ``session_token`` to generate unique tokens for each ``phone_number``.
+- Fixes call to ``phone_verify.backends.nexmo.NexmoBackend.send_sms`` method.
 
 [1.1.0]
 ^^^^^^^
