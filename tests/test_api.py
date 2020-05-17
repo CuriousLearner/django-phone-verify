@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-# Third party stuff
 import json
 import time
 
+# Third party stuff
 import pytest
 from django.apps import apps
 from django.test import override_settings
 from django.urls import reverse
+
 from conftest import backends, sandbox_backends
-from .test_backends import _get_backend_cls
 from . import factories as f
+from .test_backends import _get_backend_cls
 
 pytestmark = pytest.mark.django_db
 
