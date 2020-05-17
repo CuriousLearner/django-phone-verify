@@ -64,9 +64,8 @@ def test_backends(client, mocker, backend):
             )
             test_data = {
                 "receptor": phone_number,
-                "template": "",
-                "token": message,
-                "type": "sms",
+                "message": message,
+                "sender": from_number,
             }
 
         response = client.post(url, data)
