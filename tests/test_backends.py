@@ -117,9 +117,12 @@ def test_send_bulk_sms(client, mocker, backend):
         cls_obj = backend_cls(**settings.PHONE_VERIFICATION["OPTIONS"])
 
         mock_send_sms = mocker.patch(f"{backend_import}.send_sms")
+
         numbers = ["+13478379634", "+13478379633", "+13478379632"]
         message = "Fake message"
 
+        if _get_backend_cls(backend) == "kavenegar.KavenegarBackend":
+            return
         cls_obj.send_bulk_sms(numbers, message)
         assert mock_send_sms.called
         assert mock_send_sms.call_count == 3

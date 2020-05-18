@@ -8,6 +8,10 @@ from kavenegar import KavenegarAPI, APIException, HTTPException
 from .base import BaseBackend
 
 
+class KavenegarException(HTTPException, APIException):
+    pass
+
+
 class KavenegarBackend(BaseBackend):
     def __init__(self, **options):
         super().__init__(**options)
@@ -17,7 +21,7 @@ class KavenegarBackend(BaseBackend):
         self.sender = options.get("from", None)
 
         self.client = KavenegarAPI(self.api_key)
-        self.exception_class = APIException, HTTPException
+        self.exception_class = KavenegarException
 
     def send_sms(self, number, message):
         params = {'sender': self.sender, 'receptor': number, 'message': message, }
