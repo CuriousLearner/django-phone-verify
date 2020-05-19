@@ -6,6 +6,6 @@ from django_dynamic_fixture import G
 
 
 def create_verification(**kwargs):
-    SMSVerification = apps.get_model("phone_verify", "SMSVerification")
-    verification = G(SMSVerification, **kwargs)
+    sms_verification = apps.get_model("phone_verify", "SMSVerification")
+    verification = G(sms_verification, **kwargs)
     return verification

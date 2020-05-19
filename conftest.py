@@ -16,7 +16,7 @@ from django.conf import settings
 
 from tests import test_settings
 
-backends = {"twilio.TwilioBackend", "nexmo.NexmoBackend"}
+backends = {"twilio.TwilioBackend", "nexmo.NexmoBackend", "kavenegar.KavenegarBackend"}
 sandbox_backends = {"twilio.TwilioSandboxBackend", "nexmo.NexmoSandboxBackend"}
 all_backends = list(backends) + list(sandbox_backends)
 

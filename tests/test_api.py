@@ -25,14 +25,14 @@ def test_phone_registration_sends_message(client, mocker, backend):
     url = reverse("phone-register")
     phone_number = PHONE_NUMBER
     data = {"phone_number": phone_number}
-    twilio_api = mocker.patch(
+
+    mock_api = mocker.patch(
         "phone_verify.services.PhoneVerificationService.send_verification"
     )
-
     response = client.post(url, data)
 
     assert response.status_code == 200
-    assert twilio_api.called
+    assert mock_api.assert_called_once
     assert "session_token" in response.data
     SMSVerification = apps.get_model("phone_verify", "SMSVerification")
     assert SMSVerification.objects.get(

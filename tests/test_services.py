@@ -12,11 +12,11 @@ from twilio.base.exceptions import TwilioRestException
 
 # phone_verify Stuff
 import phone_verify.services
+from phone_verify.backends.kavenegar import KavenegarException
 from phone_verify.services import (
     PhoneVerificationService,
     send_security_code_and_generate_session_token,
 )
-
 from .test_backends import _get_backend_cls
 
 pytestmark = pytest.mark.django_db
@@ -40,16 +40,21 @@ def test_exception_is_logged_when_raised(client, mocker, backend):
         mock_logger = mocker.patch("phone_verify.services.logger")
         backend_cls = _get_backend_cls(backend)
         if (
-            backend_cls == "nexmo.NexmoBackend"
-            or backend_cls == "nexmo.NexmoSandboxBackend"
+                backend_cls == "nexmo.NexmoBackend"
+                or backend_cls == "nexmo.NexmoSandboxBackend"
         ):
             exc = ClientError()
             mock_send_verification.side_effect = exc
         elif (
-            backend_cls == "twilio.TwilioBackend"
-            or backend_cls == "twilio.TwilioSandboxBackend"
+                backend_cls == "twilio.TwilioBackend"
+                or backend_cls == "twilio.TwilioSandboxBackend"
         ):
             exc = TwilioRestException(status=mocker.Mock(), uri=mocker.Mock())
+            mock_send_verification.side_effect = exc
+        elif (
+                backend_cls == "kavenegar.KavenegarBackend"
+        ):
+            exc = KavenegarException()
             mock_send_verification.side_effect = exc
         send_security_code_and_generate_session_token(phone_number="+13478379634")
         mock_logger.error.assert_called_once_with(
@@ -70,8 +75,8 @@ def test_exception_is_raised_when_improper_settings(client):
     with pytest.raises(ImproperlyConfigured) as exc:
         PhoneVerificationService(phone_number="+13478379634")
         assert (
-            exc.info
-            == "Please specify following settings in settings.py: OPTIONS, TOKEN_LENGTH"
+                exc.info
+                == "Please specify following settings in settings.py: OPTIONS, TOKEN_LENGTH"
         )
 
 

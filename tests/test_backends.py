@@ -58,6 +58,16 @@ def test_backends(client, mocker, backend):
                 "phone_verify.backends.twilio.TwilioRestClient.messages"
             )
             mock_twilio_send_message.create = mocker.MagicMock()
+        elif backend_cls == "kavenegar.KavenegarBackend":
+            # Mock the Kavenegar client
+            mock_kavenegar_send_message = mocker.patch(
+                "phone_verify.backends.kavenegar.KavenegarAPI.sms_send"
+            )
+            test_data = {
+                "receptor": phone_number,
+                "message": message,
+                "sender": from_number,
+            }
 
         response = client.post(url, data)
         assert response.status_code == 200
@@ -68,6 +78,8 @@ def test_backends(client, mocker, backend):
             mock_twilio_send_message.create.assert_called_once_with(
                 to=phone_number, body=message, from_=from_number
             )
+        elif backend_cls == "kavenegar.KavenegarBackend":
+            mock_kavenegar_send_message.assert_called_once_with(test_data)
 
         # Get the last part of the backend and check if that is a Sandbox Backend
         if backend_cls in sandbox_backends:
@@ -105,19 +117,25 @@ def test_send_bulk_sms(client, mocker, backend):
         cls_obj = backend_cls(**settings.PHONE_VERIFICATION["OPTIONS"])
 
         mock_send_sms = mocker.patch(f"{backend_import}.send_sms")
+
         numbers = ["+13478379634", "+13478379633", "+13478379632"]
         message = "Fake message"
 
-        cls_obj.send_bulk_sms(numbers, message)
-        assert mock_send_sms.called
-        assert mock_send_sms.call_count == 3
-        mock_send_sms.assert_has_calls(
-            [
-                mocker.call(number=numbers[0], message=message),
-                mocker.call(number=numbers[1], message=message),
-                mocker.call(number=numbers[2], message=message),
-            ]
-        )
+        if _get_backend_cls(backend) == "kavenegar.KavenegarBackend":
+            mock_sendarray_sms = mocker.patch('kavenegar.KavenegarAPI.sms_sendarray')
+            cls_obj.send_bulk_sms(numbers, message)
+            assert mock_sendarray_sms.called
+        else:
+            cls_obj.send_bulk_sms(numbers, message)
+            assert mock_send_sms.called
+            assert mock_send_sms.call_count == 3
+            mock_send_sms.assert_has_calls(
+                [
+                    mocker.call(number=numbers[0], message=message),
+                    mocker.call(number=numbers[1], message=message),
+                    mocker.call(number=numbers[2], message=message),
+                ]
+            )
 
 
 class TestBaseBackend(BaseBackend):
