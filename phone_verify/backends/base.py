@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import sys
 import random
 from abc import ABCMeta, abstractmethod
 
@@ -49,7 +49,9 @@ class BaseBackend(metaclass=ABCMeta):
         identifying a particular device in subsequent calls.
         """
         data = {"phone_number": phone_number, "nonce": random.random()}
-        return jwt.encode(data, django_settings.SECRET_KEY)
+        if (sys.version_info.major == 3 and sys.version_info.minor >= 8):
+            return jwt.encode(data, django_settings.SECRET_KEY)
+        return jwt.encode(data, django_settings.SECRET_KEY).decode()
 
     @classmethod
     def check_security_code_expiry(cls, stored_verification):
