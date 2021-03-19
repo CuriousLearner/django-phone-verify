@@ -4,7 +4,7 @@
 # Core Stuff
 # -------------------------------------
 Django==2.2.10
-djangorestframework==3.9.1
+djangorestframework==3.11.2
 
 # Code quality
 #--------------------------------------
