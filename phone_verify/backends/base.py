@@ -49,7 +49,11 @@ class BaseBackend(metaclass=ABCMeta):
         identifying a particular device in subsequent calls.
         """
         data = {"phone_number": phone_number, "nonce": random.random()}
-        return jwt.encode(data, django_settings.SECRET_KEY).decode()
+        session_token = jwt.encode(data, django_settings.SECRET_KEY)
+        try:
+            return session_token.decode()
+        except AttributeError:
+            return session_token
 
     @classmethod
     def check_security_code_expiry(cls, stored_verification):

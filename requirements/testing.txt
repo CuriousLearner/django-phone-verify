@@ -1,10 +1,10 @@
 # Testing
 # -------------------------------------
-pytest==5.3.1
-pytest-django==3.7.0
-pytest-cov==2.6.1
+pytest==6.2.2
+pytest-django==4.1.0
+pytest-cov==2.11.1
 
-django-dynamic-fixture==3.0.2
+django-dynamic-fixture==3.1.1
 flake8-mypy==17.8.0
-pytest-mock==1.10.0
-tox==3.13.2
+pytest-mock==3.5.1
+tox==3.23.0
