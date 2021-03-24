@@ -49,7 +49,21 @@ class BaseBackend(metaclass=ABCMeta):
         identifying a particular device in subsequent calls.
         """
         data = {"phone_number": phone_number, "nonce": random.random()}
-        return jwt.encode(data, django_settings.SECRET_KEY).decode()
+        encoded_str = jwt.encode(data, django_settings.SECRET_KEY)
+        if type(encoded_str) is bytes:
+            # jwt v2.0.0 or greater: `jwt.encode()` no longer return <class 'bytes'> 
+            # instead it return <class 'str'> and that's why `jwt.encode().decode()` fails
+            # To support jwt v1.7.1 or greater: if `jwt.encode()` return <class 'bytes'>
+            # convert it to <class 'str'>
+            # Details: https://github.com/jpadilla/pyjwt
+            try:
+                encoded_str = str(encoded_str, encoding='utf-8')
+            except TypeError:
+                try:
+                    encoded_str = encoded_str.decode()
+                except AttributeError:
+                    pass
+        return encoded_str
 
     @classmethod
     def check_security_code_expiry(cls, stored_verification):
