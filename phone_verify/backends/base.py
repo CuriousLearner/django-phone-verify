@@ -49,18 +49,15 @@ class BaseBackend(metaclass=ABCMeta):
         identifying a particular device in subsequent calls.
         """
         data = {"phone_number": phone_number, "nonce": random.random()}
-        encoded_str = jwt.encode(data, django_settings.SECRET_KEY)
-        if type(encoded_str) is bytes:
-            # jwt v2.0.0 or greater: `jwt.encode()` no longer return <class 'bytes'>
-            # instead it return <class 'str'> and that's why `jwt.encode().decode()` fails
-            # To support jwt v1.7.1 or greater: if `jwt.encode()` return <class 'bytes'>
-            # convert it to <class 'str'>
-            # Details: https://github.com/jpadilla/pyjwt
-            try:
-                encoded_str = str(encoded_str, encoding='utf-8')
-            except TypeError:
-                pass
-        return encoded_str
+        session_token = jwt.encode(data, django_settings.SECRET_KEY)
+        try:
+            return session_token.decode()
+        except AttributeError:
+            # For JWT v2.0.0 or greater: `jwt.encode()` no longer return `<class 'bytes'>`, and
+            # instead it return `<class 'str'>`. We are handling both cases here depending
+            # on what is present, and make it backward-compatible by still first trying to
+            # use `session_token.decode()` method, in case `<class 'bytes'>` is returned.
+            return session_token
 
     @classmethod
     def check_security_code_expiry(cls, stored_verification):
