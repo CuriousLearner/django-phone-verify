@@ -110,6 +110,18 @@ GPLv3
 Release Notes
 -------------
 
+[2.0.1]
+^^^^^^^
+
+Added
+"""""
+- Support for Python 3.8 & Python 3.9.
+- CI tests for Py{36,37,38,39}-Django{20,21,22,30}
+
+Changed
+"""""""
+- Fixed issue ``generate_session_token`` to handle cases in Py38, Py39 when the ``session_token`` is already ``string`` instead of ``bytes``.
+
 [2.0.0]
 ^^^^^^^
 
