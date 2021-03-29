@@ -94,6 +94,7 @@ Usage
 
 Compatibility
 -------------
+- Python 3.6+
 - Django 2.1+
 - Django REST Framework 3.9+
 
@@ -116,7 +117,7 @@ Release Notes
 Added
 """""
 - Support for Python 3.8 & Python 3.9.
-- CI tests for Py{36,37,38,39}-Django{20,21,22,30}
+- CI tests for Py{36,37,38,39}-Django{20,21,22,30,31}
 
 Changed
 """""""
