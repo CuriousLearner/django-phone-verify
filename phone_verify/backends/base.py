@@ -51,6 +51,13 @@ class BaseBackend(metaclass=ABCMeta):
         data = {"phone_number": phone_number, "nonce": random.random()}
         session_token = jwt.encode(data, django_settings.SECRET_KEY)
         try:
+            # PyJWT 2.0 returns a string instead of bytes
+            # Bytes will always need a .decode() method.
+            # We cannot upgrade to PyJWT 2.0.0 for now
+            # since there is a dependency conflict with twilio.
+            # TODO: Just return session_token when the other lib
+            # versions are updated and we can pin PyJWT >= 2.0.0
+            # More info: https://github.com/CuriousLearner/django-phone-verify/pull/57
             return session_token.decode()
         except AttributeError:
             return session_token
