@@ -29,13 +29,13 @@ A Django app to support phone number verification using the security code sent v
 Salient Features
 ----------------
 
-- Lets you verify phone numbers via SMS.
-- Extensibility to provide tokens with varying length.
+- Let's devs verify phone numbers via SMS.
+- Extensibility to provide tokens with varying lengths.
 - Comes with Twilio already integrated.
 - Set expiration time on tokens.
 - Provides an interface for writing custom SMS sending backend for easy extensibility.
-- Does not mess-up with existing ``AUTH_USER_MODEL`` at all.
-- Can be used for a number of potential use-cases, and not just auth.
+- Does not mess up with existing ``AUTH_USER_MODEL`` at all.
+- Can be used for several potential use-cases, and not just auth.
 - Provides ready endpoints for sending SMS and verification (See `api_endpoints.rst`_).
 
 .. _api_endpoints.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/phone_verify/docs/api_endpoints.rst
@@ -86,11 +86,11 @@ Configuration
 Usage
 -----
 
-- To explore more about how to use, integrate and leverage existing functionality of ``Django Phone Verify``, have a look at `usage.rst`_
+- To explore more about how to use, integrate and leverage the existing functionality of ``Django Phone Verify``, have a look at `usage.rst`_
 
 .. _usage.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/usage.rst
 
-**Note**: ``Django Phone Verfiy`` also provides ``Nexmo`` as a backend service other than ``Twilio``. To switch to ``Nexmo``, replace ``BACKEND`` within your ``PHONE_VERIFICATION`` setting with ``phone_verify.backends.nexmo.NexmoBackend`` and define ``KEY`` within ``OPTIONS`` of ``PHONE_VERIFICATION`` setting, with your nexmo API key, in place of already available ``SID``.
+**Note**: ``Django Phone Verify`` also provides ``Nexmo`` as a backend service other than ``Twilio``. To switch to ``Nexmo``, replace ``BACKEND`` within your ``PHONE_VERIFICATION`` setting with ``phone_verify.backends.nexmo.NexmoBackend`` and define ``KEY`` within ``OPTIONS`` of ``PHONE_VERIFICATION`` setting, with your Nexmo API key, in place of already available ``SID``.
 
 Compatibility
 -------------
@@ -131,7 +131,7 @@ Changed
 [2.0.0]
 ^^^^^^^
 
-**NOTE**: Previous version of this library provided the ``security_code`` in the JWT ``session_token``. You would have to re-verify ``phone_numbers`` in *this* version to ensure they are authentically verified.
+**NOTE**: The previous version of this library provided the ``security_code`` in the JWT ``session_token``. You would have to re-verify ``phone_numbers`` in *this* version to ensure they are authentically verified.
 
 Added
 """""
@@ -153,8 +153,8 @@ Changed
 Added
 """""
 
-- Support ``Nexmo`` as a backend service alongwith ``Twilio``.
-- Add docs for writing custom backend.
+- Support ``Nexmo`` as a backend service along with ``Twilio``.
+- Add docs for writing a custom backend.
 
 Changed
 """""""
@@ -214,4 +214,4 @@ Added
 - README and documentation of API endpoints.
 - ``setup.cfg`` to manage coverage.
 - ``phone_verify`` app including backends, requirements, tests.
-- Intial app setup.
+- Initial app setup.
