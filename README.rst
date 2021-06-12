@@ -114,7 +114,9 @@ Release Notes
 [Dev]
 ^^^^^
 
-
+Added
+"""""
+- Support for Django 3.2.
 
 [2.0.1]
 ^^^^^^^
@@ -122,7 +124,7 @@ Release Notes
 Added
 """""
 - Support for Python 3.8 & Python 3.9.
-- CI tests for Py{36,37,38,39}-Django{20,21,22,30,31}
+- CI tests for Py{36,37,38,39}-Django{20,21,22,30,31}.
 
 Changed
 """""""
