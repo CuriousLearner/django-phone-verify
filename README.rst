@@ -118,6 +118,10 @@ Added
 """""
 - Support for Django 3.2.
 
+Changed
+"""""""
+- Method ``phone_verify.backends.nexmo.NexmoBackend.send_sms`` changes parameter name from ``numbers`` to ``number`` to be consistent with rest of the inherited classes.
+
 [2.0.1]
 ^^^^^^^
 
