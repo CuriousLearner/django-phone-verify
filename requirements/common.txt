@@ -4,11 +4,11 @@ PyJWT==1.7.1
 
 # Configuration
 # -------------------------------------
-python-dotenv==0.15.0
+python-dotenv==0.17.1
 
 # Phone number related Stuff
 # -------------------------------------
-phonenumbers==8.12.20
-django-phonenumber-field==5.0.0
-twilio==6.55.0
+phonenumbers==8.12.24
+django-phonenumber-field==5.2.0
+twilio==6.59.1
 nexmo==2.5.2
