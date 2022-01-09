@@ -4,7 +4,10 @@
 import logging
 
 # Third Party Stuff
-from django.utils.translation import ugettext as _
+try:
+    from django.utils.translation import ugettext_lazy as _
+except ImportError:
+    from django.utils.translation import gettext_lazy as _
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
 
