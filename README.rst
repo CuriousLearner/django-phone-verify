@@ -116,6 +116,7 @@ Release Notes
 
 Added
 """""
+- Support for Django 4.x.
 - Support for Django 3.2.
 
 Changed
