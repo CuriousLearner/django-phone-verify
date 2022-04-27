@@ -21,11 +21,13 @@ setup(
     author_email="sanyam@sanyamkhurana.com",
     install_requires=[
         "django>=2.1.5",
-        "djangorestframework>=3.9.0",
-        "PyJWT>=1.7.1",
+        "PyJWT>=2.3.0",
         "python-dotenv>=0.10.0",
         "phonenumbers>=8.10.2",
         "django-phonenumber-field>=2.1.0",
+    ],
+    extras_require=[
+        "djangorestframework>=3.9.0",
         "twilio>=6.21.0",
         "nexmo>=2.4.0",
     ],
