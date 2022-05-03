@@ -27,10 +27,13 @@ class PhoneVerificationService(object):
 
     verification_message = phone_settings.get("MESSAGE", DEFAULT_MESSAGE)
 
-    def __init__(self, phone_number, backend=None):
+    def __init__(self, phone_number, backend=None, verification_message=None):
         self._check_required_settings()
         if backend is None:
             self.backend = get_sms_backend(phone_number=phone_number)
+            
+        if verification_message is not None:
+            self.verification_message = verification_message
 
     def send_verification(self, number, security_code):
         """
@@ -67,12 +70,12 @@ class PhoneVerificationService(object):
             )
 
 
-def send_security_code_and_generate_session_token(phone_number):
+def send_security_code_and_generate_session_token(phone_number, verification_message=None):
     sms_backend = get_sms_backend(phone_number)
     security_code, session_token = sms_backend.create_security_code_and_session_token(
         phone_number
     )
-    service = PhoneVerificationService(phone_number=phone_number)
+    service = PhoneVerificationService(phone_number=phone_number, verification_message=verification_message)
     try:
         service.send_verification(phone_number, security_code)
     except service.backend.exception_class as exc:
