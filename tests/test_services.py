@@ -32,7 +32,6 @@ def test_message_generation_and_sending_service(client, mocker, backend):
         assert mock_api.called
 
 def test_i18n_message_generation_and_sending_service(client, mocker, backend):
-    backend.update({'I18N': True})
     with override_settings(PHONE_VERIFICATION=backend):
         zh_verification_message = "歡迎使用 {app}! 請使用安全碼 {security_code} 繼續。"
         mocker.patch('phone_verify.services.gettext', return_value=zh_verification_message)

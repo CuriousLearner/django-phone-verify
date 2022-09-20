@@ -44,9 +44,7 @@ class PhoneVerificationService(object):
         self.backend.send_sms(number, message)
 
     def _generate_message(self, security_code):
-        # Check if i18n messages are defined
-        i18n = settings.PHONE_VERIFICATION.get('I18N', False)
-        if i18n and self.language:
+        if self.language:
             with override(self.language):
                 verification_message = gettext(self.verification_message)
                 return verification_message.format(
