@@ -6,6 +6,7 @@ import logging
 # Third Party Stuff
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import override, gettext
 
 # phone_verify stuff
 from .backends import get_sms_backend
@@ -27,10 +28,11 @@ class PhoneVerificationService(object):
 
     verification_message = phone_settings.get("MESSAGE", DEFAULT_MESSAGE)
 
-    def __init__(self, phone_number, backend=None):
+    def __init__(self, phone_number, backend=None, language='en'):
         self._check_required_settings()
         if backend is None:
             self.backend = get_sms_backend(phone_number=phone_number)
+        self.language = language
 
     def send_verification(self, number, security_code):
         """
@@ -39,10 +41,19 @@ class PhoneVerificationService(object):
         :param number: the phone number of recipient.
         """
         message = self._generate_message(security_code)
-
         self.backend.send_sms(number, message)
 
     def _generate_message(self, security_code):
+        # Check if i18n messages are defined
+        i18n = settings.PHONE_VERIFICATION.get('I18N', False)
+        if i18n and self.language:
+            with override(self.language):
+                verification_message = gettext(self.verification_message)
+                return verification_message.format(
+                    app=settings.PHONE_VERIFICATION.get("APP_NAME", DEFAULT_APP_NAME),
+                    security_code=security_code,
+                )
+
         return self.verification_message.format(
             app=settings.PHONE_VERIFICATION.get("APP_NAME", DEFAULT_APP_NAME),
             security_code=security_code,
@@ -67,12 +78,12 @@ class PhoneVerificationService(object):
             )
 
 
-def send_security_code_and_generate_session_token(phone_number):
+def send_security_code_and_generate_session_token(phone_number, language=''):
     sms_backend = get_sms_backend(phone_number)
     security_code, session_token = sms_backend.create_security_code_and_session_token(
         phone_number
     )
-    service = PhoneVerificationService(phone_number=phone_number)
+    service = PhoneVerificationService(phone_number=phone_number, language=language)
     try:
         service.send_verification(phone_number, security_code)
     except service.backend.exception_class as exc:

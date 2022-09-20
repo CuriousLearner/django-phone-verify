@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 class PhoneSerializer(serializers.Serializer):
     phone_number = PhoneNumberField()
+    language = serializers.CharField(default='')
 
 
 class SMSVerificationSerializer(serializers.Serializer):

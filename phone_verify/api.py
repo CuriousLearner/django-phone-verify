@@ -21,7 +21,8 @@ class VerificationViewSet(viewsets.GenericViewSet):
         serializer = PhoneSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         session_token = send_security_code_and_generate_session_token(
-            str(serializer.validated_data["phone_number"])
+            str(serializer.validated_data["phone_number"]),
+            serializer.validated_data['language']
         )
         return response.Ok({"session_token": session_token})
 

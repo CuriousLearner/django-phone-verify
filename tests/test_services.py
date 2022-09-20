@@ -31,6 +31,20 @@ def test_message_generation_and_sending_service(client, mocker, backend):
 
         assert mock_api.called
 
+def test_i18n_message_generation_and_sending_service(client, mocker, backend):
+    backend.update({'I18N': True})
+    with override_settings(PHONE_VERIFICATION=backend):
+        zh_verification_message = "歡迎使用 {app}! 請使用安全碼 {security_code} 繼續。"
+        mocker.patch('phone_verify.services.gettext', return_value=zh_verification_message)
+        service = PhoneVerificationService(phone_number="+13478379634", language='zh-hant')
+        backend_service = backend.get("BACKEND")
+        mock_api = mocker.patch(f"{backend_service}.send_sms")
+        service.send_verification("+13478379634", "123456")
+        actual_message = zh_verification_message.format(
+            app=backend['APP_NAME'], security_code="123456"
+        )
+        mock_api.assert_called_with("+13478379634", actual_message)
+
 
 def test_exception_is_logged_when_raised(client, mocker, backend):
     with override_settings(PHONE_VERIFICATION=backend):
