@@ -56,15 +56,18 @@ This would create ``SMSVerification`` table, which is used to store ``phone_numb
 i18n Support
 ------------
 
-If you would like to internationalize the verification messages, set `I18N` to `True`. This would cause the
-`PhoneVerificationService` to attempt to translate the `MESSAGE` string using Django's internationalization
-primitive `django.utils.translation.gettext`.
+If you would like to internationalize the verification messages, set the option ``I18N`` to ``True``. This would cause
+``PhoneVerificationService`` to attempt to translate the ``MESSAGE`` string using Django's internationalization
+primitive ``django.utils.translation.gettext``. Then define ``MESSAGE`` for all the desired locales that you want
+to support as per Django internationalization guidelines.
 
-To expose this capability to the clients, `PhoneVerificationService` constructor supports an additional parameter,
-`language`, which is the desired language locale code which will be looked up for a localized version of `MESSAGE`.
-Also, `VerificationViewSet.register` endpoint supports an optional `language` POST data argument where you can
+Under the hood, ``PhoneVerificationService`` constructor has been extended to support an additional parameter,
+``language``, which is the desired locale code which will be looked up for a localized version of ``MESSAGE``.
+Also, ``VerificationViewSet.register`` endpoint supports an optional ``language`` POST data argument where you can
 specify the locale code for the desired verification message language. This locale code will be eventually passed
-to `PhoneVerificationService`, to try and retrieve the localized message.
+to ``PhoneVerificationService``, to retrieve the localized message.
+
+All this is optional. That is, if you don't set ``I18N`` option, everything works as before.
 
 Usage
 -----
