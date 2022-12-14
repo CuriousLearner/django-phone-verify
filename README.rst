@@ -31,7 +31,7 @@ Salient Features
 
 - Let's devs verify phone numbers via SMS.
 - Extensibility to provide tokens with varying lengths.
-- Comes with Twilio already integrated.
+- Comes with Twilio and Nexmo already integrated.
 - Set expiration time on tokens.
 - Provides an interface for writing custom SMS sending backend for easy extensibility.
 - Does not mess up with existing ``AUTH_USER_MODEL`` at all.
