@@ -1,5 +1,5 @@
 How to Use Django Phone Verify?
-=====================================
+===============================
 
 
 Installation
