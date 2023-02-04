@@ -111,6 +111,14 @@ GPLv3
 Release Notes
 -------------
 
+[Dev]
+^^^^^
+
+Added
+"""""
+- Support for Python 3.11.
+- CI tests for Py{311}-Django{2x,3x,4x}.
+
 [3.0.0]
 ^^^^^^^
 
