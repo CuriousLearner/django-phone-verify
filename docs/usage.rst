@@ -53,6 +53,16 @@ Configuration
 
 This would create ``SMSVerification`` table, which is used to store ``phone_number``, ``session_token`` and ``security_code``.
 
+i18n Support
+------------
+
+If you would like to internationalize the verification messages, localize ``MESSAGE`` for all the desired locales
+that you want to support as per Django internationalization guidelines. Then, from the client, in the call to
+the ``phone-register`` API endpoint, specify the desired verification message language by setting the ``language``
+POST data to one of the locale codes that you support. ``PhoneVerificationService`` will then try to localize
+the message for the specified language code and if found send it to the SMS backend. If a translation for the
+specified language is not found, value of ``MESSAGE`` option would be sent.
+
 Usage
 -----
 
