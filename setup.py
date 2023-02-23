@@ -28,8 +28,16 @@ setup(
         "django-phonenumber-field>=2.1.0",
     ],
     extras_require={
-        'twilio': ["twilio>=7.16.4"],
-        'nexmo': ["nexmo>=2.5.2"],
+        "twilio": ["twilio"],
+        "nexmo": ["nexmo"],
+        "all": ["twilio", "nexmo"],
+    },
+    project_urls={
+        "Documentation": "#TBD",
+        "Changelog": "#TBD",
+        "Code": "https://github.com/CuriousLearner/django-phone-verify",
+        "Tracker": "https://github.com/CuriousLearner/django-phone-verify/issues",
+        "Funding": "#TBD"
     },
     classifiers=[
         "Environment :: Web Environment",
