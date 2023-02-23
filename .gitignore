@@ -100,9 +100,6 @@ venv.bak/
 # mkdocs documentation
 /site
 
-# mypy
-.mypy_cache/
-
 # OSX specific
 .DS_Store
 

@@ -18,4 +18,4 @@ repos:
     - id: check-json
     - id: pretty-format-json
     - id: check-added-large-files
-    - id: flake8
+    - id: ruff

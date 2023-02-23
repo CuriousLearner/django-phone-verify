@@ -22,8 +22,8 @@ DEFAULT_APP_NAME = "Phone Verify"
 class PhoneVerificationService(object):
     try:
         phone_settings = settings.PHONE_VERIFICATION
-    except AttributeError:
-        raise ImproperlyConfigured("Please define PHONE_VERIFICATION in settings")
+    except AttributeError as e:
+        raise ImproperlyConfigured("Please define PHONE_VERIFICATION in settings") from e
 
     verification_message = phone_settings.get("MESSAGE", DEFAULT_MESSAGE)
 

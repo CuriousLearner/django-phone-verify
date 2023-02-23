@@ -3,6 +3,7 @@ import uuid
 
 # Third Party Stuff
 from django.db import models
+
 try:
     from django.utils.translation import ugettext_lazy as _
 except ImportError:

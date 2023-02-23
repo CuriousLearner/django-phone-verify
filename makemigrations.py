@@ -1,8 +1,8 @@
 #!/path/to/your python
 
 import os
-import django
 
+import django
 from django.conf import settings
 from django.core.management import call_command
 

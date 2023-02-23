@@ -9,9 +9,10 @@ It may be also used for extending doctest's context:
 import copy
 import functools
 
+import django
+
 # Third Party Stuff
 import pytest
-import django
 from django.conf import settings
 
 from tests import test_settings

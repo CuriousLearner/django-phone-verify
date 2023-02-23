@@ -5,9 +5,10 @@ from __future__ import absolute_import
 from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client as TwilioRestClient
 
+from phone_verify.models import SMSVerification
+
 # Local
 from .base import BaseBackend
-from phone_verify.models import SMSVerification
 
 
 class TwilioBackend(BaseBackend):
