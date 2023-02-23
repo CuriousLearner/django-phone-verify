@@ -1,0 +1,19 @@
+line-length = 120
+select = [
+    'B',  # flake8-bugbear
+    'E',  # pycodestyle errors
+    'F',  # pyflakes
+    'I',  # iSort
+    'W',  # pycodestyle warnings
+    'B9',
+]
+exclude = [
+    ".tox",
+    ".git",
+    "docs",
+    "venv",
+    ".venv",
+]
+
+[isort]
+known-first-party = ["phone_verify"]

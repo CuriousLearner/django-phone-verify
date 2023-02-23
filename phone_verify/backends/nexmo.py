@@ -5,9 +5,10 @@ from __future__ import absolute_import
 import nexmo
 from nexmo.errors import ClientError
 
+from phone_verify.models import SMSVerification
+
 # Local
 from .base import BaseBackend
-from phone_verify.models import SMSVerification
 
 
 class NexmoBackend(BaseBackend):
