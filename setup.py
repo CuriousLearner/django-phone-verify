@@ -22,13 +22,15 @@ setup(
     install_requires=[
         "django>=2.1.5",
         "djangorestframework>=3.9.0",
-        "PyJWT>=1.7.1",
-        "python-dotenv>=0.10.0",
+        "PyJWT>=2.6.0",
+        "python-dotenv>=0.21.1",
         "phonenumbers>=8.10.2",
         "django-phonenumber-field>=2.1.0",
-        "twilio>=6.21.0",
-        "nexmo>=2.4.0",
     ],
+    extras_require={
+        'twilio': ["twilio>=7.16.4"],
+        'nexmo': ["nexmo>=2.5.2"],
+    },
     classifiers=[
         "Environment :: Web Environment",
         "Development Status :: 5 - Production/Stable",
