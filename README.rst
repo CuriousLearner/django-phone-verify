@@ -60,6 +60,7 @@ Configuration
     INSTALLED_APPS = [
         ...
         "phone_verify",
+        ...
     ]
 
 - Add settings for Phone Verify as you desire:
@@ -86,9 +87,9 @@ Configuration
 Usage
 -----
 
-- To explore more about how to use, integrate and leverage the existing functionality of ``Django Phone Verify``, have a look at `usage.rst`_
+- To explore more about how to use, integrate and leverage the existing functionality of ``Django Phone Verify``, have a look at `getting_started.rst`_
 
-.. _usage.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/usage.rst
+.. _getting_started.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/getting_started.rst
 
 **Note**: ``Django Phone Verify`` also provides ``Nexmo`` as a backend service other than ``Twilio``. To switch to ``Nexmo``, replace ``BACKEND`` within your ``PHONE_VERIFICATION`` setting with ``phone_verify.backends.nexmo.NexmoBackend`` and define ``KEY`` within ``OPTIONS`` of ``PHONE_VERIFICATION`` setting, with your Nexmo API key, in place of already available ``SID``.
 
@@ -210,7 +211,7 @@ Added
 """""
 
 - ``pre-commit-config`` to maintain code quality using black and other useful tools.
-- Docs for integration and usage in `usage.rst`_.
+- Docs for integration and usage in `getting_started.rst`_.
 - Tox for testing on `py{37}-django{20,21,22}`.
 - Travis CI for testing builds.
 
