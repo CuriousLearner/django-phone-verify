@@ -1,7 +1,10 @@
+Contributing
+============
+
 Thank you for your interest in contributing to this project. The following set of steps should help you get started with contributing to ``django-phone-verify``.
 
 Project Setup
-=============
+-------------
 
 1. Clone the git repository for this project onto your local system.
 
@@ -31,7 +34,7 @@ That's it! You now have a local setup of ``django-phone-verify``. You can start 
 
 
 Running Tests
-=============
+-------------
 
 ``django-phone-verify`` has unit tests located in the ``tests/`` directory. The project uses ``pytest`` to write and run the tests.
 
@@ -58,7 +61,7 @@ To test your changes with different versions of Python & Django that the project
 This would run all the tests with a combination of all Python/Django versions that it supports. Check the ``tox.ini`` file at the root of the project for more details.
 
 Local Development and testing
-=============================
+-----------------------------
 
 Once you've made code changes, you can install this local development copy of the Django app in your project by using the ``-e`` flag with ``pip install`` in the following manner:
 
