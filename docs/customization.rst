@@ -1,5 +1,5 @@
-How to write custom backend?
-============================
+Customization
+=============
 
 In case you want to use anything other than the provided backends (``phone_verify.backends.nexmo.NexmoBackend`` and ``phone_verify.backends.twilio.TwilioBackend``), you can write a custom backend by extending ``phone_verify.backends.base.BaseBackend`` as shown below.
 
