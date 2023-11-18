@@ -1,8 +1,8 @@
 django-phone-verify
 ===================
 
-.. image:: https://travis-ci.org/CuriousLearner/django-phone-verify.svg?branch=master
-    :target: https://travis-ci.org/CuriousLearner/django-phone-verify
+.. image:: https://github.com/github/docs/actions/workflows/main.yml/badge.svg?branch=master
+    :target: https://github.com/CuriousLearner/django-phone-verify/actions
 
 .. image:: https://coveralls.io/repos/github/CuriousLearner/django-phone-verify/badge.svg?branch=master
     :target: https://coveralls.io/github/CuriousLearner/django-phone-verify?branch=master
@@ -11,8 +11,8 @@ django-phone-verify
     :target: https://pypi.python.org/pypi/django-phone-verify/
     :alt: License
 
-.. image:: https://static.pepy.tech/personalized-badge/django-phone-verify?period=total&units=international_system&left_color=black&right_color=darkgreen&left_text=Downloads
- :target: https://pepy.tech/project/django-phone-verify
+.. image:: https://static.pepy.tech/badge/django-phone-verify?period=total&units=international_system&left_color=black&right_color=darkgreen&left_text=Downloads
+   :target: https://pepy.tech/project/django-phone-verify
 
 .. image:: https://img.shields.io/badge/Made%20with-Python-1f425f.svg
    :target: https://www.python.org/
