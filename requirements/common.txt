@@ -1,14 +1,14 @@
 # Core Stuff
 # -------------------------------------
-PyJWT==2.6.0
+PyJWT==2.8.0
 
 # Configuration
 # -------------------------------------
-python-dotenv==0.21.0
+python-dotenv==1.0.0
 
 # Phone number related Stuff
 # -------------------------------------
-phonenumbers==8.13.2
-django-phonenumber-field==7.0.1
-twilio==7.15.4
+phonenumbers==8.13.25
+django-phonenumber-field==7.2.0
+twilio==8.10.2
 nexmo==2.5.2
