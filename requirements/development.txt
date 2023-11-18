@@ -3,9 +3,9 @@
 
 # Core Stuff
 # -------------------------------------
-Django==4.1.7
+Django==4.2.7
 djangorestframework==3.14.0
 
 # Code quality
 #--------------------------------------
-pre-commit==2.20.0
+pre-commit==3.5.0

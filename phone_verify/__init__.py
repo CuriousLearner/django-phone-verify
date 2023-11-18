@@ -1,3 +1,5 @@
 # -*- coding: utf-8 -*-
+import django
 
-default_app_config = "phone_verify.apps.PhoneVerificationConfig"
+if django.VERSION < (3, 2):
+    default_app_config = "phone_verify.apps.PhoneVerificationConfig"
