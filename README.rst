@@ -1,15 +1,18 @@
 django-phone-verify
 ===================
 
-.. image:: https://travis-ci.org/CuriousLearner/django-phone-verify.svg?branch=master
-    :target: https://travis-ci.org/CuriousLearner/django-phone-verify
+.. image:: https://github.com/github/docs/actions/workflows/main.yml/badge.svg?branch=master
+    :target: https://github.com/CuriousLearner/django-phone-verify/actions
 
 .. image:: https://coveralls.io/repos/github/CuriousLearner/django-phone-verify/badge.svg?branch=master
     :target: https://coveralls.io/github/CuriousLearner/django-phone-verify?branch=master
 
-.. image:: https://pypip.in/license/django-phone-verify/badge.svg
+.. image:: https://img.shields.io/pypi/l/django-phone-verify
     :target: https://pypi.python.org/pypi/django-phone-verify/
     :alt: License
+
+.. image:: https://static.pepy.tech/badge/django-phone-verify?period=total&units=international_system&left_color=black&right_color=darkgreen&left_text=Downloads
+   :target: https://pepy.tech/project/django-phone-verify
 
 .. image:: https://img.shields.io/badge/Made%20with-Python-1f425f.svg
    :target: https://www.python.org/
@@ -60,6 +63,7 @@ Configuration
     INSTALLED_APPS = [
         ...
         "phone_verify",
+        ...
     ]
 
 - Add settings for Phone Verify as you desire:
@@ -86,9 +90,9 @@ Configuration
 Usage
 -----
 
-- To explore more about how to use, integrate and leverage the existing functionality of ``Django Phone Verify``, have a look at `usage.rst`_
+- To explore more about how to use, integrate and leverage the existing functionality of ``Django Phone Verify``, have a look at `getting_started.rst`_
 
-.. _usage.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/usage.rst
+.. _getting_started.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/getting_started.rst
 
 **Note**: ``Django Phone Verify`` also provides ``Nexmo`` as a backend service other than ``Twilio``. To switch to ``Nexmo``, replace ``BACKEND`` within your ``PHONE_VERIFICATION`` setting with ``phone_verify.backends.nexmo.NexmoBackend`` and define ``KEY`` within ``OPTIONS`` of ``PHONE_VERIFICATION`` setting, with your Nexmo API key, in place of already available ``SID``.
 
@@ -210,7 +214,7 @@ Added
 """""
 
 - ``pre-commit-config`` to maintain code quality using black and other useful tools.
-- Docs for integration and usage in `usage.rst`_.
+- Docs for integration and usage in `getting_started.rst`_.
 - Tox for testing on `py{37}-django{20,21,22}`.
 - Travis CI for testing builds.
 

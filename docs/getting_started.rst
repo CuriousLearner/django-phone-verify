@@ -1,5 +1,5 @@
-How to Use Django Phone Verify?
-===============================
+Getting Started
+===============
 
 
 Installation
@@ -22,6 +22,7 @@ Configuration
     INSTALLED_APPS = [
         ...
         'phone_verify',
+        ...
     ]
 
 - Add settings in your ``settings.py`` file:
