@@ -1,12 +1,4 @@
 line-length = 120
-select = [
-    'B',  # flake8-bugbear
-    'E',  # pycodestyle errors
-    'F',  # pyflakes
-    'I',  # iSort
-    'W',  # pycodestyle warnings
-    'B9',
-]
 exclude = [
     ".tox",
     ".git",
@@ -15,5 +7,15 @@ exclude = [
     ".venv",
 ]
 
-[isort]
+[lint]
+select = [
+    'B',  # flake8-bugbear
+    'E',  # pycodestyle errors
+    'F',  # pyflakes
+    'I',  # iSort
+    'W',  # pycodestyle warnings
+    'B9',
+]
+
+[lint.isort]
 known-first-party = ["phone_verify"]

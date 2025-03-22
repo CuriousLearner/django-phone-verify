@@ -32,6 +32,6 @@ jobs:
           python -m pip install tox tox-gh-actions
           python -m pip install -r requirements/testing.txt
       - name: Run ruff
-        run: ruff .
+        run: ruff check .
       - name: Test with tox
         run: tox
