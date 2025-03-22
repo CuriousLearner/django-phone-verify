@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 9
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v3
@@ -32,6 +32,6 @@ jobs:
           python -m pip install tox tox-gh-actions
           python -m pip install -r requirements/testing.txt
       - name: Run ruff
-        run: ruff .
+        run: ruff check .
       - name: Test with tox
         run: tox
