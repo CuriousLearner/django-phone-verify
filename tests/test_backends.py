@@ -3,10 +3,12 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import override_settings
 from django.urls import reverse
+from unittest.mock import patch
 from django.utils.module_loading import import_string
 
 from conftest import sandbox_backends
 from phone_verify.backends.base import BaseBackend
+from phone_verify.backends import get_sms_backend
 
 PHONE_NUMBER = "+13478379634"
 SECURITY_CODE = "123456"
@@ -135,3 +137,38 @@ def test_base_backend_abstract_methods(mocker):
             # This might fail in case, we have methods having different
             # number of arguments
             getattr(cls_obj, method)(mocker.Mock(), mocker.Mock())
+
+
+@pytest.mark.parametrize("backend_path, provider", [
+    ("phone_verify.backends.twilio.SMSBackend", "Twilio"),
+    ("phone_verify.backends.nexmo.SMSBackend", "Nexmo"),
+])
+def test_missing_sms_provider_dependency_raises_runtime_error(backend_path, provider):
+    with override_settings(PHONE_VERIFICATION={
+        "BACKEND": backend_path,
+        "OPTIONS": {}
+    }):
+        with patch("phone_verify.backends.import_string", side_effect=ImportError("No module named")):
+            with pytest.raises(RuntimeError) as exc_info:
+                get_sms_backend("+1234567890")
+            assert str(exc_info.value) == (
+                f"{provider} backend is not installed. "
+                f"Please install '{provider.lower()}' to use this provider."
+            )
+
+
+def test_custom_backend_import_error(monkeypatch):
+    settings.PHONE_VERIFICATION = {
+        "BACKEND": "myproject.fake.CustomBackend",
+        "OPTIONS": {}
+    }
+
+    # Ensure import_string fails
+    monkeypatch.setattr("phone_verify.backends.import_string", lambda path: (_ for _ in ()).throw(ImportError("Mocked ImportError")))
+
+    with pytest.raises(RuntimeError) as excinfo:
+        get_sms_backend("+1234567890")
+
+    assert "Failed to import the specified backend" in str(excinfo.value)
+    assert "myproject.fake.CustomBackend" in str(excinfo.value)
+

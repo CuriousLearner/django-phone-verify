@@ -48,7 +48,14 @@ Installation
 
 .. code-block:: shell
 
-    pip install django-phone-verify
+    pip install django-phone-verify[all]
+
+You also have option to install only the required dependencies for Twilio or Nexmo:
+
+.. code-block:: shell
+
+    pip install django-phone-verify[twilio]
+    pip install django-phone-verify[nexmo]
 
 Configuration
 -------------
