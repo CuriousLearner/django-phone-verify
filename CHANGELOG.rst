@@ -2,7 +2,7 @@ Release Notes
 -------------
 
 [3.0.1]
-^^^^^
+^^^^^^^
 
 Added
 """""
@@ -108,7 +108,7 @@ Added
 """""
 
 - ``pre-commit-config`` to maintain code quality using black and other useful tools.
-- Docs for integration and usage in `getting_started.rst`_.
+- Docs for integration and usage in :doc:`getting_started`
 - Tox for testing on `py{37}-django{20,21,22}`.
 - Travis CI for testing builds.
 

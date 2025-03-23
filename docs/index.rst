@@ -28,6 +28,7 @@ Django Phone Verify provides the core functionality so you can focus on your bus
     integration
     customization
     contributing
+    changelog
 
 Indices and Tables
 ==================
