@@ -12,14 +12,18 @@ This guide walks you through creating:
 2. A sandbox version for testing
 
 
-Custom SMS Backend (Example: Nexmo)
------------------------------------
+Creating a Custom SMS Backend
+-----------------------------
 
-### Step 1: Create a Backend File
+This example demonstrates how to integrate Nexmo. The same pattern applies to any other provider.
 
-Create a new Python file in your Django project (e.g., ``nexmo.py``).
+Step 1: Create the Backend File
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-### Step 2: Configure Settings
+Create a new Python file in your Django project, e.g., ``nexmo.py``.
+
+Step 2: Configure Django Settings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Update your ``settings.py``:
 
@@ -41,9 +45,10 @@ Update your ``settings.py``:
     }
 
 .. note::
-   You can use a client library (like ``nexmo``) or directly call the API endpoints of the SMS provider.
+   You can use an official client library like ``nexmo``, or make raw API calls.
 
-### Step 3: Implement Backend Class
+Step 3: Implement the Backend Class
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -71,12 +76,13 @@ Update your ``settings.py``:
                 self.send_sms(number, message)
 
 
-Custom Sandbox Backend (Example: Nexmo)
----------------------------------------
+Creating a Sandbox SMS Backend
+------------------------------
 
 A sandbox backend is useful for testing flows without sending real SMS messages.
 
-### Step 1: Create Sandbox Backend
+Step 1: Implement the Sandbox Backend
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -113,9 +119,10 @@ A sandbox backend is useful for testing flows without sending real SMS messages.
 
 .. note::
    - ``generate_security_code`` returns a constant token for predictable testing.
-   - ``validate_security_code`` always returns a valid result.
+   - ``validate_security_code`` always treats the token as valid.
 
-### Step 2: Use Sandbox in Settings
+Step 2: Configure Django to Use the Sandbox Backend
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -136,5 +143,6 @@ A sandbox backend is useful for testing flows without sending real SMS messages.
 
 ----
 
-You're now ready to use a fully custom or sandbox backend with ``django-phone-verify``.
-For production, update the ``BACKEND`` to your live implementation.
+You’re now ready to use your own backend with ``django-phone-verify``.
+In production, configure the ``BACKEND`` setting to point to your real backend class.
+
