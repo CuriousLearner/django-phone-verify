@@ -1,14 +1,15 @@
+from unittest.mock import patch
+
 import pytest
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import override_settings
 from django.urls import reverse
-from unittest.mock import patch
 from django.utils.module_loading import import_string
 
 from conftest import sandbox_backends
-from phone_verify.backends.base import BaseBackend
 from phone_verify.backends import get_sms_backend
+from phone_verify.backends.base import BaseBackend
 
 PHONE_NUMBER = "+13478379634"
 SECURITY_CODE = "123456"
@@ -164,7 +165,10 @@ def test_custom_backend_import_error(monkeypatch):
     }
 
     # Ensure import_string fails
-    monkeypatch.setattr("phone_verify.backends.import_string", lambda path: (_ for _ in ()).throw(ImportError("Mocked ImportError")))
+    monkeypatch.setattr(
+        "phone_verify.backends.import_string",
+        lambda path: (_ for _ in ()
+    ).throw(ImportError("Mocked ImportError")))
 
     with pytest.raises(RuntimeError) as excinfo:
         get_sms_backend("+1234567890")
