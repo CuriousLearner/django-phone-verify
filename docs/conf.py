@@ -18,11 +18,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 # -- Project information -----------------------------------------------------
 
 project = "Django Phone Verify"
-copyright = "2017-2023, Sanyam Khurana"
+copyright = "2017-2025, Sanyam Khurana"
 author = "Sanyam Khurana"
 
 # The full version, including alpha/beta/rc tags
-release = "3.0.0"
+release = "3.0.1"
 
 master_doc = "index"
 

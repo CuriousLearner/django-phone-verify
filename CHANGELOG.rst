@@ -1,7 +1,7 @@
 Release Notes
 -------------
 
-[Dev]
+[3.0.1]
 ^^^^^
 
 Added
