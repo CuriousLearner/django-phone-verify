@@ -20,33 +20,47 @@ DEFAULT_APP_NAME = "Phone Verify"
 
 
 class PhoneVerificationService(object):
-    try:
-        phone_settings = settings.PHONE_VERIFICATION
-    except AttributeError as e:
-        raise ImproperlyConfigured("Please define PHONE_VERIFICATION in settings") from e
-
-    verification_message = phone_settings.get("MESSAGE", DEFAULT_MESSAGE)
 
     def __init__(self, phone_number, backend=None):
+        try:
+            self.phone_settings = settings.PHONE_VERIFICATION
+        except AttributeError as e:
+            raise ImproperlyConfigured("Please define PHONE_VERIFICATION in settings") from e
         self._check_required_settings()
         if backend is None:
             self.backend = get_sms_backend(phone_number=phone_number)
+        else:
+            self.backend = backend
 
-    def send_verification(self, number, security_code):
+        self.verification_message = self.phone_settings.get("MESSAGE", DEFAULT_MESSAGE)
+
+    def send_verification(self, number, security_code, context=None):
         """
         Send a verification text to the given number to verify.
 
         :param number: the phone number of recipient.
+        :param security_code: generated code to verify
+        :param context: optional dictionary for custom message formatting
         """
-        message = self._generate_message(security_code)
-
+        message = self._generate_message(security_code, context)
         self.backend.send_sms(number, message)
 
-    def _generate_message(self, security_code):
-        return self.verification_message.format(
-            app=settings.PHONE_VERIFICATION.get("APP_NAME", DEFAULT_APP_NAME),
-            security_code=security_code,
-        )
+    def _generate_message(self, security_code, context=None):
+        # If the backend has its own message generator, prefer it
+        if hasattr(self.backend, "generate_message") and callable(self.backend.generate_message):
+            message = self.backend.generate_message(security_code, context=context)
+            if message:
+                return message
+
+        # Default fallback
+        format_context = {
+            "app": settings.PHONE_VERIFICATION.get("APP_NAME", DEFAULT_APP_NAME),
+            "security_code": security_code,
+        }
+        if context:
+            format_context.update(context)
+
+        return self.verification_message.format(**format_context)
 
     def _check_required_settings(self):
         required_settings = {

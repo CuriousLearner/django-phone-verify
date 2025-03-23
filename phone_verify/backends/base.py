@@ -148,3 +148,16 @@ class BaseBackend(metaclass=ABCMeta):
         stored_verification.save()
 
         return stored_verification, self.SECURITY_CODE_VALID
+
+    def generate_message(self, security_code, context=None):
+        """
+        Optionally override this method to customize the verification message.
+
+        If this method returns None, the PhoneVerificationService will fall back
+        to the default message defined in settings.
+
+        :param security_code: The generated verification code.
+        :param context: Optional dictionary with runtime values.
+        :return: A string message or None to trigger fallback.
+        """
+        return None
