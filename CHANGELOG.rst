@@ -12,6 +12,11 @@ Added
 - Support for Python 3.11, 3.12, 3.13
 - CI tests for Py{311,312,313}-Django{2x,3x,4x,5x}.
 
+Changed
+"""""""
+
+- ``phonenumbers`` dependency is replaced with ``phonenumberslite`` to reduce the package size.
+
 [3.0.0]
 ^^^^^^^
 

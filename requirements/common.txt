@@ -8,7 +8,7 @@ python-dotenv==1.0.1
 
 # Phone number related Stuff
 # -------------------------------------
-phonenumbers==9.0.1
+phonenumberslite==9.0.1
 django-phonenumber-field==8.0.0
 twilio==9.5.1
 nexmo==2.5.2

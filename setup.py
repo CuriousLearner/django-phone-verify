@@ -24,7 +24,7 @@ setup(
         "djangorestframework>=3.9.0",
         "PyJWT>=2.6.0",
         "python-dotenv>=0.21.1",
-        "phonenumbers>=8.10.2",
+        "phonenumberslite>=9.0.1",
         "django-phonenumber-field>=2.1.0",
     ],
     extras_require={
