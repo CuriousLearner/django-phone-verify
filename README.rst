@@ -28,7 +28,7 @@ django-phone-verify
 
 
 ``django-phone-verify`` is a Django app that enables simple phone number verification using a security code sent via SMS.
-It supports Twilio and Nexmo (Vonage) out of the box and is fully customizable to suit your backend needs.
+It supports Twilio and Nexmo (Vonage) out of the box and is fully customizable to suit your backend needs. Docs are available at `https://www.sanyamkhurana.com/django-phone-verify/ <https://www.sanyamkhurana.com/django-phone-verify/>`.
 
 Features
 --------
