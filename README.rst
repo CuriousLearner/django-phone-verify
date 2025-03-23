@@ -107,10 +107,10 @@ Usage
 
 To get started using the app and integrating it into your own flow (DRF or non-DRF), check the following documentation:
 
-- 📘 `Getting Started Guide <https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/getting_started.rst>`_
-- 🔌 `Integration Examples <https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/integration.rst>`_
-- ⚙️ `Custom Backend Guide <https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/customization.rst>`_
-- 📮 `API Endpoints Reference <https://github.com/CuriousLearner/django-phone-verify/blob/master/phone_verify/docs/api_endpoints.rst>`_
+- 📘 `Getting Started Guide <docs/getting_started.rst>`_
+- 🔌 `Integration Examples <docs/integration.rst>`_
+- ⚙️ `Custom Backend Guide <docs/customization.rst>`_
+- 📮 `API Endpoints Reference <phone_verify/docs/api_endpoints.rst>`_
 
 Compatibility
 -------------
