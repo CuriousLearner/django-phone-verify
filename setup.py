@@ -34,7 +34,7 @@ setup(
     },
     project_urls={
         "Documentation": "https://www.sanyamkhurana.com/django-phone-verify/",
-        "Changelog": "https://www.sanyamkhurana.com/django-phone-verify/CHANGELOG",
+        "Changelog": "https://github.com/CuriousLearner/django-phone-verify/blob/master/CHANGELOG.rst",
         "Code": "https://github.com/CuriousLearner/django-phone-verify",
         "Tracker": "https://github.com/CuriousLearner/django-phone-verify/issues",
         "Funding": "https://github.com/sponsors/CuriousLearner"
