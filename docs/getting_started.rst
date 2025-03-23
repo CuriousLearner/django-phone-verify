@@ -9,7 +9,7 @@ for different SMS backends:
 
 .. code-block:: shell
 
-    pip install django-phone-verify          # Core install
+    pip install django-phone-verify          # Core install (only if you want to write your own backend)
     pip install django-phone-verify[twilio]  # Twilio support
     pip install django-phone-verify[nexmo]   # Nexmo (Vonage) support
     pip install django-phone-verify[all]     # All supported backends
