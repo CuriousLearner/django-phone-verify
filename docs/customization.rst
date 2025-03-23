@@ -71,6 +71,15 @@ Step 3: Implement the Backend Class
                 'text': message,
             })
 
+        def generate_message(self, security_code, context=None):
+            """You can optionally override the message formatting by
+            defining a `generate_message()` method in your backend.
+            This method receives the `security_code` and an optional
+            `context` dictionary passed at runtime, giving you more
+            flexibility than using a static `MESSAGE` template."""
+            username = context.get("username", "User") if context else "User"
+            return f"Hi {username}, your OTP is {security_code}."
+
         def send_bulk_sms(self, numbers, message):
             for number in numbers:
                 self.send_sms(number, message)
@@ -106,6 +115,9 @@ Step 1: Implement the Sandbox Backend
                 'to': number,
                 'text': message,
             })
+
+        def generate_message(self, security_code, context=None):
+            return f"[SANDBOX] Your code is {security_code}"
 
         def send_bulk_sms(self, numbers, message):
             for number in numbers:

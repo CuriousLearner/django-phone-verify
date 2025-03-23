@@ -82,3 +82,52 @@ def test_exception_is_raised_when_no_settings(client, backend):
             importlib.reload(phone_verify.services)
             PhoneVerificationService(phone_number="+13478379634")
             assert exc.info == "Please define PHONE_VERIFICATION in settings"
+
+
+class DummyBackend:
+    def __init__(self):
+        self.sent_messages = []
+
+    def send_sms(self, number, message):
+        self.sent_messages.append((number, message))
+
+
+class CustomBackendWithMessage(DummyBackend):
+    def generate_message(self, security_code, context=None):
+        return f"Custom: {security_code} / {context.get('extra', '')}"
+
+
+@pytest.mark.django_db
+def test_generate_message_default_fallback(settings):
+    settings.PHONE_VERIFICATION = {
+        'BACKEND': 'tests.test_services.DummyBackend',
+        'OPTIONS': {},
+        'TOKEN_LENGTH': 6,
+        'MESSAGE': 'Code: {security_code} from {app}, note: {extra}',
+        'APP_NAME': 'TestApp',
+        'SECURITY_CODE_EXPIRATION_TIME': 300,
+        'VERIFY_SECURITY_CODE_ONLY_ONCE': True,
+    }
+
+    svc = PhoneVerificationService(phone_number="+1234567890", backend=DummyBackend())
+    msg = svc._generate_message("123456", context={"extra": "extra-info"})
+
+    assert msg == "Code: 123456 from TestApp, note: extra-info"
+
+
+@pytest.mark.django_db
+def test_generate_message_from_custom_backend(settings):
+    settings.PHONE_VERIFICATION = {
+        'BACKEND': 'tests.test_services.CustomBackendWithMessage',
+        'OPTIONS': {},
+        'TOKEN_LENGTH': 6,
+        'MESSAGE': 'SHOULD NOT BE USED',
+        'APP_NAME': 'TestApp',
+        'SECURITY_CODE_EXPIRATION_TIME': 300,
+        'VERIFY_SECURITY_CODE_ONLY_ONCE': True,
+    }
+
+    svc = PhoneVerificationService(phone_number="+1234567890", backend=CustomBackendWithMessage())
+    msg = svc._generate_message("999999", context={"extra": "runtime"})
+
+    assert msg == "Custom: 999999 / runtime"

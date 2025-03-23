@@ -1,6 +1,19 @@
 Release Notes
 -------------
 
+[3.1.0]
+^^^^^^^
+
+Added
+"""""
+- Allow custom backends to override `generate_message(security_code, context=None)` for dynamic message generation at runtime.
+- `context` parameter support added to `send_verification()` for passing additional formatting data dynamically.
+
+Changed
+"""""""
+- `PhoneVerificationService` now delegates message generation to the backend if `generate_message()` is implemented.
+- Moved `phone_settings` inside `__init__` for better error handling when `PHONE_VERIFICATION` is missing from settings.
+
 [3.0.1]
 ^^^^^^^
 
