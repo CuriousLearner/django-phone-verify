@@ -158,6 +158,7 @@ This process happens in **two steps**:
 **request_code.html**
 
 .. code-block:: html
+    :force:
 
     <form method="post">
         {% csrf_token %}
@@ -168,6 +169,7 @@ This process happens in **two steps**:
 **verify_and_register.html**
 
 .. code-block:: html
+    :force:
 
     <form method="post">
         {% csrf_token %}
