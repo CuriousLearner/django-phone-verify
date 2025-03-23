@@ -1,73 +1,94 @@
 Contributing
 ============
 
-Thank you for your interest in contributing to this project. The following set of steps should help you get started with contributing to ``django-phone-verify``.
+Thank you for your interest in contributing to ``django-phone-verify``!
+The following guide will help you set up your development environment and start contributing effectively.
 
 Project Setup
 -------------
 
-1. Clone the git repository for this project onto your local system.
+1. **Clone the repository**
 
-::
+   Clone the GitHub repository to your local system:
 
-    git clone https://github.com/CuriousLearner/django-phone-verify.git
+   .. code-block:: shell
 
-2. Create a virtual environment. You may use any tool of your choice.
+       git clone https://github.com/CuriousLearner/django-phone-verify.git
 
-::
+2. **Create and activate a virtual environment**
 
-    $ python3 -m venv venv
+   You may use any tool of your choice (e.g., ``venv`` or ``virtualenv``). Here’s how to do it using the built-in ``venv``:
 
-Activate env using
+   .. code-block:: shell
 
-::
+       python3 -m venv venv
+       source venv/bin/activate
 
-    $ source venv/bin/activate
+3. **Install development dependencies**
 
-3. Install the python dependencies via the following command. Make sure you are in the root directory.
+   Make sure you are in the root directory of the project, then install the required dependencies:
 
-::
+   .. code-block:: shell
 
-    (venv) $ python -m pip install -r requirements/development.txt
+       python -m pip install -r requirements/development.txt
 
-That's it! You now have a local setup of ``django-phone-verify``. You can start contributing to it.
+You now have a local setup of ``django-phone-verify`` ready for development and contribution.
 
+.. _running-tests:
 
 Running Tests
 -------------
 
-``django-phone-verify`` has unit tests located in the ``tests/`` directory. The project uses ``pytest`` to write and run the tests.
+Unit tests are located in the ``tests/`` directory, and the project uses ``pytest`` for testing.
 
-Before we proceed with performing tests, we should install the testing dependencies. Install the testing requirements via the following command. Make sure you are in the root directory.
+1. **Install testing dependencies**
 
-::
+   From the root directory, run:
 
-    (venv) $ python -m pip install requirements/testing.txt
+   .. code-block:: shell
 
-To run the test, you have to run the ``pytest`` command. If you want to get the code coverage, use the ``--cov`` argument as
+       python -m pip install -r requirements/testing.txt
 
-::
+2. **Run the test suite**
 
-    (venv) $ pytest --cov
+   To execute the test suite:
 
-This will list down the current code coverage.
+   .. code-block:: shell
 
-To test your changes with different versions of Python & Django that the project supports, you can use ``tox`` like:
+       pytest
 
-::
+3. **Run tests with code coverage**
 
-    (venv) $ tox
+   For checking code coverage, use the ``--cov`` option:
 
-This would run all the tests with a combination of all Python/Django versions that it supports. Check the ``tox.ini`` file at the root of the project for more details.
+   .. code-block:: shell
 
-Local Development and testing
+       pytest --cov
+
+4. **Test with multiple Python/Django versions using tox**
+
+   The project supports multiple versions of Python and Django. To run the full test matrix using ``tox``, use:
+
+   .. code-block:: shell
+
+       tox
+
+   Refer to the ``tox.ini`` file at the root of the repository for supported versions and configurations.
+
+Local Development and Testing
 -----------------------------
 
-Once you've made code changes, you can install this local development copy of the Django app in your project by using the ``-e`` flag with ``pip install`` in the following manner:
+After making code changes, you can install the app in **editable mode** inside your Django project to test your modifications:
 
-::
+.. code-block:: shell
 
-    $ cd /path/to/new/django/project
-    $ pip install -e /path/to/local/django-phone-verify
+    cd /path/to/your/django/project
+    pip install -e /path/to/local/django-phone-verify
 
-This will install your local modified copy of the app in your Django application rather than fetching it from PyPI. After you're satisfied with the changes, you can run tests using the `running tests <#running-tests>`_ section above.
+This installs your local copy instead of the one from PyPI, allowing you to test changes immediately.
+
+Once you're satisfied, refer back to the :ref:`running-tests` section to verify that everything works correctly before submitting a pull request.
+
+----
+
+Feel free to open issues, suggest improvements, and submit pull requests. Happy coding!
