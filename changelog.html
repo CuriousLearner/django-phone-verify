@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Release Notes &#8212; Django Phone Verify 3.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=08bfcbec"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Contributing" href="contributing.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="release-notes">
+<h1>Release Notes<a class="headerlink" href="#release-notes" title="Link to this heading">¶</a></h1>
+<section id="id1">
+<h2>[3.1.0]<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<section id="added">
+<h3>Added<a class="headerlink" href="#added" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Allow custom backends to override <cite>generate_message(security_code, context=None)</cite> for dynamic message generation at runtime.</p></li>
+<li><p><cite>context</cite> parameter support added to <cite>send_verification()</cite> for passing additional formatting data dynamically.</p></li>
+</ul>
+</section>
+<section id="changed">
+<h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><cite>PhoneVerificationService</cite> now delegates message generation to the backend if <cite>generate_message()</cite> is implemented.</p></li>
+<li><p>Moved <cite>phone_settings</cite> inside <cite>__init__</cite> for better error handling when <cite>PHONE_VERIFICATION</cite> is missing from settings.</p></li>
+</ul>
+</section>
+</section>
+<section id="id2">
+<h2>[3.0.1]<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<section id="id3">
+<h3>Added<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Optional dependencies (<code class="docutils literal notranslate"><span class="pre">twilio</span></code>, <code class="docutils literal notranslate"><span class="pre">nexmo</span></code>) are now only required if explicitly used in the <code class="docutils literal notranslate"><span class="pre">PHONE_VERIFICATION[&quot;BACKEND&quot;]</span></code> setting.</p></li>
+<li><p>Improved error messaging to guide users to install the required backend package (e.g., <code class="docutils literal notranslate"><span class="pre">twilio</span></code>, <code class="docutils literal notranslate"><span class="pre">nexmo</span></code>) only when needed.</p></li>
+<li><p>Custom backends now raise a clear <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> if the import fails, instead of misleading dependency errors.</p></li>
+<li><p>Support for Python 3.11, 3.12, 3.13</p></li>
+<li><p>CI tests for Py{311,312,313}-Django{2x,3x,4x,5x}.</p></li>
+</ul>
+</section>
+<section id="id4">
+<h3>Changed<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">phonenumbers</span></code> dependency is replaced with <code class="docutils literal notranslate"><span class="pre">phonenumberslite</span></code> to reduce the package size.</p></li>
+</ul>
+</section>
+</section>
+<section id="id5">
+<h2>[3.0.0]<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<section id="id6">
+<h3>Added<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Support for Django 4.x.</p></li>
+<li><p>Support for Django 3.2.</p></li>
+</ul>
+</section>
+<section id="id7">
+<h3>Changed<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Method <code class="docutils literal notranslate"><span class="pre">phone_verify.backends.nexmo.NexmoBackend.send_sms</span></code> changes parameter name from <code class="docutils literal notranslate"><span class="pre">numbers</span></code> to <code class="docutils literal notranslate"><span class="pre">number</span></code> to be consistent with rest of the inherited classes.</p></li>
+</ul>
+</section>
+</section>
+<section id="id8">
+<h2>[2.0.1]<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
+<section id="id9">
+<h3>Added<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Support for Python 3.8 &amp; Python 3.9.</p></li>
+<li><p>CI tests for Py{36,37,38,39}-Django{20,21,22,30,31}.</p></li>
+</ul>
+</section>
+<section id="id10">
+<h3>Changed<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed issue <code class="docutils literal notranslate"><span class="pre">generate_session_token</span></code> to handle cases in Py38, Py39 when the <code class="docutils literal notranslate"><span class="pre">session_token</span></code> is already <code class="docutils literal notranslate"><span class="pre">string</span></code> instead of <code class="docutils literal notranslate"><span class="pre">bytes</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id11">
+<h2>[2.0.0]<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h2>
+<p><strong>NOTE</strong>: The previous version of this library provided the <code class="docutils literal notranslate"><span class="pre">security_code</span></code> in the JWT <code class="docutils literal notranslate"><span class="pre">session_token</span></code>. You would have to re-verify <code class="docutils literal notranslate"><span class="pre">phone_numbers</span></code> in <em>this</em> version to ensure they are authentically verified.</p>
+<section id="id12">
+<h3>Added<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Tests added to provide 100% coverage on the package.</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">nexmo.errors.ClientError</span></code> as exception class in <code class="docutils literal notranslate"><span class="pre">phone_verify.backends.nexmo.NexmoBackend</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">phone_verify.backends.nexmo.NexmoSandboxBackend</span></code>.</p></li>
+</ul>
+</section>
+<section id="id13">
+<h3>Changed<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Method signature changed for <code class="docutils literal notranslate"><span class="pre">phone_verify.backends.BaseBackend.generate_session_token</span></code>. It now accepts only <code class="docutils literal notranslate"><span class="pre">phone_number</span></code> instead of combination of <code class="docutils literal notranslate"><span class="pre">phone_number</span></code> and <code class="docutils literal notranslate"><span class="pre">security_code</span></code>.</p></li>
+<li><p>Remove the <code class="docutils literal notranslate"><span class="pre">security_code</span></code> from JWT <code class="docutils literal notranslate"><span class="pre">session_token</span></code> to avoid leaking information.</p></li>
+<li><p>Add nonce in <code class="docutils literal notranslate"><span class="pre">session_token</span></code> to generate unique tokens for each <code class="docutils literal notranslate"><span class="pre">phone_number</span></code>.</p></li>
+<li><p>Fixes call to <code class="docutils literal notranslate"><span class="pre">phone_verify.backends.nexmo.NexmoBackend.send_sms</span></code> method.</p></li>
+</ul>
+</section>
+</section>
+<section id="id14">
+<h2>[1.1.0]<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h2>
+<section id="id15">
+<h3>Added<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Support <code class="docutils literal notranslate"><span class="pre">Nexmo</span></code> as a backend service along with <code class="docutils literal notranslate"><span class="pre">Twilio</span></code>.</p></li>
+<li><p>Add docs for writing a custom backend.</p></li>
+</ul>
+</section>
+<section id="id16">
+<h3>Changed<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">backends.base.BaseBackend.validate_security_code</span></code> to use <code class="docutils literal notranslate"><span class="pre">save()</span></code> instead of <code class="docutils literal notranslate"><span class="pre">update()</span></code> to allow Django to emit its <code class="docutils literal notranslate"><span class="pre">post_save()</span></code> signal.</p></li>
+</ul>
+</section>
+</section>
+<section id="id17">
+<h2>[1.0.0]<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h2>
+<section id="id18">
+<h3>Added<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Add coverage report through <code class="docutils literal notranslate"><span class="pre">coveralls</span></code>.</p></li>
+<li><p>Support for One-Time Passwords (OTP) using <code class="docutils literal notranslate"><span class="pre">VERIFY_SECURITY_CODE_ONLY_ONCE</span></code> as <code class="docutils literal notranslate"><span class="pre">True</span></code> in the settings.</p></li>
+<li><p>Script to support makemigrations for development.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BaseBackend</span></code> status now have <code class="docutils literal notranslate"><span class="pre">SECURITY_CODE_VERIFIED</span></code> and <code class="docutils literal notranslate"><span class="pre">SESSION_TOKEN_INVALID</span></code> status to support new states.</p></li>
+</ul>
+</section>
+<section id="id19">
+<h3>Changed<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Rename <code class="docutils literal notranslate"><span class="pre">TWILIO_SANDBOX_TOKEN</span></code> to <code class="docutils literal notranslate"><span class="pre">SANDBOX_TOKEN</span></code>.</p></li>
+<li><p>Fix signature for <code class="docutils literal notranslate"><span class="pre">send_bulk_sms</span></code> method in <code class="docutils literal notranslate"><span class="pre">TwilioBackend</span></code> and <code class="docutils literal notranslate"><span class="pre">TwilioSandboxBackend</span></code>.</p></li>
+<li><p>Response for <code class="docutils literal notranslate"><span class="pre">/api/phone/register</span></code> contains key <code class="docutils literal notranslate"><span class="pre">session_token</span></code> instead of <code class="docutils literal notranslate"><span class="pre">session_code</span></code>.</p></li>
+<li><p>Request payload for <code class="docutils literal notranslate"><span class="pre">/api/phone/verify</span></code> now expects <code class="docutils literal notranslate"><span class="pre">session_token</span></code> key instead of <code class="docutils literal notranslate"><span class="pre">session_code</span></code>.</p></li>
+<li><p>Response for <code class="docutils literal notranslate"><span class="pre">/api/phone/verify</span></code> now sends additional response of <code class="docutils literal notranslate"><span class="pre">Security</span> <span class="pre">code</span> <span class="pre">is</span> <span class="pre">already</span> <span class="pre">verified</span></code> in case <code class="docutils literal notranslate"><span class="pre">VERIFY_SECURITY_CODE_ONLY_ONCE</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p>Rename <code class="docutils literal notranslate"><span class="pre">otp</span></code> to <code class="docutils literal notranslate"><span class="pre">security_code</span></code> in code and docs to be more consistent.</p></li>
+<li><p>Rename <code class="docutils literal notranslate"><span class="pre">BaseBackend</span></code> status from <code class="docutils literal notranslate"><span class="pre">VALID</span></code>, <code class="docutils literal notranslate"><span class="pre">INVALID</span></code>, <code class="docutils literal notranslate"><span class="pre">EXPIRED</span></code> to <code class="docutils literal notranslate"><span class="pre">SECURITY_CODE_VALID</span></code>, <code class="docutils literal notranslate"><span class="pre">SECURITY_CODE_INVALID</span></code>, and <code class="docutils literal notranslate"><span class="pre">SECURITY_CODE_EXPIRED</span></code> respectively.</p></li>
+<li><p>Rename <code class="docutils literal notranslate"><span class="pre">session_code</span></code> to <code class="docutils literal notranslate"><span class="pre">session_token</span></code> to be consistent in code and naming across the app.</p></li>
+<li><p>Rename service <code class="docutils literal notranslate"><span class="pre">send_otp_and_generate_session_code</span></code> to <code class="docutils literal notranslate"><span class="pre">send_security_code_and_generate_session_token</span></code>.</p></li>
+<li><p>Rename method <code class="docutils literal notranslate"><span class="pre">BaseBackend.generate_token</span></code> to <code class="docutils literal notranslate"><span class="pre">BaseBackend.generate_security_code</span></code>.</p></li>
+<li><p>Rename method <code class="docutils literal notranslate"><span class="pre">create_otp_and_session_token</span></code> to <code class="docutils literal notranslate"><span class="pre">create_security_code_and_session_token</span></code>.</p></li>
+<li><p>Rename method <code class="docutils literal notranslate"><span class="pre">BaseBackend.validate_token</span></code> to <code class="docutils literal notranslate"><span class="pre">BaseBackend.validate_security_code</span></code> with an additional parameter of <code class="docutils literal notranslate"><span class="pre">session_token</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id20">
+<h2>[0.2.0]<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h2>
+<section id="id21">
+<h3>Added<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pre-commit-config</span></code> to maintain code quality using black and other useful tools.</p></li>
+<li><p>Docs for integration and usage in <a class="reference internal" href="getting_started.html"><span class="doc">Getting Started</span></a></p></li>
+<li><p>Tox for testing on <cite>py{37}-django{20,21,22}</cite>.</p></li>
+<li><p>Travis CI for testing builds.</p></li>
+</ul>
+</section>
+<section id="id22">
+<h3>Changed<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Convert <code class="docutils literal notranslate"><span class="pre">*.md</span></code> docs to reST Markup.</p></li>
+<li><p>Fix issue with installing required package dependencies via <code class="docutils literal notranslate"><span class="pre">install_requires</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id23">
+<h2>[0.1.1]<a class="headerlink" href="#id23" title="Link to this heading">¶</a></h2>
+<section id="id24">
+<h3>Added<a class="headerlink" href="#id24" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>README and documentation of API endpoints.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code> to manage coverage.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">phone_verify</span></code> app including backends, requirements, tests.</p></li>
+<li><p>Initial app setup.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Django Phone Verify</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="customization.html">Customization Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Release Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">[3.1.0]</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">[3.0.1]</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id5">[3.0.0]</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id8">[2.0.1]</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id11">[2.0.0]</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id14">[1.1.0]</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id17">[1.0.0]</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id20">[0.2.0]</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id23">[0.1.1]</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="contributing.html" title="previous chapter">Contributing</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2017-2025, Sanyam Khurana.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/changelog.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

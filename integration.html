@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Integration Guide &#8212; Django Phone Verify 3.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=08bfcbec"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Customization Guide" href="customization.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="integration-guide">
+<span id="integration"></span><h1>Integration Guide<a class="headerlink" href="#integration-guide" title="Link to this heading">¶</a></h1>
+<p>This guide explains how to integrate <code class="docutils literal notranslate"><span class="pre">django-phone-verify</span></code> into your user signup process.
+It includes two approaches:</p>
+<ol class="arabic simple">
+<li><p>Using Django REST Framework (DRF)</p></li>
+<li><p>Using standard Django views and forms (non-DRF)</p></li>
+</ol>
+<section id="approach-1-integration-with-django-rest-framework-drf">
+<h2>Approach 1: Integration with Django REST Framework (DRF)<a class="headerlink" href="#approach-1-integration-with-django-rest-framework-drf" title="Link to this heading">¶</a></h2>
+<p>This method is ideal if your project uses APIs for registration.</p>
+<ol class="arabic simple">
+<li><p><strong>Create a custom ViewSet</strong></p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">action</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllowAny</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.response</span><span class="w"> </span><span class="kn">import</span> <span class="n">Response</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phone_verify.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">VerificationViewSet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phone_verify</span><span class="w"> </span><span class="kn">import</span> <span class="n">serializers</span> <span class="k">as</span> <span class="n">phone_serializers</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">services</span><span class="p">,</span> <span class="n">serializers</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">YourCustomViewSet</span><span class="p">(</span><span class="n">VerificationViewSet</span><span class="p">):</span>
+
+    <span class="nd">@action</span><span class="p">(</span>
+        <span class="n">detail</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">],</span>
+        <span class="n">permission_classes</span><span class="o">=</span><span class="p">[</span><span class="n">AllowAny</span><span class="p">],</span>
+        <span class="n">serializer_class</span><span class="o">=</span><span class="n">serializers</span><span class="o">.</span><span class="n">YourCustomSerializer</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">verify_and_register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">phone_serializer</span> <span class="o">=</span> <span class="n">phone_serializers</span><span class="o">.</span><span class="n">SMSVerificationSerializer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">phone_serializer</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">user_serializer</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">YourUserSerializer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">user_serializer</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">user</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">create_user_account</span><span class="p">(</span><span class="o">**</span><span class="n">user_serializer</span><span class="o">.</span><span class="n">validated_data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">user_serializer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p><strong>Create serializers</strong></p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">serializers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phone_verify.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">SMSVerificationSerializer</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">YourUserSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">Serializer</span><span class="p">):</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">EmailField</span><span class="p">()</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">YourCustomSerializer</span><span class="p">(</span><span class="n">YourUserSerializer</span><span class="p">,</span> <span class="n">SMSVerificationSerializer</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p><strong>Create service for user creation</strong></p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_user_model</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_user_account</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="o">**</span><span class="n">extra</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">get_user_model</span><span class="p">()</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+        <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span>
+        <span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+        <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">extra</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p><strong>Register viewset in urls.py</strong></p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.routers</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultRouter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">yourapp.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">YourCustomViewSet</span>
+
+<span class="n">router</span> <span class="o">=</span> <span class="n">DefaultRouter</span><span class="p">(</span><span class="n">trailing_slash</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">router</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;phone&#39;</span><span class="p">,</span> <span class="n">YourCustomViewSet</span><span class="p">,</span> <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;phone&#39;</span><span class="p">)</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">router</span><span class="o">.</span><span class="n">urls</span>
+</pre></div>
+</div>
+</section>
+<section id="approach-2-integration-without-drf-using-django-views-forms">
+<h2>Approach 2: Integration Without DRF (Using Django Views &amp; Forms)<a class="headerlink" href="#approach-2-integration-without-drf-using-django-views-forms" title="Link to this heading">¶</a></h2>
+<p>If you’re using Django templates and standard views, you can integrate phone verification manually using the core service API.</p>
+<p>This process happens in <strong>two steps</strong>:</p>
+<ol class="arabic simple">
+<li><p>First, the user submits their phone number to request a verification code.</p></li>
+<li><p>Then, on a second form, they enter the code they received to verify their number and proceed with registration.</p></li>
+</ol>
+<ol class="arabic simple">
+<li><p><strong>Forms</strong></p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">forms</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PhoneRequestForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">phone_number</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">VerificationForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">phone_number</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">HiddenInput</span><span class="p">)</span>
+    <span class="n">security_code</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">EmailField</span><span class="p">()</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">PasswordInput</span><span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p><strong>Views</strong></p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phone_verify.services</span><span class="w"> </span><span class="kn">import</span> <span class="n">PhoneVerificationService</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_user_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">PhoneRequestForm</span><span class="p">,</span> <span class="n">VerificationForm</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">request_code_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">PhoneRequestForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">phone</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;phone_number&#39;</span><span class="p">]</span>
+            <span class="n">verifier</span> <span class="o">=</span> <span class="n">PhoneVerificationService</span><span class="p">(</span><span class="n">phone</span><span class="p">)</span>
+            <span class="n">verifier</span><span class="o">.</span><span class="n">send_verification</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;/verify/?phone_number=</span><span class="si">{</span><span class="n">phone</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">PhoneRequestForm</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;request_code.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">verify_and_register_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">VerificationForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">phone</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;phone_number&#39;</span><span class="p">]</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;security_code&#39;</span><span class="p">]</span>
+            <span class="n">verifier</span> <span class="o">=</span> <span class="n">PhoneVerificationService</span><span class="p">(</span><span class="n">phone</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verifier</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">code</span><span class="p">):</span>
+                <span class="n">get_user_model</span><span class="p">()</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+                    <span class="n">username</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">],</span>
+                    <span class="n">email</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span>
+                    <span class="n">password</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;login&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">phone</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;phone_number&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">VerificationForm</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;phone_number&#39;</span><span class="p">:</span> <span class="n">phone</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;verify_and_register.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p><strong>Templates</strong></p></li>
+</ol>
+<p><strong>request_code.html</strong></p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span><span class="p">&gt;</span>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span><span class="p">&gt;</span>Send Verification Code<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p><strong>verify_and_register.html</strong></p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span><span class="p">&gt;</span>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span><span class="p">&gt;</span>Verify <span class="err">&amp;</span> Register<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+<p>Choose the approach that best fits your architecture. For APIs, use DRF. For standard form submissions, follow the manual integration path.</p>
+<p>For sandbox or custom backend support, see the <a class="reference internal" href="customization.html"><span class="doc">Customization Guide</span></a> guide.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Django Phone Verify</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Integration Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#approach-1-integration-with-django-rest-framework-drf">Approach 1: Integration with Django REST Framework (DRF)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#approach-2-integration-without-drf-using-django-views-forms">Approach 2: Integration Without DRF (Using Django Views &amp; Forms)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="customization.html">Customization Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Release Notes</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="getting_started.html" title="previous chapter">Getting Started</a></li>
+      <li>Next: <a href="customization.html" title="next chapter">Customization Guide</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2017-2025, Sanyam Khurana.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/integration.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
