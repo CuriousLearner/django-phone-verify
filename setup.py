@@ -37,7 +37,7 @@ setup(
         "Changelog": "https://www.sanyamkhurana.com/django-phone-verify/CHANGELOG",
         "Code": "https://github.com/CuriousLearner/django-phone-verify",
         "Tracker": "https://github.com/CuriousLearner/django-phone-verify/issues",
-        "Funding": "#TBD"
+        "Funding": "https://github.com/sponsors/CuriousLearner"
     },
     classifiers=[
         "Environment :: Web Environment",
