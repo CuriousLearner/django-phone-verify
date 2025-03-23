@@ -12,45 +12,45 @@ django-phone-verify
     :alt: License
 
 .. image:: https://static.pepy.tech/badge/django-phone-verify?period=total&units=international_system&left_color=black&right_color=darkgreen&left_text=Downloads
-   :target: https://pepy.tech/project/django-phone-verify
+    :target: https://pepy.tech/project/django-phone-verify
 
 .. image:: https://img.shields.io/badge/Made%20with-Python-1f425f.svg
-   :target: https://www.python.org/
+    :target: https://www.python.org/
 
 .. image:: https://img.shields.io/badge/Maintained%3F-yes-green.svg
-   :target: https://GitHub.com/CuriousLearner/django-phone-verify/graphs/commit-activity
+    :target: https://GitHub.com/CuriousLearner/django-phone-verify/graphs/commit-activity
 
 .. image:: https://badge.fury.io/py/django-phone-verify.svg
-   :target: https://pypi.python.org/pypi/django-phone-verify/
+    :target: https://pypi.python.org/pypi/django-phone-verify/
 
 .. image:: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
-   :target: http://makeapullrequest.com
+    :target: http://makeapullrequest.com
 
 
-A Django app to support phone number verification using the security code sent via SMS.
+``django-phone-verify`` is a Django app that enables simple phone number verification using a security code sent via SMS.
+It supports Twilio and Nexmo (Vonage) out of the box and is fully customizable to suit your backend needs.
 
-Salient Features
-----------------
+Features
+--------
 
-- Let's devs verify phone numbers via SMS.
-- Extensibility to provide tokens with varying lengths.
-- Comes with Twilio and Nexmo already integrated.
-- Set expiration time on tokens.
-- Provides an interface for writing custom SMS sending backend for easy extensibility.
-- Does not mess up with existing ``AUTH_USER_MODEL`` at all.
-- Can be used for several potential use-cases, and not just auth.
-- Provides ready endpoints for sending SMS and verification (See `api_endpoints.rst`_).
-
-.. _api_endpoints.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/phone_verify/docs/api_endpoints.rst
+- 🔐 Verify phone numbers using SMS security codes
+- 🔧 Supports custom token length and expiration time
+- 🔄 Built-in support for Twilio and Nexmo (Vonage)
+- 🧩 Easily extensible via pluggable backends
+- ✅ Doesn't interfere with your existing ``AUTH_USER_MODEL``
+- 🚀 Ready-to-use API endpoints via Django REST Framework
+- 🛠 Can be used for multiple flows like signup, 2FA, marketing opt-in, etc.
 
 Installation
 ------------
+
+Install the package with all supported backends:
 
 .. code-block:: shell
 
     pip install django-phone-verify[all]
 
-You also have option to install only the required dependencies for Twilio or Nexmo:
+Or install with just the backend you need:
 
 .. code-block:: shell
 
@@ -60,27 +60,22 @@ You also have option to install only the required dependencies for Twilio or Nex
 Configuration
 -------------
 
-- Add app to `INSTALLED_APPS`
+1. Add ``phone_verify`` to ``INSTALLED_APPS``:
 
 .. code-block:: python
 
-    # In settings.py:
-
-    # Add app to `INSTALLED_APPS`
     INSTALLED_APPS = [
         ...
         "phone_verify",
         ...
     ]
 
-- Add settings for Phone Verify as you desire:
+2. Configure ``PHONE_VERIFICATION`` settings:
 
 .. code-block:: python
 
-    # In settings.py
-    # Add settings for phone_verify to work
     PHONE_VERIFICATION = {
-        "BACKEND": "phone_verify.backends.twilio.TwilioBackend",
+        "BACKEND": "phone_verify.backends.twilio.TwilioBackend",  # or NexmoBackend
         "OPTIONS": {
             "SID": "fake",
             "SECRET": "fake",
@@ -90,21 +85,36 @@ Configuration
         "TOKEN_LENGTH": 6,
         "MESSAGE": "Welcome to {app}! Please use security code {security_code} to proceed.",
         "APP_NAME": "Phone Verify",
-        "SECURITY_CODE_EXPIRATION_TIME": 3600,  # In seconds only
-        "VERIFY_SECURITY_CODE_ONLY_ONCE": False,  # If False, then a security code can be used multiple times for verification
+        "SECURITY_CODE_EXPIRATION_TIME": 3600,  # in seconds
+        "VERIFY_SECURITY_CODE_ONLY_ONCE": False,
     }
+
+**Note:** To use Nexmo instead of Twilio, change the ``BACKEND`` path to:
+
+.. code-block:: python
+
+    "BACKEND": "phone_verify.backends.nexmo.NexmoBackend"
+
+and in ``OPTIONS``, use:
+
+.. code-block:: python
+
+    "KEY": "your-nexmo-key",
+    "SECRET": "your-nexmo-secret"
 
 Usage
 -----
 
-- To explore more about how to use, integrate and leverage the existing functionality of ``Django Phone Verify``, have a look at `getting_started.rst`_
+To get started using the app and integrating it into your own flow (DRF or non-DRF), check the following documentation:
 
-.. _getting_started.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/getting_started.rst
-
-**Note**: ``Django Phone Verify`` also provides ``Nexmo`` as a backend service other than ``Twilio``. To switch to ``Nexmo``, replace ``BACKEND`` within your ``PHONE_VERIFICATION`` setting with ``phone_verify.backends.nexmo.NexmoBackend`` and define ``KEY`` within ``OPTIONS`` of ``PHONE_VERIFICATION`` setting, with your Nexmo API key, in place of already available ``SID``.
+- 📘 `Getting Started Guide <https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/getting_started.rst>`_
+- 🔌 `Integration Examples <https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/integration.rst>`_
+- ⚙️ `Custom Backend Guide <https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/customization.rst>`_
+- 📮 `API Endpoints Reference <https://github.com/CuriousLearner/django-phone-verify/blob/master/phone_verify/docs/api_endpoints.rst>`_
 
 Compatibility
 -------------
+
 - Python 3.6+
 - Django 2.1+
 - Django REST Framework 3.9+
@@ -112,16 +122,16 @@ Compatibility
 Contributing
 ------------
 
-No code is bug-free and I'm sure this app will have bugs. If you find any bugs, please create an issue on GitHub.
+Found a bug? Want to suggest an improvement or submit a patch?
+Pull requests are welcome! 🙌 Please check the `contributing guide <https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/contributing.rst>`_ before you start.
 
-Licence
+License
 -------
 
-GPLv3
+This project is licensed under the **GPLv3** license.
 
 Changelog
 ---------
 
-See `changelog.rst`_
-
-.. _changelog.rst: https://github.com/CuriousLearner/django-phone-verify/blob/master/CHANGELOG.rst
+See the full changelog here:
+📄 `CHANGELOG.rst <https://github.com/CuriousLearner/django-phone-verify/blob/master/CHANGELOG.rst>`_
