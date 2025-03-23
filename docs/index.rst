@@ -25,6 +25,7 @@ Django Phone Verify provides the core functionality so you can focus on your bus
     :caption: Contents:
 
     getting_started
+    integration
     customization
     contributing
 
