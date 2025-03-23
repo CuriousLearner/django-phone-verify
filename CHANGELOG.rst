@@ -6,6 +6,9 @@ Release Notes
 
 Added
 """""
+- Optional dependencies (``twilio``, ``nexmo``) are now only required if explicitly used in the ``PHONE_VERIFICATION["BACKEND"]`` setting.
+- Improved error messaging to guide users to install the required backend package (e.g., ``twilio``, ``nexmo``) only when needed.
+- Custom backends now raise a clear ``RuntimeError`` if the import fails, instead of misleading dependency errors.
 - Support for Python 3.11, 3.12, 3.13
 - CI tests for Py{311,312,313}-Django{2x,3x,4x,5x}.
 
