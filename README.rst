@@ -1,8 +1,8 @@
 django-phone-verify
 ===================
 
-.. image:: https://github.com/github/docs/actions/workflows/main.yml/badge.svg?branch=master
-    :target: https://github.com/CuriousLearner/django-phone-verify/actions
+.. image:: https://github.com/CuriousLearner/django-phone-verify/actions/workflows/main.yml/badge.svg?branch=master
+    :target: https://github.com/CuriousLearner/django-phone-verify/actions/workflows/main.yml
 
 .. image:: https://coveralls.io/repos/github/CuriousLearner/django-phone-verify/badge.svg?branch=master
     :target: https://coveralls.io/github/CuriousLearner/django-phone-verify?branch=master
@@ -48,7 +48,14 @@ Installation
 
 .. code-block:: shell
 
-    pip install django-phone-verify
+    pip install django-phone-verify[all]
+
+You also have option to install only the required dependencies for Twilio or Nexmo:
+
+.. code-block:: shell
+
+    pip install django-phone-verify[twilio]
+    pip install django-phone-verify[nexmo]
 
 Configuration
 -------------
