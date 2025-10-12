@@ -6,6 +6,7 @@ from abc import ABCMeta, abstractmethod
 # Third Party Stuff
 import jwt
 from django.conf import settings as django_settings
+from django.db import models
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 
@@ -20,6 +21,7 @@ class BaseBackend(metaclass=ABCMeta):
     SECURITY_CODE_EXPIRED = 2
     SECURITY_CODE_VERIFIED = 3
     SESSION_TOKEN_INVALID = 4
+    SECURITY_CODE_TOO_MANY_ATTEMPTS = 5
 
     def __init__(self, **settings):
         self.exception_class = None
@@ -120,6 +122,7 @@ class BaseBackend(metaclass=ABCMeta):
             - `BaseBackend.SECURITY_CODE_EXPIRED`
             - `BaseBackend.SECURITY_CODE_VERIFIED`
             - `BaseBackend.SESSION_TOKEN_INVALID`
+            - `BaseBackend.SECURITY_CODE_TOO_MANY_ATTEMPTS` (new)
         """
         stored_verification = SMSVerification.objects.filter(
             security_code=security_code, phone_number=phone_number
@@ -127,27 +130,63 @@ class BaseBackend(metaclass=ABCMeta):
 
         # check security_code exists
         if stored_verification is None:
+            # Wrong security code - don't increment attempts since we can't associate
+            # this failed attempt with a specific verification session
             return stored_verification, self.SECURITY_CODE_INVALID
 
-        # check session code exists
+        # check session token matches
         if not stored_verification.session_token == session_token:
+            # Wrong session token - legitimate user might be using different device
+            # Don't increment attempts for session mismatch
             return stored_verification, self.SESSION_TOKEN_INVALID
+
+        # Now we have a valid verification record with matching session token
+        # Check if too many failed attempts for this specific verification session
+        max_failed_attempts = django_settings.PHONE_VERIFICATION.get("MAX_FAILED_ATTEMPTS", 5)
+        if stored_verification.failed_attempts >= max_failed_attempts:
+            return stored_verification, self.SECURITY_CODE_TOO_MANY_ATTEMPTS
 
         # check security_code is not expired
         if self.check_security_code_expiry(stored_verification):
+            # Increment failed attempts for expired codes (user waited too long)
+            stored_verification.failed_attempts = models.F('failed_attempts') + 1
+            stored_verification.save(update_fields=['failed_attempts'])
+            stored_verification.refresh_from_db()
             return stored_verification, self.SECURITY_CODE_EXPIRED
 
-        # check security_code is not verified
+        # check security_code is not already verified
         if stored_verification.is_verified and django_settings.PHONE_VERIFICATION.get(
             "VERIFY_SECURITY_CODE_ONLY_ONCE"
         ):
+            # Increment failed attempts for already used codes (potential replay attack)
+            stored_verification.failed_attempts = models.F('failed_attempts') + 1
+            stored_verification.save(update_fields=['failed_attempts'])
+            stored_verification.refresh_from_db()
             return stored_verification, self.SECURITY_CODE_VERIFIED
 
-        # mark security_code as verified
+        # All validations passed - mark security_code as verified
         stored_verification.is_verified = True
-        stored_verification.save()
+        stored_verification.failed_attempts = 0  # Reset on successful verification
+        stored_verification.save(update_fields=['is_verified', 'failed_attempts'])
 
         return stored_verification, self.SECURITY_CODE_VALID
+
+    def _increment_failed_attempts(self, session_token, phone_number):
+        """
+        Increment failed attempts for the given session token.
+        If the verification record exists but the code was wrong, increment its counter.
+        If no record exists for this session, we don't track attempts (they're already invalid).
+        """
+        try:
+            verification = SMSVerification.objects.get(
+                session_token=session_token, phone_number=phone_number
+            )
+            verification.failed_attempts += 1
+            verification.save()
+        except SMSVerification.DoesNotExist:
+            # No verification record exists for this session/phone combination
+            # This is already an invalid attempt, but we don't need to track it
+            pass
 
     def generate_message(self, security_code, context=None):
         """

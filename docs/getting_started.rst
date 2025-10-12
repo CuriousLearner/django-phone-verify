@@ -43,6 +43,8 @@ Configuration
             'SANDBOX_TOKEN': '123456',
         },
         'TOKEN_LENGTH': 6,
+        'MIN_TOKEN_LENGTH': 6,  # Minimum allowed token length for security
+        'MAX_FAILED_ATTEMPTS': 5,  # Maximum failed verification attempts before locking session
         'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
         'APP_NAME': 'Phone Verify',
         'SECURITY_CODE_EXPIRATION_TIME': 3600,
