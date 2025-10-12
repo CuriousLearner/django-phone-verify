@@ -12,3 +12,4 @@ phonenumberslite==9.0.1
 django-phonenumber-field==8.0.0
 twilio==9.5.1
 nexmo==2.5.2
+smsir-python==1.0.4
