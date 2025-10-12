@@ -1,0 +1,129 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-phone-verify"
+version = "3.2.0"
+description = "A Django app to support phone number verification using security code sent via SMS."
+readme = "README.rst"
+requires-python = ">=3.8"
+license = {text = "GPLv3"}
+authors = [
+    {name = "Sanyam Khurana", email = "sanyam@sanyamkhurana.com"}
+]
+keywords = [
+    "django",
+    "phone",
+    "verification",
+    "SMS",
+    "twilio",
+    "nexmo",
+    "vonage",
+    "OTP",
+    "2FA",
+    "authentication"
+]
+classifiers = [
+    "Environment :: Web Environment",
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Django",
+    "Framework :: Django :: 2.0",
+    "Framework :: Django :: 2.1",
+    "Framework :: Django :: 2.2",
+    "Framework :: Django :: 3.0",
+    "Framework :: Django :: 3.1",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.0",
+    "Framework :: Django :: 4.1",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+]
+dependencies = [
+    "django>=2.1.5",
+    "djangorestframework>=3.9.0",
+    "PyJWT>=2.6.0",
+    "python-dotenv>=0.21.1",
+    "phonenumberslite>=9.0.1",
+    "django-phonenumber-field>=2.1.0",
+]
+
+[project.optional-dependencies]
+twilio = ["twilio"]
+nexmo = ["nexmo"]
+all = ["twilio", "nexmo"]
+
+[project.urls]
+Documentation = "https://www.sanyamkhurana.com/django-phone-verify/"
+Changelog = "https://github.com/CuriousLearner/django-phone-verify/blob/master/CHANGELOG.rst"
+Code = "https://github.com/CuriousLearner/django-phone-verify"
+Homepage = "https://github.com/CuriousLearner/django-phone-verify"
+Tracker = "https://github.com/CuriousLearner/django-phone-verify/issues"
+Funding = "https://github.com/sponsors/CuriousLearner"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["phone_verify*"]
+exclude = ["tests*", "docs*"]
+
+[tool.ruff]
+line-length = 120
+exclude = [
+    ".tox",
+    ".git",
+    "docs",
+    "venv",
+    ".venv",
+]
+
+[tool.ruff.lint]
+select = [
+    'B',  # flake8-bugbear
+    'E',  # pycodestyle errors
+    'F',  # pyflakes
+    'I',  # iSort
+    'W',  # pycodestyle warnings
+    'B9',
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["phone_verify"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "--cov=phone_verify --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["phone_verify"]
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]

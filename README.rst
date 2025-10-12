@@ -27,21 +27,45 @@ django-phone-verify
     :target: http://makeapullrequest.com
 
 
-``django-phone-verify`` is a Django app that enables simple phone number verification using a security code sent via SMS.
-It supports Twilio and Nexmo (Vonage) out of the box and is fully customizable to suit your backend needs.
+A Django app to support **phone number verification** using a security code sent via SMS.
 
-Docs are available at `https://www.sanyamkhurana.com/django-phone-verify/ <https://www.sanyamkhurana.com/django-phone-verify/>`_.
+``django-phone-verify`` provides a simple, secure way to verify phone numbers for user authentication, 2FA, account recovery, and more. It works seamlessly with Django and Django REST Framework, supports multiple SMS providers (Twilio, Nexmo/Vonage), and is fully extensible with custom backends.
 
-Features
---------
+📖 **Full Documentation:** `https://www.sanyamkhurana.com/django-phone-verify/ <https://www.sanyamkhurana.com/django-phone-verify/>`_
 
-- 🔐 Verify phone numbers using SMS security codes
-- 🔧 Supports custom token length and expiration time
-- 🔄 Built-in support for Twilio and Nexmo (Vonage)
-- 🧩 Easily extensible via pluggable backends
-- ✅ Doesn't interfere with your existing ``AUTH_USER_MODEL``
-- 🚀 Ready-to-use API endpoints via Django REST Framework
-- 🛠 Can be used for multiple flows like signup, 2FA, marketing opt-in, etc.
+What It Does
+------------
+
+``django-phone-verify`` handles the complete phone verification flow:
+
+1. **Send Verification Code** - User requests verification, receives SMS with security code
+2. **Verify Code** - User submits code, system validates and confirms phone number
+3. **Session Management** - Secure JWT-based session tokens prevent tampering
+4. **Multiple Use Cases** - Registration, 2FA, password reset, marketing opt-in, and more
+
+Key Features
+------------
+
+**Security & Flexibility**
+
+- 🔐 **Secure verification flow** - JWT session tokens, configurable code expiration, one-time use options
+- 🔧 **Highly customizable** - Token length, expiration time, message templates, custom backends
+- 🔒 **Production-ready** - Rate limiting support, security best practices, GDPR/CCPA compliance guidance
+
+**Easy Integration**
+
+- 🚀 **Django REST Framework** - Pre-built viewsets and serializers for instant API setup
+- 🔌 **Pluggable backends** - Use Twilio, Nexmo/Vonage, or write your own (AWS SNS, MessageBird, etc.)
+- ✅ **Non-intrusive** - Works with any ``AUTH_USER_MODEL``, no database changes required to your user model
+- 🧪 **Sandbox mode** - Test flows without sending real SMS messages
+
+**Multiple Use Cases**
+
+- 👤 User registration phone verification
+- 🔑 Two-factor authentication (2FA)
+- 🔄 Account recovery / password reset
+- 📧 Marketing opt-in verification
+- 📱 Phone number update flows
 
 Installation
 ------------
@@ -72,17 +96,37 @@ Configuration
         ...
     ]
 
-2. Configure ``PHONE_VERIFICATION`` settings:
+2. Run migrations:
+
+.. code-block:: shell
+
+    python manage.py migrate
+
+3. Include the API URLs in your project's ``urls.py``:
+
+.. code-block:: python
+
+    from django.urls import path, include
+
+    urlpatterns = [
+        ...
+        path("api/phone/", include("phone_verify.urls")),
+        ...
+    ]
+
+4. Configure ``PHONE_VERIFICATION`` settings in your ``settings.py``:
+
+**For Twilio:**
 
 .. code-block:: python
 
     PHONE_VERIFICATION = {
-        "BACKEND": "phone_verify.backends.twilio.TwilioBackend",  # or NexmoBackend
+        "BACKEND": "phone_verify.backends.twilio.TwilioBackend",
         "OPTIONS": {
-            "SID": "fake",
-            "SECRET": "fake",
-            "FROM": "+14755292729",
-            "SANDBOX_TOKEN": "123456",
+            "SID": "your-twilio-account-sid",
+            "SECRET": "your-twilio-auth-token",
+            "FROM": "+1234567890",  # Your Twilio phone number
+            "SANDBOX_TOKEN": "123456",  # Optional: for testing without sending real SMS
         },
         "TOKEN_LENGTH": 6,
         "MESSAGE": "Welcome to {app}! Please use security code {security_code} to proceed.",
@@ -91,33 +135,104 @@ Configuration
         "VERIFY_SECURITY_CODE_ONLY_ONCE": False,
     }
 
-**Note:** To use Nexmo instead of Twilio, change the ``BACKEND`` path to:
+**For Nexmo (Vonage):**
 
 .. code-block:: python
 
-    "BACKEND": "phone_verify.backends.nexmo.NexmoBackend"
+    PHONE_VERIFICATION = {
+        "BACKEND": "phone_verify.backends.nexmo.NexmoBackend",
+        "OPTIONS": {
+            "KEY": "your-nexmo-api-key",
+            "SECRET": "your-nexmo-api-secret",
+            "FROM": "YourApp",  # Sender ID
+            "SANDBOX_TOKEN": "123456",  # Optional: for testing
+        },
+        "TOKEN_LENGTH": 6,
+        "MESSAGE": "Welcome to {app}! Please use security code {security_code} to proceed.",
+        "APP_NAME": "Phone Verify",
+        "SECURITY_CODE_EXPIRATION_TIME": 3600,
+        "VERIFY_SECURITY_CODE_ONLY_ONCE": False,
+    }
 
-and in ``OPTIONS``, use:
+Quick Start
+-----------
+
+**Step 1: Send verification code**
+
+.. code-block:: bash
+
+    curl -X POST http://localhost:8000/api/phone/register/ \
+      -H "Content-Type: application/json" \
+      -d '{"phone_number": "+1234567890"}'
+
+    # Response:
+    # {
+    #   "session_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+    #   "phone_number": "+1234567890"
+    # }
+
+**Step 2: Verify the code**
+
+.. code-block:: bash
+
+    curl -X POST http://localhost:8000/api/phone/verify/ \
+      -H "Content-Type: application/json" \
+      -d '{
+        "phone_number": "+1234567890",
+        "security_code": "123456",
+        "session_token": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+      }'
+
+    # Response:
+    # {
+    #   "message": "Security code is valid",
+    #   "phone_number": "+1234567890"
+    # }
+
+**Using in Python/Django code:**
 
 .. code-block:: python
 
-    "KEY": "your-nexmo-key",
-    "SECRET": "your-nexmo-secret"
+    from phone_verify.services import send_security_code_and_generate_session_token
+    from phone_verify.services import verify_security_code
 
-Usage
------
+    # Send verification code via SMS
+    session_token = send_security_code_and_generate_session_token(
+        phone_number="+1234567890"
+    )
+    # User receives SMS: "Welcome to Phone Verify! Please use security code 847291 to proceed."
 
-To get started using the app and integrating it into your own flow (DRF or non-DRF), check the following documentation:
+    # Verify the code user entered
+    try:
+        verify_security_code(
+            phone_number="+1234567890",
+            security_code="847291",
+            session_token=session_token
+        )
+        print("✓ Phone number verified successfully!")
+    except Exception as e:
+        print(f"✗ Verification failed: {e}")
 
-- 📘 `Getting Started Guide <docs/getting_started.rst>`_
-- 🔌 `Integration Examples <docs/integration.rst>`_
-- ⚙️ `Custom Backend Guide <docs/customization.rst>`_
-- 📮 `API Endpoints Reference <phone_verify/docs/api_endpoints.rst>`_
+Documentation
+-------------
+
+Full documentation is available at `https://www.sanyamkhurana.com/django-phone-verify/ <https://www.sanyamkhurana.com/django-phone-verify/>`_
+
+**Quick Links:**
+
+- 📘 `Getting Started Guide <https://www.sanyamkhurana.com/django-phone-verify/getting_started.html>`_
+- ⚙️ `Configuration Reference <https://www.sanyamkhurana.com/django-phone-verify/configuration.html>`_
+- 🔌 `Integration Examples <https://www.sanyamkhurana.com/django-phone-verify/integration.html>`_
+- 🚀 `Advanced Examples <https://www.sanyamkhurana.com/django-phone-verify/advanced_examples.html>`_ (2FA, password reset, marketing opt-in)
+- 🔧 `Custom Backend Guide <https://www.sanyamkhurana.com/django-phone-verify/customization.html>`_
+- 🔒 `Security Best Practices <https://www.sanyamkhurana.com/django-phone-verify/security.html>`_
+- 📖 `API Reference <https://www.sanyamkhurana.com/django-phone-verify/api_reference.html>`_
+- 🐛 `Troubleshooting Guide <https://www.sanyamkhurana.com/django-phone-verify/troubleshooting.html>`_
 
 Compatibility
 -------------
 
-- Python 3.6+
+- Python 3.8+ (Python 3.7 and below are EOL)
 - Django 2.1+
 - Django REST Framework 3.9+
 
@@ -125,7 +240,20 @@ Contributing
 ------------
 
 Found a bug? Want to suggest an improvement or submit a patch?
-Pull requests are welcome! 🙌 Please check the `contributing guide <https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/contributing.rst>`_ before you start.
+
+We welcome contributions! Here's how you can help:
+
+1. 🐛 **Report bugs** via `GitHub Issues <https://github.com/CuriousLearner/django-phone-verify/issues>`_
+2. 💡 **Suggest features** or improvements
+3. 🔧 **Submit pull requests** - please check the `contributing guide <https://github.com/CuriousLearner/django-phone-verify/blob/master/docs/contributing.rst>`_ first
+4. 📖 **Improve documentation**
+
+Before submitting a PR:
+
+- Write tests for new features
+- Ensure all tests pass: ``pytest``
+- Follow the existing code style
+- Update documentation if needed
 
 License
 -------
