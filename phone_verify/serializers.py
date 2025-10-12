@@ -48,5 +48,7 @@ class SMSVerificationSerializer(serializers.Serializer):
             raise serializers.ValidationError(_("Security code has expired"))
         elif token_validatation == backend.SECURITY_CODE_VERIFIED:
             raise serializers.ValidationError(_("Security code is already verified"))
+        elif token_validatation == backend.SECURITY_CODE_TOO_MANY_ATTEMPTS:
+            raise serializers.ValidationError(_("Too many failed verification attempts. Please request a new code."))
 
         return attrs

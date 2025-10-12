@@ -80,6 +80,14 @@ class PhoneVerificationService(object):
                 )
             )
 
+        # Validate minimum token length
+        token_length = settings.PHONE_VERIFICATION.get("TOKEN_LENGTH", 6)
+        min_token_length = settings.PHONE_VERIFICATION.get("MIN_TOKEN_LENGTH", 6)
+        if token_length < min_token_length:
+            raise ImproperlyConfigured(
+                f"TOKEN_LENGTH ({token_length}) cannot be less than MIN_TOKEN_LENGTH ({min_token_length})"
+            )
+
 
 def send_security_code_and_generate_session_token(phone_number):
     sms_backend = get_sms_backend(phone_number)
