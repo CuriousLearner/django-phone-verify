@@ -49,7 +49,6 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
 ]
@@ -106,7 +105,6 @@ select = [
 known-first-party = ["phone_verify"]
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "tests.settings"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
 addopts = "--cov=phone_verify --cov-report=term-missing"
 
