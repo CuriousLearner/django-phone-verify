@@ -131,3 +131,18 @@ def test_generate_message_from_custom_backend(settings):
     msg = svc._generate_message("999999", context={"extra": "runtime"})
 
     assert msg == "Custom: 999999 / runtime"
+
+
+@pytest.mark.django_db
+def test_i18n_message_generation_and_sending_service(client, mocker, backend):
+    with override_settings(PHONE_VERIFICATION=backend):
+        zh_verification_message = "歡迎使用 {app}! 請使用安全碼 {security_code} 繼續。"
+        mocker.patch('phone_verify.services.gettext', return_value=zh_verification_message)
+        service = PhoneVerificationService(phone_number="+13478379634", language='zh-hant')
+        backend_service = backend.get("BACKEND")
+        mock_api = mocker.patch(f"{backend_service}.send_sms")
+        service.send_verification("+13478379634", "123456")
+        actual_message = zh_verification_message.format(
+            app=backend['APP_NAME'], security_code="123456"
+        )
+        mock_api.assert_called_with("+13478379634", actual_message)

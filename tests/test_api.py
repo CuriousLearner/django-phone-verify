@@ -202,3 +202,32 @@ def test_verified_security_code(client, backend):
         response_data = json.loads(json.dumps(response.data))
         assert response.status_code == 200
         assert response.data["message"] == "Security code is valid."
+
+
+def test_phone_registration_with_accept_language_header(client, mocker, backend):
+    with override_settings(PHONE_VERIFICATION=backend):
+        zh_verification_message = "歡迎使用 {app}! 請使用安全碼 {security_code} 繼續。"
+        mocker.patch('phone_verify.services.gettext', return_value=zh_verification_message)
+
+        backend_service = backend.get("BACKEND")
+        mock_backend_send_sms = mocker.patch(f"{backend_service}.send_sms")
+
+        url = reverse("phone-register")
+        phone_number = PHONE_NUMBER
+        data = {"phone_number": phone_number}
+
+        # Send request with Accept-Language header
+        response = client.post(url, data, HTTP_ACCEPT_LANGUAGE="zh-hant")
+
+        assert response.status_code == 200
+        assert "session_token" in response.data
+        SMSVerification = apps.get_model("phone_verify", "SMSVerification")
+        sms_verification = SMSVerification.objects.get(
+            session_token=response.data["session_token"], phone_number=phone_number
+        )
+        assert sms_verification
+        actual_message = zh_verification_message.format(
+            app=backend['APP_NAME'],
+            security_code=sms_verification.security_code
+        )
+        mock_backend_send_sms.assert_called_with("+13478379634", actual_message)
