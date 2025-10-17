@@ -1,18 +1,46 @@
 Release Notes
 -------------
 
+[3.2.0] - 2025-10-08
+^^^^^^^^^^^^^^^^^^^^
+
+Added
+"""""
+- **Documentation**: Completely overhauled documentation to professional, enterprise-grade quality:
+
+  - **Getting Started Guide** - Expanded with prerequisites, step-by-step configuration, environment variables, and testing instructions
+  - **Architecture & Flow** - New comprehensive guide explaining system architecture, verification flow diagrams, security features, and extension points
+  - **Security Best Practices** - Detailed guide covering rate limiting, credential storage, compliance (GDPR, CCPA, TCPA), and production deployment
+  - **API Reference** - Complete documentation of all services, backends, models, serializers, and viewsets with code examples
+  - **Advanced Examples** - 8 real-world implementations: 2FA, password reset, marketing opt-in, multi-tenant, async/Celery, custom messages, fallback providers, phone number updates
+  - **Configuration Reference** - Detailed explanations of all settings with security recommendations and examples
+  - **Troubleshooting Guide** - Common issues and solutions for installation, configuration, SMS, verification, and performance
+  - **FAQ** - 30+ frequently asked questions covering all aspects of the library
+  - **Enhanced README** - Added "What It Does" section, improved features list, better Quick Start with response examples
+
+- **Security**: Added ``SECURITY.md`` file with vulnerability reporting process, supported versions, and security best practices summary
+- **Package Metadata**: Added ``__version__`` attribute to ``phone_verify`` module for programmatic version checking
+- **Modern Packaging**: Added ``pyproject.toml`` for PEP 518 compliance with modern Python tooling and consolidated configuration
+
+Changed
+"""""""
+- **Python Support**: Officially dropped support for Python 3.6 and 3.7 (both EOL). Minimum Python version is now 3.8
+- **README**: Improved with Quick Start section showing actual usage examples, better configuration examples, and fixed documentation links
+- **CI/CD**: Updated GitHub Actions workflow to test Python 3.8-3.13 for full coverage
+- **Testing**: Updated tox configuration to include Python 3.8 in test matrix
+
 [3.1.0]
 ^^^^^^^
 
 Added
 """""
-- Allow custom backends to override `generate_message(security_code, context=None)` for dynamic message generation at runtime.
-- `context` parameter support added to `send_verification()` for passing additional formatting data dynamically.
+- Allow custom backends to override ``generate_message(security_code, context=None)`` for dynamic message generation at runtime
+- ``context`` parameter support added to ``send_verification()`` for passing additional formatting data dynamically
 
 Changed
 """""""
-- `PhoneVerificationService` now delegates message generation to the backend if `generate_message()` is implemented.
-- Moved `phone_settings` inside `__init__` for better error handling when `PHONE_VERIFICATION` is missing from settings.
+- ``PhoneVerificationService`` now delegates message generation to the backend if ``generate_message()`` is implemented
+- Moved ``phone_settings`` inside ``__init__`` for better error handling when ``PHONE_VERIFICATION`` is missing from settings
 
 [3.0.1]
 ^^^^^^^
