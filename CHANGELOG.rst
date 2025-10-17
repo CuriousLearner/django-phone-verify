@@ -6,6 +6,7 @@ Release Notes
 
 Added
 """""
+- **Brute Force Protection**: Added comprehensive brute force protection for SMS verification codes to prevent automated attacks. New settings: ``MAX_FAILED_ATTEMPTS`` (default: 5) for session lockout threshold and ``MIN_TOKEN_LENGTH`` (default: 6) to enforce minimum security code length. Added ``failed_attempts`` field to ``SMSVerification`` model with migration for backward compatibility. Contributed by `Harsh <https://github.com/Kaos599>`_. Closes `#100 <https://github.com/CuriousLearner/django-phone-verify/issues/100>`_.
 - **Internationalization (i18n)**: Added support for localizing verification messages based on the ``Accept-Language`` HTTP header. The library now automatically detects the user's preferred language and sends verification messages in that language using Django's translation system. Contributed by `Hari Mahadevan <https://github.com/harikvpy>`_.
 - **Documentation**: Completely overhauled documentation to professional, enterprise-grade quality:
 

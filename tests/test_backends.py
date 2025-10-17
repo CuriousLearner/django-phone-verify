@@ -10,6 +10,8 @@ from django.utils.module_loading import import_string
 from conftest import sandbox_backends
 from phone_verify.backends import get_sms_backend
 from phone_verify.backends.base import BaseBackend
+from phone_verify.models import SMSVerification
+from phone_verify.services import PhoneVerificationService
 
 PHONE_NUMBER = "+13478379634"
 SECURITY_CODE = "123456"
@@ -175,4 +177,92 @@ def test_custom_backend_import_error(monkeypatch):
 
     assert "Failed to import the specified backend" in str(excinfo.value)
     assert "myproject.fake.CustomBackend" in str(excinfo.value)
+
+
+def test_brute_force_protection_max_attempts(client, backend):
+    """Test that verification is blocked after MAX_FAILED_ATTEMPTS."""
+    with override_settings(PHONE_VERIFICATION=backend):
+        settings.PHONE_VERIFICATION["MAX_FAILED_ATTEMPTS"] = 3
+
+        # Register phone number
+        url = reverse("phone-register")
+        response = client.post(url, {"phone_number": PHONE_NUMBER})
+        assert response.status_code == 200
+        session_token = response.data["session_token"]
+
+        # Get the actual security code from database
+        verification = SMSVerification.objects.get(session_token=session_token)
+        correct_code = verification.security_code
+
+        # Make 3 failed attempts with wrong codes
+        verify_url = reverse("phone-verify")
+        for i in range(3):
+            response = client.post(verify_url, {
+                "phone_number": PHONE_NUMBER,
+                "security_code": "wrong" + str(i),
+                "session_token": session_token
+            })
+            # Should return error for wrong code
+            assert response.status_code == 400
+
+        # Refresh from database to check failed_attempts
+        verification.refresh_from_db()
+        assert verification.failed_attempts == 3
+
+        # Next attempt with correct code should be blocked
+        response = client.post(verify_url, {
+            "phone_number": PHONE_NUMBER,
+            "security_code": correct_code,
+            "session_token": session_token
+        })
+        assert response.status_code == 400
+        assert "Too many failed verification attempts" in str(response.data)
+
+
+def test_brute_force_protection_reset_on_success(client, backend):
+    """Test that failed_attempts resets to 0 on successful verification."""
+    with override_settings(PHONE_VERIFICATION=backend):
+        settings.PHONE_VERIFICATION["MAX_FAILED_ATTEMPTS"] = 5
+
+        # Register phone number
+        url = reverse("phone-register")
+        response = client.post(url, {"phone_number": PHONE_NUMBER})
+        session_token = response.data["session_token"]
+
+        verification = SMSVerification.objects.get(session_token=session_token)
+        correct_code = verification.security_code
+
+        # Make 2 failed attempts
+        verify_url = reverse("phone-verify")
+        for i in range(2):
+            client.post(verify_url, {
+                "phone_number": PHONE_NUMBER,
+                "security_code": "wrong" + str(i),
+                "session_token": session_token
+            })
+
+        verification.refresh_from_db()
+        assert verification.failed_attempts == 2
+
+        # Successful verification should reset failed_attempts
+        response = client.post(verify_url, {
+            "phone_number": PHONE_NUMBER,
+            "security_code": correct_code,
+            "session_token": session_token
+        })
+        assert response.status_code == 200
+
+        verification.refresh_from_db()
+        assert verification.failed_attempts == 0
+
+
+def test_min_token_length_validation(backend):
+    """Test that TOKEN_LENGTH cannot be less than MIN_TOKEN_LENGTH."""
+    backend["TOKEN_LENGTH"] = 4
+    backend["MIN_TOKEN_LENGTH"] = 6
+
+    with override_settings(PHONE_VERIFICATION=backend):
+        with pytest.raises(ImproperlyConfigured) as exc:
+            PhoneVerificationService(phone_number=PHONE_NUMBER)
+        assert "TOKEN_LENGTH (4) cannot be less than MIN_TOKEN_LENGTH (6)" in str(exc.value)
 
