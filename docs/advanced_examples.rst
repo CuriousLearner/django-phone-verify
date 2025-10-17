@@ -570,6 +570,149 @@ Implementation
         ...
     }
 
+Internationalization (i18n) Support
+------------------------------------
+
+Send verification messages in different languages based on user preferences.
+
+Overview
+^^^^^^^^
+
+The library automatically detects the user's language from the ``Accept-Language`` HTTP header
+and localizes the verification message accordingly. This is useful for applications serving
+users in multiple countries or regions.
+
+Setup
+^^^^^
+
+First, ensure Django's internationalization is enabled in your ``settings.py``:
+
+.. code-block:: python
+
+    # settings.py
+    USE_I18N = True
+    LANGUAGE_CODE = 'en-us'
+
+    LANGUAGES = [
+        ('en', 'English'),
+        ('es', 'Spanish'),
+        ('fr', 'French'),
+        ('zh-hant', 'Traditional Chinese'),
+        # Add more languages as needed
+    ]
+
+    LOCALE_PATHS = [
+        BASE_DIR / 'locale',
+    ]
+
+Create Translation Files
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Create translation files for your verification message. The message template in ``PHONE_VERIFICATION['MESSAGE']``
+will be automatically translated:
+
+.. code-block:: bash
+
+    # Create locale directories
+    mkdir -p locale/es/LC_MESSAGES
+    mkdir -p locale/fr/LC_MESSAGES
+    mkdir -p locale/zh_Hant/LC_MESSAGES
+
+    # Generate message files
+    django-admin makemessages -l es
+    django-admin makemessages -l fr
+    django-admin makemessages -l zh_Hant
+
+Edit the generated ``.po`` files to add translations:
+
+.. code-block:: po
+
+    # locale/es/LC_MESSAGES/django.po
+    msgid "Welcome to {app}! Please use security code {security_code} to proceed."
+    msgstr "¡Bienvenido a {app}! Por favor usa el código de seguridad {security_code} para continuar."
+
+    # locale/fr/LC_MESSAGES/django.po
+    msgid "Welcome to {app}! Please use security code {security_code} to proceed."
+    msgstr "Bienvenue sur {app}! Veuillez utiliser le code de sécurité {security_code} pour continuer."
+
+    # locale/zh_Hant/LC_MESSAGES/django.po
+    msgid "Welcome to {app}! Please use security code {security_code} to proceed."
+    msgstr "歡迎使用 {app}! 請使用安全碼 {security_code} 繼續。"
+
+Compile the translations:
+
+.. code-block:: bash
+
+    django-admin compilemessages
+
+Usage
+^^^^^
+
+The library automatically reads the ``Accept-Language`` header from HTTP requests and sends
+the verification message in the user's preferred language:
+
+.. code-block:: javascript
+
+    // Frontend: Set Accept-Language header
+    fetch('/api/phone/register/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept-Language': 'es'  // Spanish
+        },
+        body: JSON.stringify({
+            phone_number: '+1234567890'
+        })
+    });
+
+The SMS sent to the user will automatically be in Spanish if you've provided a translation.
+
+Programmatic Usage
+^^^^^^^^^^^^^^^^^^
+
+You can also specify the language programmatically when using the service directly:
+
+.. code-block:: python
+
+    from phone_verify.services import send_security_code_and_generate_session_token
+
+    # Send verification in French
+    session_token = send_security_code_and_generate_session_token(
+        phone_number="+1234567890",
+        language="fr"
+    )
+
+    # Or using the service class directly
+    from phone_verify.services import PhoneVerificationService
+
+    service = PhoneVerificationService(
+        phone_number="+1234567890",
+        language="zh-hant"  # Traditional Chinese
+    )
+
+    backend = service.backend
+    security_code, session_token = backend.create_security_code_and_session_token(
+        phone_number="+1234567890"
+    )
+
+    service.send_verification("+1234567890", security_code)
+
+Language Code Format
+^^^^^^^^^^^^^^^^^^^^
+
+The library accepts standard language codes:
+
+- Simple codes: ``en``, ``es``, ``fr``, ``de``, ``ja``, ``zh``
+- Locale-specific: ``en-US``, ``en-GB``, ``zh-Hans`` (Simplified Chinese), ``zh-Hant`` (Traditional Chinese)
+- The first language in comma-separated ``Accept-Language`` headers is used
+- Quality values (``q=``) are ignored; only the first language is considered
+
+Fallback Behavior
+^^^^^^^^^^^^^^^^^
+
+If a translation is not available for the requested language, the library falls back to
+the default message defined in ``PHONE_VERIFICATION['MESSAGE']``.
+
 Phone Number Update Flow
 -------------------------
 

@@ -6,6 +6,7 @@ Release Notes
 
 Added
 """""
+- **Internationalization (i18n)**: Added support for localizing verification messages based on the ``Accept-Language`` HTTP header. The library now automatically detects the user's preferred language and sends verification messages in that language using Django's translation system. Contributed by `Hari Mahadevan <https://github.com/harikvpy>`_.
 - **Documentation**: Completely overhauled documentation to professional, enterprise-grade quality:
 
   - **Getting Started Guide** - Expanded with prerequisites, step-by-step configuration, environment variables, and testing instructions

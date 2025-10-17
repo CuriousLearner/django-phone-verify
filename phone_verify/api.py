@@ -20,8 +20,18 @@ class VerificationViewSet(viewsets.GenericViewSet):
     def register(self, request):
         serializer = PhoneSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        # Extract language from Accept-Language header
+        # Format: "en-US,en;q=0.9,es;q=0.8" -> take first language "en-US"
+        accept_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
+        language = None
+        if accept_language:
+            # Take first language, strip quality params (e.g., "en-US;q=0.9" -> "en-US")
+            language = accept_language.split(',')[0].split(';')[0].strip() or None
+
         session_token = send_security_code_and_generate_session_token(
-            str(serializer.validated_data["phone_number"])
+            str(serializer.validated_data["phone_number"]),
+            language=language
         )
         return response.Ok({"session_token": session_token})
 

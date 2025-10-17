@@ -6,6 +6,7 @@ import logging
 # Third Party Stuff
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import gettext, override
 
 # phone_verify stuff
 from .backends import get_sms_backend
@@ -21,7 +22,7 @@ DEFAULT_APP_NAME = "Phone Verify"
 
 class PhoneVerificationService(object):
 
-    def __init__(self, phone_number, backend=None):
+    def __init__(self, phone_number, backend=None, language=None):
         try:
             self.phone_settings = settings.PHONE_VERIFICATION
         except AttributeError as e:
@@ -33,6 +34,7 @@ class PhoneVerificationService(object):
             self.backend = backend
 
         self.verification_message = self.phone_settings.get("MESSAGE", DEFAULT_MESSAGE)
+        self.language = language
 
     def send_verification(self, number, security_code, context=None):
         """
@@ -60,7 +62,13 @@ class PhoneVerificationService(object):
         if context:
             format_context.update(context)
 
-        return self.verification_message.format(**format_context)
+        # Apply i18n if language is specified
+        verification_message = self.verification_message
+        if self.language:
+            with override(self.language):
+                verification_message = gettext(self.verification_message)
+
+        return verification_message.format(**format_context)
 
     def _check_required_settings(self):
         required_settings = {
@@ -81,12 +89,12 @@ class PhoneVerificationService(object):
             )
 
 
-def send_security_code_and_generate_session_token(phone_number):
+def send_security_code_and_generate_session_token(phone_number, language=None):
     sms_backend = get_sms_backend(phone_number)
     security_code, session_token = sms_backend.create_security_code_and_session_token(
         phone_number
     )
-    service = PhoneVerificationService(phone_number=phone_number)
+    service = PhoneVerificationService(phone_number=phone_number, language=language)
     try:
         service.send_verification(phone_number, security_code)
     except service.backend.exception_class as exc:
