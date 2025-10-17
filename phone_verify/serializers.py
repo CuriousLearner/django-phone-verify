@@ -44,9 +44,13 @@ class SMSVerificationSerializer(serializers.Serializer):
             raise serializers.ValidationError(_("Security code is not valid"))
         elif token_validatation == backend.SESSION_TOKEN_INVALID:
             raise serializers.ValidationError(_("Session Token mis-match"))
+        elif token_validatation == backend.SECURITY_CODE_INVALID:
+            raise serializers.ValidationError(_("Security code is not valid"))
         elif token_validatation == backend.SECURITY_CODE_EXPIRED:
             raise serializers.ValidationError(_("Security code has expired"))
         elif token_validatation == backend.SECURITY_CODE_VERIFIED:
             raise serializers.ValidationError(_("Security code is already verified"))
+        elif token_validatation == backend.SECURITY_CODE_TOO_MANY_ATTEMPTS:
+            raise serializers.ValidationError(_("Too many failed verification attempts. Please request a new code."))
 
         return attrs

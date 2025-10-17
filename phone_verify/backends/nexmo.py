@@ -5,8 +5,6 @@ from __future__ import absolute_import
 import nexmo
 from nexmo.errors import ClientError
 
-from phone_verify.models import SMSVerification
-
 # Local
 from .base import BaseBackend
 
@@ -58,5 +56,9 @@ class NexmoSandboxBackend(BaseBackend):
         """
         return self._token
 
-    def validate_security_code(self, security_code, phone_number, session_token):
-        return SMSVerification.objects.none(), self.SECURITY_CODE_VALID
+    def _should_bypass_code_check(self, security_code):
+        """
+        Sandbox mode: bypass code validation if the security code matches the sandbox token.
+        This allows testing without real SMS while still enforcing brute force protection.
+        """
+        return security_code == self._token

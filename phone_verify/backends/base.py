@@ -6,12 +6,15 @@ from abc import ABCMeta, abstractmethod
 # Third Party Stuff
 import jwt
 from django.conf import settings as django_settings
+from django.db import models
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 
 from ..models import SMSVerification
 
 DEFAULT_TOKEN_LENGTH = 6
+DEFAULT_MIN_TOKEN_LENGTH = 6
+DEFAULT_MAX_FAILED_ATTEMPTS = 5
 
 
 class BaseBackend(metaclass=ABCMeta):
@@ -20,6 +23,7 @@ class BaseBackend(metaclass=ABCMeta):
     SECURITY_CODE_EXPIRED = 2
     SECURITY_CODE_VERIFIED = 3
     SESSION_TOKEN_INVALID = 4
+    SECURITY_CODE_TOO_MANY_ATTEMPTS = 5
 
     def __init__(self, **settings):
         self.exception_class = None
@@ -102,6 +106,34 @@ class BaseBackend(metaclass=ABCMeta):
         )
         return security_code, session_token
 
+    def _should_bypass_code_check(self, security_code):
+        """
+        Hook for sandbox backends to bypass security code validation.
+        Returns True if the code check should be bypassed.
+
+        :param security_code: The security code to check
+        :return: Boolean indicating whether to bypass code validation
+        """
+        return False
+
+    def _increment_failed_attempts(self, verification):
+        """Atomically increment failed attempts counter."""
+        verification.failed_attempts = models.F('failed_attempts') + 1
+        verification.save(update_fields=['failed_attempts'])
+        verification.refresh_from_db()
+
+    def _reset_failed_attempts(self, verification):
+        """Reset failed attempts counter to 0."""
+        verification.failed_attempts = 0
+        verification.save(update_fields=['failed_attempts'])
+
+    def _has_exceeded_failed_attempts(self, verification):
+        """Return True if verification has exceeded the failed attempts limit."""
+        max_failed_attempts = django_settings.PHONE_VERIFICATION.get(
+            "MAX_FAILED_ATTEMPTS", DEFAULT_MAX_FAILED_ATTEMPTS
+        )
+        return verification.failed_attempts >= max_failed_attempts
+
     def validate_security_code(self, security_code, phone_number, session_token):
         """
         A utility method to verify if the `security_code` entered is valid for
@@ -120,32 +152,53 @@ class BaseBackend(metaclass=ABCMeta):
             - `BaseBackend.SECURITY_CODE_EXPIRED`
             - `BaseBackend.SECURITY_CODE_VERIFIED`
             - `BaseBackend.SESSION_TOKEN_INVALID`
+            - `BaseBackend.SECURITY_CODE_TOO_MANY_ATTEMPTS`
         """
         stored_verification = SMSVerification.objects.filter(
-            security_code=security_code, phone_number=phone_number
+            phone_number=phone_number, session_token=session_token
         ).first()
 
-        # check security_code exists
-        if stored_verification is None:
-            return stored_verification, self.SECURITY_CODE_INVALID
+        # Allow sandbox backends to bypass validation (but check brute force first if verification exists)
+        if self._should_bypass_code_check(security_code):
+            if stored_verification is None:
+                return SMSVerification.objects.none(), self.SECURITY_CODE_VALID
 
-        # check session code exists
-        if not stored_verification.session_token == session_token:
+            # Even for sandbox, check brute force limit first
+            if self._has_exceeded_failed_attempts(stored_verification):
+                return stored_verification, self.SECURITY_CODE_TOO_MANY_ATTEMPTS
+
+            self._reset_failed_attempts(stored_verification)
+            return SMSVerification.objects.none(), self.SECURITY_CODE_VALID
+
+        # check verification exists
+        if stored_verification is None:
             return stored_verification, self.SESSION_TOKEN_INVALID
+
+        # check if too many failed attempts
+        if self._has_exceeded_failed_attempts(stored_verification):
+            return stored_verification, self.SECURITY_CODE_TOO_MANY_ATTEMPTS
+
+        # check security_code matches
+        if stored_verification.security_code != security_code:
+            self._increment_failed_attempts(stored_verification)
+            return stored_verification, self.SECURITY_CODE_INVALID
 
         # check security_code is not expired
         if self.check_security_code_expiry(stored_verification):
+            self._increment_failed_attempts(stored_verification)
             return stored_verification, self.SECURITY_CODE_EXPIRED
 
         # check security_code is not verified
         if stored_verification.is_verified and django_settings.PHONE_VERIFICATION.get(
             "VERIFY_SECURITY_CODE_ONLY_ONCE"
         ):
+            self._increment_failed_attempts(stored_verification)
             return stored_verification, self.SECURITY_CODE_VERIFIED
 
         # mark security_code as verified
         stored_verification.is_verified = True
-        stored_verification.save()
+        stored_verification.failed_attempts = 0
+        stored_verification.save(update_fields=['is_verified', 'failed_attempts'])
 
         return stored_verification, self.SECURITY_CODE_VALID
 
