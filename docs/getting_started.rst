@@ -108,6 +108,8 @@ Add the ``PHONE_VERIFICATION`` configuration to your ``settings.py``.
             'FROM': os.environ.get('TWILIO_PHONE_NUMBER'),    # Your Twilio phone number (e.g., '+1234567890')
         },
         'TOKEN_LENGTH': 6,                                     # Length of security code
+        'MIN_TOKEN_LENGTH': 6,                                 # Minimum allowed token length for security
+        'MAX_FAILED_ATTEMPTS': 5,                             # Maximum failed verification attempts before locking session
         'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
         'APP_NAME': 'MyApp',                                   # Your app name (used in MESSAGE)
         'SECURITY_CODE_EXPIRATION_TIME': 600,                 # 10 minutes (in seconds)
@@ -129,6 +131,8 @@ Add the ``PHONE_VERIFICATION`` configuration to your ``settings.py``.
             'FROM': 'MyApp',                                   # Sender ID (alphanumeric or phone number)
         },
         'TOKEN_LENGTH': 6,
+        'MIN_TOKEN_LENGTH': 6,                                 # Minimum allowed token length for security
+        'MAX_FAILED_ATTEMPTS': 5,                             # Maximum failed verification attempts before locking session
         'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
         'APP_NAME': 'MyApp',
         'SECURITY_CODE_EXPIRATION_TIME': 600,
@@ -171,6 +175,8 @@ Here's what each setting does:
   - Nexmo: ``KEY``, ``SECRET``, ``FROM``
 
 - **TOKEN_LENGTH**: Number of digits in the security code (recommended: 6)
+- **MIN_TOKEN_LENGTH**: Minimum allowed token length for security (default: 6). Prevents setting TOKEN_LENGTH to insecure low values
+- **MAX_FAILED_ATTEMPTS**: Maximum failed verification attempts before session lockout (default: 5). Protects against brute force attacks
 - **MESSAGE**: SMS message template. Variables: ``{app}`` and ``{security_code}``
 - **APP_NAME**: Your application name (used in MESSAGE template)
 - **SECURITY_CODE_EXPIRATION_TIME**: How long codes are valid (in seconds). Recommended: 300-600 (5-10 minutes)

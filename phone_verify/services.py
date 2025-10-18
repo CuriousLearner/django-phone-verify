@@ -10,6 +10,7 @@ from django.utils.translation import gettext, override
 
 # phone_verify stuff
 from .backends import get_sms_backend
+from .backends.base import DEFAULT_MIN_TOKEN_LENGTH, DEFAULT_TOKEN_LENGTH
 
 logger = logging.getLogger(__name__)
 
@@ -86,6 +87,14 @@ class PhoneVerificationService(object):
                 "Please specify following settings in settings.py: {}".format(
                     ", ".join(required_settings - user_settings)
                 )
+            )
+
+        # Validate minimum token length
+        token_length = settings.PHONE_VERIFICATION.get("TOKEN_LENGTH", DEFAULT_TOKEN_LENGTH)
+        min_token_length = settings.PHONE_VERIFICATION.get("MIN_TOKEN_LENGTH", DEFAULT_MIN_TOKEN_LENGTH)
+        if token_length < min_token_length:
+            raise ImproperlyConfigured(
+                f"TOKEN_LENGTH ({token_length}) cannot be less than MIN_TOKEN_LENGTH ({min_token_length})"
             )
 
 
