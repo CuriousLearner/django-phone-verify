@@ -1,4 +1,3 @@
-import time
 from datetime import timedelta
 
 import pytest
@@ -87,9 +86,9 @@ def test_sms_verification_is_expired_with_deprecated_setting_name(backend):
             session_token=SESSION_TOKEN,
         )
 
-        time.sleep(2)
-
-        assert sms_verification.is_expired is True
+        future_time = timezone.now() + timedelta(seconds=2)
+        with freeze_time(future_time):
+            assert sms_verification.is_expired is True
 
 
 def test_sms_verification_new_setting_takes_precedence(backend):
@@ -106,7 +105,7 @@ def test_sms_verification_new_setting_takes_precedence(backend):
             session_token=SESSION_TOKEN,
         )
 
-        time.sleep(2)
-
-        # Should use the new setting (1 second), so should be expired
-        assert sms_verification.is_expired is True
+        future_time = timezone.now() + timedelta(seconds=2)
+        with freeze_time(future_time):
+            # Should use the new setting (1 second), so should be expired
+            assert sms_verification.is_expired is True

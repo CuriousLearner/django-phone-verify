@@ -7,6 +7,9 @@ from django.utils import timezone
 
 from phone_verify.models import SMSVerification
 
+# Number of records to preview in dry-run mode
+DRY_RUN_PREVIEW_LIMIT = 10
+
 
 class Command(BaseCommand):
     help = "Delete old SMS verification records based on RECORD_RETENTION_DAYS setting"
@@ -48,12 +51,12 @@ class Command(BaseCommand):
                 )
             )
             self.stdout.write("Records that would be deleted:")
-            for record in old_verifications[:10]:
+            for record in old_verifications[:DRY_RUN_PREVIEW_LIMIT]:
                 self.stdout.write(
                     f"  - {record.phone_number} (created: {record.created_at})"
                 )
-            if count > 10:
-                self.stdout.write(f"  ... and {count - 10} more")
+            if count > DRY_RUN_PREVIEW_LIMIT:
+                self.stdout.write(f"  ... and {count - DRY_RUN_PREVIEW_LIMIT} more")
         else:
             deleted_count, _ = old_verifications.delete()
             self.stdout.write(
