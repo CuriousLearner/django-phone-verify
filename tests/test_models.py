@@ -46,9 +46,9 @@ def test_sms_verification_is_expired_true(backend):
             session_token=SESSION_TOKEN,
         )
 
-        time.sleep(2)
-
-        assert sms_verification.is_expired is True
+        future_time = timezone.now() + timedelta(seconds=2)
+        with freeze_time(future_time):
+            assert sms_verification.is_expired is True
 
 
 def test_sms_verification_is_expired_custom_expiration_time(backend):
