@@ -13,6 +13,9 @@ except ImportError:
     from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
+# phone_verify stuff
+from .constants import DEFAULT_SECURITY_CODE_EXPIRATION_SECONDS
+
 
 class UUIDModel(models.Model):
     """ An abstract base class model that makes primary key `id` as UUID
@@ -65,7 +68,7 @@ class SMSVerification(TimeStampedUUIDModel):
         # Check for new setting name first, then fall back to old name
         expiration_time = phone_settings.get(
             "SECURITY_CODE_EXPIRATION_SECONDS",
-            phone_settings.get("SECURITY_CODE_EXPIRATION_TIME", 600)
+            phone_settings.get("SECURITY_CODE_EXPIRATION_TIME", DEFAULT_SECURITY_CODE_EXPIRATION_SECONDS)
         )
         expiration_datetime = self.created_at + timedelta(seconds=expiration_time)
         return timezone.now() > expiration_datetime

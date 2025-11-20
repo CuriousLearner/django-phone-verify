@@ -11,11 +11,12 @@ from django.db import models
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 
+from ..constants import (
+    DEFAULT_MAX_FAILED_ATTEMPTS,
+    DEFAULT_SECURITY_CODE_EXPIRATION_SECONDS,
+    DEFAULT_TOKEN_LENGTH,
+)
 from ..models import SMSVerification
-
-DEFAULT_TOKEN_LENGTH = 6
-DEFAULT_MIN_TOKEN_LENGTH = 6
-DEFAULT_MAX_FAILED_ATTEMPTS = 5
 
 
 def get_security_code_expiration():
@@ -26,7 +27,7 @@ def get_security_code_expiration():
     then falls back to SECURITY_CODE_EXPIRATION_TIME (deprecated).
     Issues a deprecation warning if the old setting name is used.
 
-    :return: Expiration time in seconds (default: 600)
+    :return: Expiration time in seconds (default: DEFAULT_SECURITY_CODE_EXPIRATION_SECONDS)
     """
     phone_settings = getattr(django_settings, 'PHONE_VERIFICATION', {})
 
@@ -45,7 +46,7 @@ def get_security_code_expiration():
         return phone_settings['SECURITY_CODE_EXPIRATION_TIME']
 
     # Default value
-    return 600
+    return DEFAULT_SECURITY_CODE_EXPIRATION_SECONDS
 
 
 class BaseBackend(metaclass=ABCMeta):

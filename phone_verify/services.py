@@ -10,7 +10,7 @@ from django.utils.translation import gettext, override
 
 # phone_verify stuff
 from .backends import get_sms_backend
-from .backends.base import DEFAULT_MIN_TOKEN_LENGTH, DEFAULT_TOKEN_LENGTH
+from .constants import DEFAULT_MIN_TOKEN_LENGTH, DEFAULT_TOKEN_LENGTH
 
 logger = logging.getLogger(__name__)
 
