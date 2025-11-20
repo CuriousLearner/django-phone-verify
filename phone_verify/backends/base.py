@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import random
+import warnings
 from abc import ABCMeta, abstractmethod
 
 # Third Party Stuff
@@ -15,6 +16,36 @@ from ..models import SMSVerification
 DEFAULT_TOKEN_LENGTH = 6
 DEFAULT_MIN_TOKEN_LENGTH = 6
 DEFAULT_MAX_FAILED_ATTEMPTS = 5
+
+
+def get_security_code_expiration():
+    """
+    Get security code expiration time in seconds.
+
+    Checks for SECURITY_CODE_EXPIRATION_SECONDS (preferred) first,
+    then falls back to SECURITY_CODE_EXPIRATION_TIME (deprecated).
+    Issues a deprecation warning if the old setting name is used.
+
+    :return: Expiration time in seconds (default: 600)
+    """
+    phone_settings = getattr(django_settings, 'PHONE_VERIFICATION', {})
+
+    # Check for new setting name first
+    if 'SECURITY_CODE_EXPIRATION_SECONDS' in phone_settings:
+        return phone_settings['SECURITY_CODE_EXPIRATION_SECONDS']
+
+    # Fall back to old setting name with deprecation warning
+    if 'SECURITY_CODE_EXPIRATION_TIME' in phone_settings:
+        warnings.warn(
+            "SECURITY_CODE_EXPIRATION_TIME is deprecated and will be removed in a future version. "
+            "Please use SECURITY_CODE_EXPIRATION_SECONDS instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return phone_settings['SECURITY_CODE_EXPIRATION_TIME']
+
+    # Default value
+    return 600
 
 
 class BaseBackend(metaclass=ABCMeta):
@@ -72,9 +103,7 @@ class BaseBackend(metaclass=ABCMeta):
         Returns True if the `security_code` for the `stored_verification` is expired.
         """
         time_difference = timezone.now() - stored_verification.created_at
-        if time_difference.seconds > django_settings.PHONE_VERIFICATION.get(
-            "SECURITY_CODE_EXPIRATION_TIME"
-        ):
+        if time_difference.seconds > get_security_code_expiration():
             return True
         return False
 

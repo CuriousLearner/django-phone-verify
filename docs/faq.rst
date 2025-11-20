@@ -83,7 +83,7 @@ You should implement **rate limiting** on your verification endpoints. See the :
 - DRF Throttling
 - Cache-based rate limiting
 
-**Q: What's a good SECURITY_CODE_EXPIRATION_TIME value?**
+**Q: What's a good SECURITY_CODE_EXPIRATION_SECONDS value?**
 
 We recommend **300-600 seconds (5-10 minutes)**. This balances security and user experience:
 
@@ -195,7 +195,7 @@ See the "SMS Sending Problems" section in :doc:`troubleshooting`.
 
 Common causes:
 
-1. **Code expired**: Check ``SECURITY_CODE_EXPIRATION_TIME`` setting
+1. **Code expired**: Check ``SECURITY_CODE_EXPIRATION_SECONDS`` setting
 2. **Session token mismatch**: Ensure you're using the same ``session_token`` from registration
 3. **Already verified**: If ``VERIFY_SECURITY_CODE_ONLY_ONCE`` is True, codes can only be used once
 4. **Clock skew**: Ensure server time is accurate (for JWT token validation)

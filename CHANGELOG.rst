@@ -1,6 +1,18 @@
 Release Notes
 -------------
 
+[Unreleased]
+^^^^^^^^^^^^
+
+Added
+"""""
+- **Admin Interface Enhancements**: Added expiration status display in Django admin with ``is_valid`` column showing intuitive boolean indicators (green checkmark for valid codes, red X for expired codes). Added ``is_expired`` property to ``SMSVerification`` model for easy expiration checking.
+- **Database Cleanup**: Added ``cleanup_phone_verifications`` management command to automatically delete old verification records. Supports ``--days`` parameter to customize retention period and ``--dry-run`` mode for previewing deletions. New ``RECORD_RETENTION_DAYS`` setting (default: 30 days) for configuring default retention period.
+
+Changed
+"""""""
+- **Settings**: ``SECURITY_CODE_EXPIRATION_TIME`` is now deprecated in favor of the more explicit ``SECURITY_CODE_EXPIRATION_SECONDS``. Both settings are supported for backward compatibility, with ``SECURITY_CODE_EXPIRATION_SECONDS`` taking precedence. A deprecation warning is issued when the old setting name is used. The old name will be removed in a future major version.
+
 [3.2.0] - 2025-10-19
 ^^^^^^^^^^^^^^^^^^^^
 

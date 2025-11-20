@@ -78,7 +78,6 @@ class PhoneVerificationService(object):
             "TOKEN_LENGTH",
             "MESSAGE",
             "APP_NAME",
-            "SECURITY_CODE_EXPIRATION_TIME",
             "VERIFY_SECURITY_CODE_ONLY_ONCE",
         }
         user_settings = set(settings.PHONE_VERIFICATION.keys())
@@ -87,6 +86,17 @@ class PhoneVerificationService(object):
                 "Please specify following settings in settings.py: {}".format(
                     ", ".join(required_settings - user_settings)
                 )
+            )
+
+        # Check for expiration time setting (either old or new name)
+        has_expiration_setting = (
+            "SECURITY_CODE_EXPIRATION_SECONDS" in user_settings
+            or "SECURITY_CODE_EXPIRATION_TIME" in user_settings
+        )
+        if not has_expiration_setting:
+            raise ImproperlyConfigured(
+                "Please specify either SECURITY_CODE_EXPIRATION_SECONDS (recommended) "
+                "or SECURITY_CODE_EXPIRATION_TIME in settings.py"
             )
 
         # Validate minimum token length

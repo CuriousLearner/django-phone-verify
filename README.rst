@@ -131,7 +131,7 @@ Configuration
         "TOKEN_LENGTH": 6,
         "MESSAGE": "Welcome to {app}! Please use security code {security_code} to proceed.",
         "APP_NAME": "Phone Verify",
-        "SECURITY_CODE_EXPIRATION_TIME": 3600,  # in seconds
+        "SECURITY_CODE_EXPIRATION_SECONDS": 3600,  # in seconds
         "VERIFY_SECURITY_CODE_ONLY_ONCE": False,
     }
 
@@ -150,7 +150,7 @@ Configuration
         "TOKEN_LENGTH": 6,
         "MESSAGE": "Welcome to {app}! Please use security code {security_code} to proceed.",
         "APP_NAME": "Phone Verify",
-        "SECURITY_CODE_EXPIRATION_TIME": 3600,
+        "SECURITY_CODE_EXPIRATION_SECONDS": 3600,
         "VERIFY_SECURITY_CODE_ONLY_ONCE": False,
     }
 

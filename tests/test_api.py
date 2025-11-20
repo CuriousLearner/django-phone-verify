@@ -162,6 +162,38 @@ def test_check_security_code_expiry(client, backend):
             assert response.status_code == 200
 
 
+def test_check_security_code_expiry_with_deprecated_setting(client, backend):
+    """Test that expiry check works with deprecated SECURITY_CODE_EXPIRATION_TIME setting."""
+    backend_copy = backend.copy()
+    del backend_copy["SECURITY_CODE_EXPIRATION_SECONDS"]
+    backend_copy["SECURITY_CODE_EXPIRATION_TIME"] = 1
+
+    with override_settings(PHONE_VERIFICATION=backend_copy):
+        f.create_verification(
+            security_code=SECURITY_CODE,
+            phone_number=PHONE_NUMBER,
+            session_token=SESSION_TOKEN,
+        )
+        time.sleep(2)
+        url = reverse("phone-verify")
+        data = {
+            "phone_number": PHONE_NUMBER,
+            "security_code": SECURITY_CODE,
+            "session_token": SESSION_TOKEN,
+        }
+        response = client.json.post(url, data=data)
+        response_data = json.loads(json.dumps(response.data))
+
+        backend_cls = _get_backend_cls(backend_copy)
+
+        if backend_cls in backends:
+            assert response.status_code == 400
+            assert response_data["non_field_errors"][0] == "Security code has expired"
+        elif backend_cls in sandbox_backends:
+            # Sandbox Backend returns a 200 status code when verifying security code expiry
+            assert response.status_code == 200
+
+
 def test_verified_security_code(client, backend):
     with override_settings(PHONE_VERIFICATION=backend):
         f.create_verification(

@@ -50,7 +50,7 @@ ImproperlyConfigured: Please define PHONE_VERIFICATION in settings
         "TOKEN_LENGTH": 6,
         "MESSAGE": "Your code is {security_code}",
         "APP_NAME": "MyApp",
-        "SECURITY_CODE_EXPIRATION_TIME": 3600,
+        "SECURITY_CODE_EXPIRATION_SECONDS": 3600,
         "VERIFY_SECURITY_CODE_ONLY_ONCE": False,
     }
 
@@ -66,7 +66,7 @@ ImproperlyConfigured: Please specify following settings
 - ``TOKEN_LENGTH``
 - ``MESSAGE``
 - ``APP_NAME``
-- ``SECURITY_CODE_EXPIRATION_TIME``
+- ``SECURITY_CODE_EXPIRATION_SECONDS``
 - ``VERIFY_SECURITY_CODE_ONLY_ONCE``
 
 Even if you don't need to customize them, you must include all keys with at least their default values.
@@ -143,7 +143,7 @@ Verification Issues
 **Possible Causes:**
 
 1. **Typo in the code** - User entered wrong code
-2. **Code expired** - Check ``SECURITY_CODE_EXPIRATION_TIME`` setting
+2. **Code expired** - Check ``SECURITY_CODE_EXPIRATION_SECONDS`` setting
 3. **Database was cleared** - Security codes were deleted
 4. **Different phone number** - Verification and code request used different numbers
 
@@ -183,7 +183,7 @@ Verification Issues
 
       PHONE_VERIFICATION = {
           ...
-          "SECURITY_CODE_EXPIRATION_TIME": 7200,  # 2 hours instead of 1
+          "SECURITY_CODE_EXPIRATION_SECONDS": 7200,  # 2 hours instead of 1
       }
 
 2. **Implement resend functionality** - Let users request a new code

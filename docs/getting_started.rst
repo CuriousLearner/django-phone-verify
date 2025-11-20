@@ -112,7 +112,7 @@ Add the ``PHONE_VERIFICATION`` configuration to your ``settings.py``.
         'MAX_FAILED_ATTEMPTS': 5,                             # Maximum failed verification attempts before locking session
         'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
         'APP_NAME': 'MyApp',                                   # Your app name (used in MESSAGE)
-        'SECURITY_CODE_EXPIRATION_TIME': 600,                 # 10 minutes (in seconds)
+        'SECURITY_CODE_EXPIRATION_SECONDS': 600,                 # 10 minutes (in seconds)
         'VERIFY_SECURITY_CODE_ONLY_ONCE': True,               # Code can only be used once
     }
 
@@ -135,7 +135,7 @@ Add the ``PHONE_VERIFICATION`` configuration to your ``settings.py``.
         'MAX_FAILED_ATTEMPTS': 5,                             # Maximum failed verification attempts before locking session
         'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
         'APP_NAME': 'MyApp',
-        'SECURITY_CODE_EXPIRATION_TIME': 600,
+        'SECURITY_CODE_EXPIRATION_SECONDS': 600,
         'VERIFY_SECURITY_CODE_ONLY_ONCE': True,
     }
 
@@ -179,7 +179,7 @@ Here's what each setting does:
 - **MAX_FAILED_ATTEMPTS**: Maximum failed verification attempts before session lockout (default: 5). Protects against brute force attacks
 - **MESSAGE**: SMS message template. Variables: ``{app}`` and ``{security_code}``
 - **APP_NAME**: Your application name (used in MESSAGE template)
-- **SECURITY_CODE_EXPIRATION_TIME**: How long codes are valid (in seconds). Recommended: 300-600 (5-10 minutes)
+- **SECURITY_CODE_EXPIRATION_SECONDS**: How long codes are valid (in seconds). Recommended: 300-600 (5-10 minutes)
 - **VERIFY_SECURITY_CODE_ONLY_ONCE**: If ``True``, codes can only be used once
 
 For detailed configuration options, see the :doc:`configuration` reference.

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import importlib
+import warnings
 
 # Third Party Stuff
 import pytest
@@ -12,6 +13,7 @@ from twilio.base.exceptions import TwilioRestException
 
 # phone_verify Stuff
 import phone_verify.services
+from phone_verify.backends.base import get_security_code_expiration
 from phone_verify.services import (
     PhoneVerificationService,
     send_security_code_and_generate_session_token,
@@ -62,7 +64,7 @@ def test_exception_is_logged_when_raised(client, mocker, backend):
         "BACKEND": "phone_verify.backends.twilio.TwilioBackend",
         "MESSAGE": "Welcome to {app}! Please use security code {security_code} to proceed.",
         "APP_NAME": "Phone Verify",
-        "SECURITY_CODE_EXPIRATION_TIME": 1,  # In seconds only
+        "SECURITY_CODE_EXPIRATION_SECONDS": 1,
         "VERIFY_SECURITY_CODE_ONLY_ONCE": False,
     }
 )
@@ -82,6 +84,57 @@ def test_exception_is_raised_when_no_settings(client, backend):
             importlib.reload(phone_verify.services)
             PhoneVerificationService(phone_number="+13478379634")
             assert exc.info == "Please define PHONE_VERIFICATION in settings"
+
+
+def test_settings_validation_accepts_deprecated_expiration_time(backend):
+    """Test that settings validation accepts deprecated SECURITY_CODE_EXPIRATION_TIME."""
+    backend_copy = backend.copy()
+    del backend_copy["SECURITY_CODE_EXPIRATION_SECONDS"]
+    backend_copy["SECURITY_CODE_EXPIRATION_TIME"] = 600
+
+    with override_settings(PHONE_VERIFICATION=backend_copy):
+        # Should not raise ImproperlyConfigured
+        service = PhoneVerificationService(phone_number="+13478379634")
+        assert service is not None
+
+
+def test_settings_validation_accepts_new_expiration_seconds(backend):
+    """Test that settings validation accepts new SECURITY_CODE_EXPIRATION_SECONDS."""
+    with override_settings(PHONE_VERIFICATION=backend):
+        # Should not raise ImproperlyConfigured
+        service = PhoneVerificationService(phone_number="+13478379634")
+        assert service is not None
+
+
+def test_settings_validation_fails_without_expiration_setting(backend):
+    """Test that settings validation fails when neither expiration setting is present."""
+    backend_copy = backend.copy()
+    if "SECURITY_CODE_EXPIRATION_SECONDS" in backend_copy:
+        del backend_copy["SECURITY_CODE_EXPIRATION_SECONDS"]
+    if "SECURITY_CODE_EXPIRATION_TIME" in backend_copy:
+        del backend_copy["SECURITY_CODE_EXPIRATION_TIME"]
+
+    with override_settings(PHONE_VERIFICATION=backend_copy):
+        with pytest.raises(ImproperlyConfigured) as exc:
+            PhoneVerificationService(phone_number="+13478379634")
+        assert "SECURITY_CODE_EXPIRATION" in str(exc.value)
+
+
+def test_deprecation_warning_for_old_expiration_setting(backend):
+    """Test that a deprecation warning is issued when using SECURITY_CODE_EXPIRATION_TIME."""
+    backend_copy = backend.copy()
+    del backend_copy["SECURITY_CODE_EXPIRATION_SECONDS"]
+    backend_copy["SECURITY_CODE_EXPIRATION_TIME"] = 600
+
+    with override_settings(PHONE_VERIFICATION=backend_copy):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            # Call the utility function that should issue the warning
+            expiration = get_security_code_expiration()
+            assert expiration == 600
+            assert len(w) == 1
+            assert issubclass(w[0].category, DeprecationWarning)
+            assert "SECURITY_CODE_EXPIRATION_TIME is deprecated" in str(w[0].message)
 
 
 class DummyBackend:
@@ -105,7 +158,7 @@ def test_generate_message_default_fallback(settings):
         'TOKEN_LENGTH': 6,
         'MESSAGE': 'Code: {security_code} from {app}, note: {extra}',
         'APP_NAME': 'TestApp',
-        'SECURITY_CODE_EXPIRATION_TIME': 300,
+        'SECURITY_CODE_EXPIRATION_SECONDS': 300,
         'VERIFY_SECURITY_CODE_ONLY_ONCE': True,
     }
 
@@ -123,7 +176,7 @@ def test_generate_message_from_custom_backend(settings):
         'TOKEN_LENGTH': 6,
         'MESSAGE': 'SHOULD NOT BE USED',
         'APP_NAME': 'TestApp',
-        'SECURITY_CODE_EXPIRATION_TIME': 300,
+        'SECURITY_CODE_EXPIRATION_SECONDS': 300,
         'VERIFY_SECURITY_CODE_ONLY_ONCE': True,
     }
 

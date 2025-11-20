@@ -219,8 +219,26 @@ SMSVerification
    - ``security_code`` (CharField): The verification code sent
    - ``session_token`` (CharField): JWT token for this verification session
    - ``is_verified`` (BooleanField): Whether the code has been successfully verified
+   - ``failed_attempts`` (PositiveIntegerField): Number of failed verification attempts (default: 0)
    - ``created_at`` (DateTimeField): When the verification was created
    - ``modified_at`` (DateTimeField): Last modification time
+
+   **Properties:**
+
+   .. py:attribute:: is_expired
+
+      Returns ``True`` if the security code has expired based on the ``SECURITY_CODE_EXPIRATION_SECONDS`` setting.
+
+      :return: Whether the code is expired
+      :rtype: bool
+
+      **Example:**
+
+      .. code-block:: python
+
+         verification = SMSVerification.objects.get(session_token=token)
+         if verification.is_expired:
+             print("Code has expired")
 
    **Constraints:**
 
@@ -238,6 +256,11 @@ SMSVerification
           phone_number="+1234567890",
           is_verified=False
       )
+
+      # Check if a verification has expired
+      verification = SMSVerification.objects.first()
+      if verification and verification.is_expired:
+          print("Verification has expired")
 
 Serializers
 -----------
@@ -365,3 +388,102 @@ VerificationViewSet
           def verify_and_login(self, request):
               # Custom logic here
               pass
+
+Django Admin Interface
+----------------------
+
+SMSVerificationAdmin
+^^^^^^^^^^^^^^^^^^^^
+
+The Django admin interface provides an intuitive way to manage and monitor phone verifications.
+
+**Features:**
+
+- **List Display**: Shows ID, security code, phone number, verification status, validity status, failed attempts, and creation date
+- **Is Valid**: Boolean indicator using Django's standard icons - green checkmark when valid, red X when expired
+- **Search**: Search by phone number
+- **Filters**: Filter by verification status and creation date
+- **Read-only Fields**: All fields are read-only to prevent accidental modifications
+
+**Accessing the Admin:**
+
+1. Navigate to Django admin: ``/admin/``
+2. Click on "SMS Verifications" under the "Phone Verify" section
+3. View all verification records with their validity status
+
+**Example View:**
+
+The admin list will show entries like:
+
+- **ID**: 550e8400-e29b-41d4-a716-446655440000
+- **Security Code**: 123456
+- **Phone Number**: +1234567890
+- **Is Verified**: ✓ (green checkmark)
+- **Is Valid**: ✓ (green checkmark - not expired) or ✗ (red X - expired)
+- **Failed Attempts**: 0
+- **Created At**: 2025-10-19 14:30:00
+
+Management Commands
+-------------------
+
+cleanup_phone_verifications
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Django management command to clean up old SMS verification records from the database.
+
+**Usage:**
+
+.. code-block:: bash
+
+   # Delete records older than the default retention period (30 days or RECORD_RETENTION_DAYS setting)
+   python manage.py cleanup_phone_verifications
+
+   # Delete records older than a custom number of days
+   python manage.py cleanup_phone_verifications --days 7
+
+   # Dry-run mode: preview what would be deleted without actually deleting
+   python manage.py cleanup_phone_verifications --dry-run
+
+   # Combine options
+   python manage.py cleanup_phone_verifications --days 14 --dry-run
+
+**Options:**
+
+- ``--days N``: Number of days to retain records (overrides ``RECORD_RETENTION_DAYS`` setting)
+- ``--dry-run``: Show what would be deleted without actually deleting anything
+
+**Configuration:**
+
+Add ``RECORD_RETENTION_DAYS`` to your ``PHONE_VERIFICATION`` settings to set the default retention period:
+
+.. code-block:: python
+
+   PHONE_VERIFICATION = {
+       ...
+       'RECORD_RETENTION_DAYS': 30,  # Keep records for 30 days (default)
+   }
+
+**Scheduling:**
+
+For production use, schedule this command to run periodically using cron, Celery Beat, or your preferred task scheduler:
+
+.. code-block:: bash
+
+   # Example crontab entry (runs daily at 2 AM)
+   0 2 * * * /path/to/python /path/to/manage.py cleanup_phone_verifications
+
+**Example Output:**
+
+.. code-block:: text
+
+   Successfully deleted 42 verification record(s) older than 30 days
+
+Or for dry-run mode:
+
+.. code-block:: text
+
+   DRY RUN: Would delete 42 verification record(s) older than 30 days
+   Records that would be deleted:
+     - +1234567890 (created: 2025-09-15 10:23:45)
+     - +1234567891 (created: 2025-09-14 08:15:30)
+     ... and 40 more
