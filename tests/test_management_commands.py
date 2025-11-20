@@ -18,9 +18,9 @@ SESSION_TOKEN = "phone-auth-session-token"
 
 def test_cleanup_phone_verifications_no_old_records(backend):
     """Test cleanup command when no old records exist."""
-    with override_settings(PHONE_VERIFICATION=backend):
-        backend["RECORD_RETENTION_DAYS"] = 30
+    backend["RECORD_RETENTION_DAYS"] = 30
 
+    with override_settings(PHONE_VERIFICATION=backend):
         f.create_verification(
             security_code=SECURITY_CODE,
             phone_number=PHONE_NUMBER,
@@ -36,9 +36,9 @@ def test_cleanup_phone_verifications_no_old_records(backend):
 
 def test_cleanup_phone_verifications_deletes_old_records(backend):
     """Test cleanup command deletes old records."""
-    with override_settings(PHONE_VERIFICATION=backend):
-        backend["RECORD_RETENTION_DAYS"] = 30
+    backend["RECORD_RETENTION_DAYS"] = 30
 
+    with override_settings(PHONE_VERIFICATION=backend):
         recent_verification = f.create_verification(
             security_code=SECURITY_CODE,
             phone_number=PHONE_NUMBER,
@@ -86,9 +86,9 @@ def test_cleanup_phone_verifications_custom_days(backend):
 
 def test_cleanup_phone_verifications_dry_run(backend):
     """Test cleanup command with dry-run flag."""
-    with override_settings(PHONE_VERIFICATION=backend):
-        backend["RECORD_RETENTION_DAYS"] = 30
+    backend["RECORD_RETENTION_DAYS"] = 30
 
+    with override_settings(PHONE_VERIFICATION=backend):
         verification = f.create_verification(
             security_code=SECURITY_CODE,
             phone_number=PHONE_NUMBER,

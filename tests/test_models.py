@@ -1,10 +1,10 @@
 import time
 from datetime import timedelta
-from unittest.mock import patch
 
 import pytest
 from django.test import override_settings
 from django.utils import timezone
+from freezegun import freeze_time
 
 from tests import factories as f
 
@@ -37,9 +37,9 @@ def test_sms_verification_is_expired_false(backend):
 
 def test_sms_verification_is_expired_true(backend):
     """Test that an old verification is expired."""
-    with override_settings(PHONE_VERIFICATION=backend):
-        backend["SECURITY_CODE_EXPIRATION_SECONDS"] = 1
+    backend["SECURITY_CODE_EXPIRATION_SECONDS"] = 1
 
+    with override_settings(PHONE_VERIFICATION=backend):
         sms_verification = f.create_verification(
             security_code=SECURITY_CODE,
             phone_number=PHONE_NUMBER,
@@ -53,9 +53,9 @@ def test_sms_verification_is_expired_true(backend):
 
 def test_sms_verification_is_expired_custom_expiration_time(backend):
     """Test is_expired with custom expiration time."""
-    with override_settings(PHONE_VERIFICATION=backend):
-        backend["SECURITY_CODE_EXPIRATION_SECONDS"] = 300
+    backend["SECURITY_CODE_EXPIRATION_SECONDS"] = 300
 
+    with override_settings(PHONE_VERIFICATION=backend):
         sms_verification = f.create_verification(
             security_code=SECURITY_CODE,
             phone_number=PHONE_NUMBER,
@@ -63,11 +63,11 @@ def test_sms_verification_is_expired_custom_expiration_time(backend):
         )
 
         fake_expired_time = timezone.now() + timedelta(seconds=301)
-        with patch("django.utils.timezone.now", return_value=fake_expired_time):
+        with freeze_time(fake_expired_time):
             assert sms_verification.is_expired is True
 
         fake_valid_time = timezone.now() + timedelta(seconds=200)
-        with patch("django.utils.timezone.now", return_value=fake_valid_time):
+        with freeze_time(fake_valid_time):
             assert sms_verification.is_expired is False
 
 

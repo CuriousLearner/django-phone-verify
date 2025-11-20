@@ -3,7 +3,6 @@ import uuid
 from datetime import timedelta
 
 # Third Party Stuff
-from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -14,7 +13,7 @@ except ImportError:
 from phonenumber_field.modelfields import PhoneNumberField
 
 # phone_verify stuff
-from .constants import DEFAULT_SECURITY_CODE_EXPIRATION_SECONDS
+from .constants import get_security_code_expiration
 
 
 class UUIDModel(models.Model):
@@ -63,12 +62,8 @@ class SMSVerification(TimeStampedUUIDModel):
 
         Uses SECURITY_CODE_EXPIRATION_SECONDS (preferred) or
         SECURITY_CODE_EXPIRATION_TIME (deprecated) setting.
+        Issues a deprecation warning if the old setting name is used.
         """
-        phone_settings = settings.PHONE_VERIFICATION
-        # Check for new setting name first, then fall back to old name
-        expiration_time = phone_settings.get(
-            "SECURITY_CODE_EXPIRATION_SECONDS",
-            phone_settings.get("SECURITY_CODE_EXPIRATION_TIME", DEFAULT_SECURITY_CODE_EXPIRATION_SECONDS)
-        )
+        expiration_time = get_security_code_expiration()
         expiration_datetime = self.created_at + timedelta(seconds=expiration_time)
         return timezone.now() > expiration_datetime
