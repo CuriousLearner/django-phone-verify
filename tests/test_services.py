@@ -13,7 +13,7 @@ from twilio.base.exceptions import TwilioRestException
 
 # phone_verify Stuff
 import phone_verify.services
-from phone_verify.backends.base import get_security_code_expiration
+from phone_verify.constants import get_security_code_expiration
 from phone_verify.services import (
     PhoneVerificationService,
     send_security_code_and_generate_session_token,

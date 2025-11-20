@@ -37,9 +37,10 @@ def test_sms_verification_is_expired_false(backend):
 
 def test_sms_verification_is_expired_true(backend):
     """Test that an old verification is expired."""
-    backend["SECURITY_CODE_EXPIRATION_SECONDS"] = 1
+    backend_copy = backend.copy()
+    backend_copy["SECURITY_CODE_EXPIRATION_SECONDS"] = 1
 
-    with override_settings(PHONE_VERIFICATION=backend):
+    with override_settings(PHONE_VERIFICATION=backend_copy):
         sms_verification = f.create_verification(
             security_code=SECURITY_CODE,
             phone_number=PHONE_NUMBER,
@@ -53,9 +54,10 @@ def test_sms_verification_is_expired_true(backend):
 
 def test_sms_verification_is_expired_custom_expiration_time(backend):
     """Test is_expired with custom expiration time."""
-    backend["SECURITY_CODE_EXPIRATION_SECONDS"] = 300
+    backend_copy = backend.copy()
+    backend_copy["SECURITY_CODE_EXPIRATION_SECONDS"] = 300
 
-    with override_settings(PHONE_VERIFICATION=backend):
+    with override_settings(PHONE_VERIFICATION=backend_copy):
         sms_verification = f.create_verification(
             security_code=SECURITY_CODE,
             phone_number=PHONE_NUMBER,
