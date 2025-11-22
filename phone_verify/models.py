@@ -1,14 +1,19 @@
 # Standard Library
 import uuid
+from datetime import timedelta
 
 # Third Party Stuff
 from django.db import models
+from django.utils import timezone
 
 try:
     from django.utils.translation import ugettext_lazy as _
 except ImportError:
     from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
+
+# phone_verify stuff
+from .constants import get_security_code_expiration
 
 
 class UUIDModel(models.Model):
@@ -50,3 +55,15 @@ class SMSVerification(TimeStampedUUIDModel):
 
     def __str__(self):
         return "{}: {}".format(str(self.phone_number), self.security_code)
+
+    @property
+    def is_expired(self):
+        """Check if the security code has expired.
+
+        Uses SECURITY_CODE_EXPIRATION_SECONDS (preferred) or
+        SECURITY_CODE_EXPIRATION_TIME (deprecated) setting.
+        Issues a deprecation warning if the old setting name is used.
+        """
+        expiration_time = get_security_code_expiration()
+        expiration_datetime = self.created_at + timedelta(seconds=expiration_time)
+        return timezone.now() > expiration_datetime

@@ -60,7 +60,7 @@ When using django-phone-verify in production, we recommend:
 
 3. **HTTPS Only**: Always use HTTPS in production to protect session tokens and security codes in transit
 
-4. **Token Expiration**: Set reasonable `SECURITY_CODE_EXPIRATION_TIME` values (recommended: 300-600 seconds)
+4. **Token Expiration**: Set reasonable `SECURITY_CODE_EXPIRATION_SECONDS` values (recommended: 300-600 seconds)
 
 5. **One-Time Codes**: Consider enabling `VERIFY_SECURITY_CODE_ONLY_ONCE: True` for high-security applications
 

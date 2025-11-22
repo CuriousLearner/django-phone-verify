@@ -18,7 +18,7 @@ All configuration is defined in a single dictionary called ``PHONE_VERIFICATION`
         "TOKEN_LENGTH": 6,
         "MESSAGE": "Your code is {security_code}",
         "APP_NAME": "MyApp",
-        "SECURITY_CODE_EXPIRATION_TIME": 3600,
+        "SECURITY_CODE_EXPIRATION_SECONDS": 3600,
         "VERIFY_SECURITY_CODE_ONLY_ONCE": False,
     }
 
@@ -170,27 +170,32 @@ The name of your application, used in the ``MESSAGE`` template.
 
 This value is available as ``{app}`` in the message template.
 
-SECURITY_CODE_EXPIRATION_TIME
+SECURITY_CODE_EXPIRATION_SECONDS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Type:** ``int`` (seconds)
 
-**Required:** Yes
+**Required:** Yes (or ``SECURITY_CODE_EXPIRATION_TIME`` for backward compatibility)
 
 How long a security code remains valid after being generated.
 
 .. code-block:: python
 
-    "SECURITY_CODE_EXPIRATION_TIME": 300     # 5 minutes
-    "SECURITY_CODE_EXPIRATION_TIME": 600     # 10 minutes
-    "SECURITY_CODE_EXPIRATION_TIME": 1800    # 30 minutes
-    "SECURITY_CODE_EXPIRATION_TIME": 3600    # 1 hour
+    "SECURITY_CODE_EXPIRATION_SECONDS": 300     # 5 minutes
+    "SECURITY_CODE_EXPIRATION_SECONDS": 600     # 10 minutes
+    "SECURITY_CODE_EXPIRATION_SECONDS": 1800    # 30 minutes
+    "SECURITY_CODE_EXPIRATION_SECONDS": 3600    # 1 hour
 
 **Recommendations:**
 
 - **5-10 minutes**: Best for security-critical operations (login, password reset)
 - **30-60 minutes**: Acceptable for registration flows
 - **Longer**: Only if you have a specific use case
+
+.. note::
+   **Deprecated Setting:** ``SECURITY_CODE_EXPIRATION_TIME`` is deprecated in favor of ``SECURITY_CODE_EXPIRATION_SECONDS``.
+   Both settings are currently supported for backward compatibility, but ``SECURITY_CODE_EXPIRATION_SECONDS``
+   takes precedence if both are present. ``SECURITY_CODE_EXPIRATION_TIME`` will be removed in a future major version.
 
 .. warning::
    Longer expiration times increase the window for brute-force attacks. Consider implementing rate limiting.
@@ -224,6 +229,101 @@ Whether a security code can be verified multiple times or only once.
 
 .. note::
    When ``True``, attempting to verify an already-verified code returns the ``SECURITY_CODE_VERIFIED`` error.
+
+Optional Settings
+-----------------
+
+These settings are optional and have default values. You can override them in your ``PHONE_VERIFICATION`` configuration.
+
+MIN_TOKEN_LENGTH
+^^^^^^^^^^^^^^^^
+
+**Type:** ``int``
+
+**Required:** No
+
+**Default:** ``6``
+
+The minimum allowed value for ``TOKEN_LENGTH``. This prevents accidentally setting insecure token lengths.
+
+.. code-block:: python
+
+    "MIN_TOKEN_LENGTH": 6   # Requires TOKEN_LENGTH >= 6
+    "MIN_TOKEN_LENGTH": 4   # Allow shorter codes (not recommended)
+
+**Recommendations:**
+
+- Keep the default of ``6`` for production use
+- Shorter codes significantly reduce security (4 digits = only 10,000 combinations)
+
+.. warning::
+   If ``TOKEN_LENGTH`` is less than ``MIN_TOKEN_LENGTH``, an ``ImproperlyConfigured`` exception will be raised.
+
+MAX_FAILED_ATTEMPTS
+^^^^^^^^^^^^^^^^^^^
+
+**Type:** ``int``
+
+**Required:** No
+
+**Default:** ``5``
+
+The maximum number of failed verification attempts allowed before a session is locked out. This provides brute-force protection.
+
+.. code-block:: python
+
+    "MAX_FAILED_ATTEMPTS": 5   # Default: lock after 5 failed attempts
+    "MAX_FAILED_ATTEMPTS": 3   # More restrictive
+    "MAX_FAILED_ATTEMPTS": 10  # More lenient
+
+**Behavior:**
+
+- Each incorrect code increments the ``failed_attempts`` counter
+- After reaching the limit, all verification attempts return ``SECURITY_CODE_TOO_MANY_ATTEMPTS``
+- Counter resets to 0 on successful verification
+- User must request a new code to try again
+
+**Recommendations:**
+
+- ``3-5 attempts``: Good balance between security and user experience
+- Lower values: More secure but may frustrate users
+- Higher values: Less secure, increases brute-force attack window
+
+RECORD_RETENTION_DAYS
+^^^^^^^^^^^^^^^^^^^^^
+
+**Type:** ``int``
+
+**Required:** No
+
+**Default:** ``30``
+
+Number of days to retain SMS verification records in the database before cleanup.
+
+.. code-block:: python
+
+    "RECORD_RETENTION_DAYS": 30   # Keep records for 30 days (default)
+    "RECORD_RETENTION_DAYS": 7    # Keep records for 1 week
+    "RECORD_RETENTION_DAYS": 90   # Keep records for 3 months
+
+**Usage:**
+
+This setting is used by the ``cleanup_phone_verifications`` management command to determine which records to delete.
+
+.. code-block:: bash
+
+   # Uses RECORD_RETENTION_DAYS setting
+   python manage.py cleanup_phone_verifications
+
+   # Override with custom value
+   python manage.py cleanup_phone_verifications --days 14
+
+**Considerations:**
+
+- **Compliance**: Check GDPR, CCPA, or other privacy regulations for your retention requirements
+- **Analytics**: Keep records longer if you need historical verification data
+- **Storage**: Shorter retention reduces database size
+- **Debugging**: Longer retention helps with support and troubleshooting
 
 Backend-Specific Settings
 --------------------------
@@ -296,7 +396,7 @@ It's common to use different settings for development, staging, and production:
             "TOKEN_LENGTH": 6,
             "MESSAGE": "[DEV] Your code is {security_code}",
             "APP_NAME": "MyApp Dev",
-            "SECURITY_CODE_EXPIRATION_TIME": 7200,  # Longer for testing
+            "SECURITY_CODE_EXPIRATION_SECONDS": 7200,  # Longer for testing
             "VERIFY_SECURITY_CODE_ONLY_ONCE": False,  # Allow retries
         }
     else:
@@ -311,7 +411,7 @@ It's common to use different settings for development, staging, and production:
             "TOKEN_LENGTH": 6,
             "MESSAGE": "Your {app} verification code is {security_code}",
             "APP_NAME": "MyApp",
-            "SECURITY_CODE_EXPIRATION_TIME": 600,  # 10 minutes
+            "SECURITY_CODE_EXPIRATION_SECONDS": 600,  # 10 minutes
             "VERIFY_SECURITY_CODE_ONLY_ONCE": True,
         }
 
@@ -341,7 +441,7 @@ Store sensitive credentials in environment variables, not in your code:
             "Your {app} code is {security_code}"
         ),
         "APP_NAME": os.getenv("PHONE_VERIFY_APP_NAME", "MyApp"),
-        "SECURITY_CODE_EXPIRATION_TIME": int(
+        "SECURITY_CODE_EXPIRATION_SECONDS": int(
             os.getenv("PHONE_VERIFY_EXPIRATION", "600")
         ),
         "VERIFY_SECURITY_CODE_ONLY_ONCE": os.getenv(
@@ -451,7 +551,7 @@ Example: Complete Production Configuration
 
         # Security Code Settings
         "TOKEN_LENGTH": 6,
-        "SECURITY_CODE_EXPIRATION_TIME": 600,  # 10 minutes
+        "SECURITY_CODE_EXPIRATION_SECONDS": 600,  # 10 minutes
         "VERIFY_SECURITY_CODE_ONLY_ONCE": True,
 
         # Message Settings

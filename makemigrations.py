@@ -32,7 +32,7 @@ DJANGO_SETTINGS = {
         "TOKEN_LENGTH": 6,
         "MESSAGE": "Welcome to {app}! Please use security code {security_code} to proceed.",
         "APP_NAME": "Phone Verify",
-        "SECURITY_CODE_EXPIRATION_TIME": 1,  # In seconds only
+        "SECURITY_CODE_EXPIRATION_SECONDS": 1,
         "VERIFY_SECURITY_CODE_ONLY_ONCE": False,
     },
 }

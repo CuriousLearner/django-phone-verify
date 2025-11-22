@@ -10,11 +10,12 @@ from django.db import models
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 
+from ..constants import (
+    DEFAULT_MAX_FAILED_ATTEMPTS,
+    DEFAULT_TOKEN_LENGTH,
+    get_security_code_expiration,
+)
 from ..models import SMSVerification
-
-DEFAULT_TOKEN_LENGTH = 6
-DEFAULT_MIN_TOKEN_LENGTH = 6
-DEFAULT_MAX_FAILED_ATTEMPTS = 5
 
 
 class BaseBackend(metaclass=ABCMeta):
@@ -72,11 +73,7 @@ class BaseBackend(metaclass=ABCMeta):
         Returns True if the `security_code` for the `stored_verification` is expired.
         """
         time_difference = timezone.now() - stored_verification.created_at
-        if time_difference.seconds > django_settings.PHONE_VERIFICATION.get(
-            "SECURITY_CODE_EXPIRATION_TIME"
-        ):
-            return True
-        return False
+        return time_difference.total_seconds() > get_security_code_expiration()
 
     def create_security_code_and_session_token(self, number):
         """

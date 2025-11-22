@@ -142,7 +142,7 @@ Step 2: Verify Security Code
 4. Queries database for matching ``SMSVerification`` record
 5. Backend validates:
    - Does the code match?
-   - Has it expired (based on ``SECURITY_CODE_EXPIRATION_TIME``)?
+   - Has it expired (based on ``SECURITY_CODE_EXPIRATION_SECONDS``)?
    - Has it already been used (if ``VERIFY_SECURITY_CODE_ONLY_ONCE`` is True)?
 6. If valid, marks record as verified in database
 7. Returns validation status (``SECURITY_CODE_VALID`` or error)
@@ -220,7 +220,7 @@ This prevents:
 Code Expiration
 ^^^^^^^^^^^^^^^
 
-Security codes expire after ``SECURITY_CODE_EXPIRATION_TIME`` seconds (recommended: 300-600).
+Security codes expire after ``SECURITY_CODE_EXPIRATION_SECONDS`` seconds (recommended: 300-600).
 
 This limits the window for brute-force attacks.
 
@@ -267,7 +267,7 @@ Settings are loaded from ``PHONE_VERIFICATION`` in ``settings.py``:
         'TOKEN_LENGTH': 6,
         'MESSAGE': 'Code: {security_code}',
         'APP_NAME': 'MyApp',
-        'SECURITY_CODE_EXPIRATION_TIME': 600,
+        'SECURITY_CODE_EXPIRATION_SECONDS': 600,
         'VERIFY_SECURITY_CODE_ONLY_ONCE': True,
     }
 

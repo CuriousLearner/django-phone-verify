@@ -134,10 +134,10 @@ Use short expiration times for security-sensitive operations:
 
     PHONE_VERIFICATION = {
         # Security-sensitive (login, 2FA, password reset)
-        "SECURITY_CODE_EXPIRATION_TIME": 300,  # 5 minutes
+        "SECURITY_CODE_EXPIRATION_SECONDS": 300,  # 5 minutes
 
         # Standard registration flows
-        "SECURITY_CODE_EXPIRATION_TIME": 600,  # 10 minutes
+        "SECURITY_CODE_EXPIRATION_SECONDS": 600,  # 10 minutes
 
         # Avoid longer times in production
         ...
@@ -568,7 +568,7 @@ Use this checklist before going to production:
 
     ☐ Rate limiting implemented (per IP and per phone number)
     ☐ TOKEN_LENGTH >= 6
-    ☐ SECURITY_CODE_EXPIRATION_TIME <= 600 (10 minutes)
+    ☐ SECURITY_CODE_EXPIRATION_SECONDS <= 600 (10 minutes)
     ☐ VERIFY_SECURITY_CODE_ONLY_ONCE = True
     ☐ Credentials stored in environment variables or secrets manager
     ☐ Django SECRET_KEY is strong and secret

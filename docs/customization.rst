@@ -40,7 +40,7 @@ Update your ``settings.py``:
         'TOKEN_LENGTH': 6,
         'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
         'APP_NAME': 'Phone Verify',
-        'SECURITY_CODE_EXPIRATION_TIME': 3600,
+        'SECURITY_CODE_EXPIRATION_SECONDS': 3600,
         'VERIFY_SECURITY_CODE_ONLY_ONCE': True,
     }
 
@@ -149,7 +149,7 @@ Step 2: Configure Django to Use the Sandbox Backend
         'TOKEN_LENGTH': 6,
         'MESSAGE': 'Welcome to {app}! Please use security code {security_code} to proceed.',
         'APP_NAME': 'Phone Verify',
-        'SECURITY_CODE_EXPIRATION_TIME': 3600,
+        'SECURITY_CODE_EXPIRATION_SECONDS': 3600,
         'VERIFY_SECURITY_CODE_ONLY_ONCE': True,
     }
 
