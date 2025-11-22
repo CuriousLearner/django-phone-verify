@@ -145,8 +145,9 @@ def test_check_security_code_expiry(client, backend):
             session_token=SESSION_TOKEN,
         )
 
-        future_time = timezone.now() + timedelta(seconds=2)
-        with freeze_time(future_time):
+        # Move time forward 2 seconds (past the 1-second expiration)
+        two_seconds_later = timezone.now() + timedelta(seconds=2)
+        with freeze_time(two_seconds_later):
             url = reverse("phone-verify")
             data = {
                 "phone_number": PHONE_NUMBER,
@@ -179,8 +180,9 @@ def test_check_security_code_expiry_with_deprecated_setting(client, backend):
             session_token=SESSION_TOKEN,
         )
 
-        future_time = timezone.now() + timedelta(seconds=2)
-        with freeze_time(future_time):
+        # Move time forward 2 seconds (past the 1-second expiration)
+        two_seconds_later = timezone.now() + timedelta(seconds=2)
+        with freeze_time(two_seconds_later):
             url = reverse("phone-verify")
             data = {
                 "phone_number": PHONE_NUMBER,

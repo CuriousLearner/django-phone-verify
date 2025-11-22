@@ -46,8 +46,9 @@ def test_sms_verification_is_expired_true(backend):
             session_token=SESSION_TOKEN,
         )
 
-        future_time = timezone.now() + timedelta(seconds=2)
-        with freeze_time(future_time):
+        # Move time forward 2 seconds (past the 1-second expiration)
+        two_seconds_later = timezone.now() + timedelta(seconds=2)
+        with freeze_time(two_seconds_later):
             assert sms_verification.is_expired is True
 
 
@@ -63,12 +64,14 @@ def test_sms_verification_is_expired_custom_expiration_time(backend):
             session_token=SESSION_TOKEN,
         )
 
-        fake_expired_time = timezone.now() + timedelta(seconds=301)
-        with freeze_time(fake_expired_time):
+        # Move time forward 301 seconds (past the 300-second expiration)
+        after_expiration = timezone.now() + timedelta(seconds=301)
+        with freeze_time(after_expiration):
             assert sms_verification.is_expired is True
 
-        fake_valid_time = timezone.now() + timedelta(seconds=200)
-        with freeze_time(fake_valid_time):
+        # Move time forward 200 seconds (before the 300-second expiration)
+        before_expiration = timezone.now() + timedelta(seconds=200)
+        with freeze_time(before_expiration):
             assert sms_verification.is_expired is False
 
 
@@ -86,8 +89,9 @@ def test_sms_verification_is_expired_with_deprecated_setting_name(backend):
             session_token=SESSION_TOKEN,
         )
 
-        future_time = timezone.now() + timedelta(seconds=2)
-        with freeze_time(future_time):
+        # Move time forward 2 seconds (past the 1-second expiration)
+        two_seconds_later = timezone.now() + timedelta(seconds=2)
+        with freeze_time(two_seconds_later):
             assert sms_verification.is_expired is True
 
 
