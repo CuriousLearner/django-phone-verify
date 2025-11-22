@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
+from phone_verify.constants import DEFAULT_RECORD_RETENTION_DAYS
 from phone_verify.models import SMSVerification
 
 # Number of records to preview in dry-run mode
@@ -31,7 +32,9 @@ class Command(BaseCommand):
         dry_run = options.get("dry_run", False)
 
         if days is None:
-            days = settings.PHONE_VERIFICATION.get("RECORD_RETENTION_DAYS", 30)
+            days = settings.PHONE_VERIFICATION.get(
+                "RECORD_RETENTION_DAYS", DEFAULT_RECORD_RETENTION_DAYS
+            )
 
         cutoff_date = timezone.now() - timedelta(days=days)
 

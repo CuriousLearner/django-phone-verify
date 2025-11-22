@@ -73,9 +73,7 @@ class BaseBackend(metaclass=ABCMeta):
         Returns True if the `security_code` for the `stored_verification` is expired.
         """
         time_difference = timezone.now() - stored_verification.created_at
-        if time_difference.total_seconds() > get_security_code_expiration():
-            return True
-        return False
+        return time_difference.total_seconds() > get_security_code_expiration()
 
     def create_security_code_and_session_token(self, number):
         """
