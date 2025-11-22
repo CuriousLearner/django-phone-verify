@@ -31,7 +31,7 @@ A Django app to support **phone number verification** using a security code sent
 
 ``django-phone-verify`` provides a simple, secure way to verify phone numbers for user authentication, 2FA, account recovery, and more. It works seamlessly with Django and Django REST Framework, supports multiple SMS providers (Twilio, Nexmo/Vonage), and is fully extensible with custom backends.
 
-📖 **Full Documentation:** `https://www.sanyamkhurana.com/django-phone-verify/ <https://www.sanyamkhurana.com/django-phone-verify/>`_
+📖 **Full Documentation:** `https://django-phone-verify.readthedocs.io/ <https://django-phone-verify.readthedocs.io/>`_
 
 What It Does
 ------------
@@ -216,18 +216,18 @@ Quick Start
 Documentation
 -------------
 
-Full documentation is available at `https://www.sanyamkhurana.com/django-phone-verify/ <https://www.sanyamkhurana.com/django-phone-verify/>`_
+Full documentation is available at `https://django-phone-verify.readthedocs.io/ <https://django-phone-verify.readthedocs.io/>`_
 
 **Quick Links:**
 
-- 📘 `Getting Started Guide <https://www.sanyamkhurana.com/django-phone-verify/getting_started.html>`_
-- ⚙️ `Configuration Reference <https://www.sanyamkhurana.com/django-phone-verify/configuration.html>`_
-- 🔌 `Integration Examples <https://www.sanyamkhurana.com/django-phone-verify/integration.html>`_
-- 🚀 `Advanced Examples <https://www.sanyamkhurana.com/django-phone-verify/advanced_examples.html>`_ (2FA, password reset, marketing opt-in)
-- 🔧 `Custom Backend Guide <https://www.sanyamkhurana.com/django-phone-verify/customization.html>`_
-- 🔒 `Security Best Practices <https://www.sanyamkhurana.com/django-phone-verify/security.html>`_
-- 📖 `API Reference <https://www.sanyamkhurana.com/django-phone-verify/api_reference.html>`_
-- 🐛 `Troubleshooting Guide <https://www.sanyamkhurana.com/django-phone-verify/troubleshooting.html>`_
+- 📘 `Getting Started Guide <https://django-phone-verify.readthedocs.io/getting_started.html>`_
+- ⚙️ `Configuration Reference <https://django-phone-verify.readthedocs.io/configuration.html>`_
+- 🔌 `Integration Examples <https://django-phone-verify.readthedocs.io/integration.html>`_
+- 🚀 `Advanced Examples <https://django-phone-verify.readthedocs.io/advanced_examples.html>`_ (2FA, password reset, marketing opt-in)
+- 🔧 `Custom Backend Guide <https://django-phone-verify.readthedocs.io/customization.html>`_
+- 🔒 `Security Best Practices <https://django-phone-verify.readthedocs.io/security.html>`_
+- 📖 `API Reference <https://django-phone-verify.readthedocs.io/api_reference.html>`_
+- 🐛 `Troubleshooting Guide <https://django-phone-verify.readthedocs.io/troubleshooting.html>`_
 
 Compatibility
 -------------

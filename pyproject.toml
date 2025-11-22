@@ -69,7 +69,7 @@ nexmo = ["nexmo"]
 all = ["twilio", "nexmo"]
 
 [project.urls]
-Documentation = "https://www.sanyamkhurana.com/django-phone-verify/"
+Documentation = "https://django-phone-verify.readthedocs.io/"
 Changelog = "https://github.com/CuriousLearner/django-phone-verify/blob/master/CHANGELOG.rst"
 Code = "https://github.com/CuriousLearner/django-phone-verify"
 Homepage = "https://github.com/CuriousLearner/django-phone-verify"

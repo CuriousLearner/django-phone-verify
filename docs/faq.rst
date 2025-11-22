@@ -312,4 +312,4 @@ Still Have Questions?
 - Check the :doc:`troubleshooting` guide for common issues
 - Review the :doc:`api_reference` for detailed API documentation
 - Open an issue on `GitHub <https://github.com/CuriousLearner/django-phone-verify/issues>`_
-- Read the full documentation at `https://www.sanyamkhurana.com/django-phone-verify/ <https://www.sanyamkhurana.com/django-phone-verify/>`_
+- Read the full documentation at `https://django-phone-verify.readthedocs.io/ <https://django-phone-verify.readthedocs.io/>`_

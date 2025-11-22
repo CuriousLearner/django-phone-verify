@@ -71,7 +71,7 @@ When using django-phone-verify in production, we recommend:
    - Multiple failed verification attempts
    - Verification attempts for many different phone numbers from one source
 
-For more detailed security guidance, see our [Security Best Practices documentation](https://www.sanyamkhurana.com/django-phone-verify/security.html).
+For more detailed security guidance, see our [Security Best Practices documentation](https://django-phone-verify.readthedocs.io/security.html).
 
 ## Disclosure Policy
 
