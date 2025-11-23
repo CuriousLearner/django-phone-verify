@@ -7,5 +7,5 @@ pytest-cov==5.0.0
 django-dynamic-fixture==4.0.1
 pytest-mock==3.14.1
 freezegun==1.5.5
-tox==4.30.3
+tox==4.25.0
 ruff==0.14.6
