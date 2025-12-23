@@ -10,7 +10,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name="django-phone-verify",
-    version="3.2.0",
+    version="3.3.0",
     packages=find_packages(),
     include_package_data=True,
     license="GPLv3",
@@ -55,6 +55,8 @@ setup(
         "Framework :: Django :: 4.2",
         "Framework :: Django :: 5.0",
         "Framework :: Django :: 5.1",
+        "Framework :: Django :: 5.2",
+        "Framework :: Django :: 6.0",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",

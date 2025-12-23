@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-phone-verify"
-version = "3.2.0"
+version = "3.3.0"
 description = "A Django app to support phone number verification using security code sent via SMS."
 readme = "README.rst"
 requires-python = ">=3.8"
@@ -40,6 +40,7 @@ classifiers = [
     "Framework :: Django :: 5.0",
     "Framework :: Django :: 5.1",
     "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: OS Independent",
