@@ -1,11 +1,12 @@
 Release Notes
 -------------
 
-[Unreleased]
-^^^^^^^^^^^^
+[3.3.0] - 2025-12-21
+^^^^^^^^^^^^^^^^^^^^
 
 Added
 """""
+- **Django 6.0 Support**: Added official support for Django 6.0. Note that Django 6.0 requires Python 3.12+.
 - **Admin Interface Enhancements**: Added expiration status display in Django admin with ``is_valid`` column showing intuitive boolean indicators (green checkmark for valid codes, red X for expired codes). Added ``is_expired`` property to ``SMSVerification`` model for easy expiration checking.
 - **Database Cleanup**: Added ``cleanup_phone_verifications`` management command to automatically delete old verification records. Supports ``--days`` parameter to customize retention period and ``--dry-run`` mode for previewing deletions. New ``RECORD_RETENTION_DAYS`` setting (default: 30 days) for configuring default retention period.
 
