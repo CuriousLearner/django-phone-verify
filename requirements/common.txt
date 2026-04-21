@@ -4,7 +4,7 @@ PyJWT==2.10.1
 
 # Configuration
 # -------------------------------------
-python-dotenv==1.2.1
+python-dotenv==1.2.2
 
 # Phone number related Stuff
 # -------------------------------------
