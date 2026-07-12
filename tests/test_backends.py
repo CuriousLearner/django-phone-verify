@@ -179,10 +179,11 @@ def test_custom_backend_import_error(monkeypatch):
     assert "myproject.fake.CustomBackend" in str(excinfo.value)
 
 
-def test_brute_force_protection_max_attempts(client, backend):
+def test_brute_force_protection_max_attempts(client, mocker, backend):
     """Test that verification is blocked after MAX_FAILED_ATTEMPTS."""
     with override_settings(PHONE_VERIFICATION=backend):
         settings.PHONE_VERIFICATION["MAX_FAILED_ATTEMPTS"] = 3
+        mocker.patch(f"{backend['BACKEND']}.send_sms")
 
         # Register phone number
         url = reverse("phone-register")
@@ -219,10 +220,11 @@ def test_brute_force_protection_max_attempts(client, backend):
         assert "Too many failed verification attempts" in str(response.data)
 
 
-def test_brute_force_protection_reset_on_success(client, backend):
+def test_brute_force_protection_reset_on_success(client, mocker, backend):
     """Test that failed_attempts resets to 0 on successful verification."""
     with override_settings(PHONE_VERIFICATION=backend):
         settings.PHONE_VERIFICATION["MAX_FAILED_ATTEMPTS"] = 5
+        mocker.patch(f"{backend['BACKEND']}.send_sms")
 
         # Register phone number
         url = reverse("phone-register")
