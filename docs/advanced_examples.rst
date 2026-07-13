@@ -608,8 +608,11 @@ First, ensure Django's internationalization is enabled in your ``settings.py``:
 Create Translation Files
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Create translation files for your verification message. The message template in ``PHONE_VERIFICATION['MESSAGE']``
-will be automatically translated:
+Create translation files for your verification message. At send time the message
+in ``PHONE_VERIFICATION['MESSAGE']`` is passed through ``gettext``, so it is only
+translated if you add that exact string as a ``msgid`` in your ``.po`` files. The
+setting is a plain string with no ``_()`` wrapper, so ``makemessages`` will not
+discover it for you; add the ``msgid`` manually (shown below):
 
 .. code-block:: bash
 

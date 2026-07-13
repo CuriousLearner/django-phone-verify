@@ -193,8 +193,11 @@ Quick Start
 
 .. code-block:: python
 
-    from phone_verify.services import send_security_code_and_generate_session_token
-    from phone_verify.services import verify_security_code
+    from phone_verify.backends.base import BaseBackend
+    from phone_verify.services import (
+        send_security_code_and_generate_session_token,
+        verify_security_code,
+    )
 
     # Send verification code via SMS
     session_token = send_security_code_and_generate_session_token(
@@ -202,16 +205,17 @@ Quick Start
     )
     # User receives SMS: "Welcome to Phone Verify! Please use security code 847291 to proceed."
 
-    # Verify the code user entered
-    try:
-        verify_security_code(
-            phone_number="+1234567890",
-            security_code="847291",
-            session_token=session_token
-        )
+    # Verify the code user entered. Returns a (verification, status) tuple
+    # where status is one of the BaseBackend status constants.
+    verification, status = verify_security_code(
+        phone_number="+1234567890",
+        security_code="847291",
+        session_token=session_token,
+    )
+    if status == BaseBackend.SECURITY_CODE_VALID:
         print("✓ Phone number verified successfully!")
-    except Exception as e:
-        print(f"✗ Verification failed: {e}")
+    else:
+        print(f"✗ Verification failed with status {status}")
 
 Documentation
 -------------

@@ -25,19 +25,22 @@ Quick Example
 
 .. code-block:: python
 
-    from phone_verify.services import send_security_code_and_generate_session_token
-    from phone_verify.services import verify_security_code
+    from phone_verify.backends.base import BaseBackend
+    from phone_verify.services import (
+        send_security_code_and_generate_session_token,
+        verify_security_code,
+    )
 
     # Send verification code via SMS
     session_token = send_security_code_and_generate_session_token("+1234567890")
 
     # User receives SMS: "Your verification code is 847291"
 
-    # Verify the code
-    verify_security_code("+1234567890", "847291", session_token)
-    # Returns: SECURITY_CODE_VALID
+    # Verify the code. Returns a (verification, status) tuple.
+    verification, status = verify_security_code("+1234567890", "847291", session_token)
+    assert status == BaseBackend.SECURITY_CODE_VALID
 
-That's it! Phone verification in 3 lines of code.
+That's it! Phone verification in a few lines of code.
 
 Installation
 ------------

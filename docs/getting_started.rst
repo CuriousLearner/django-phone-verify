@@ -194,20 +194,28 @@ You can quickly test if everything is working using the Django shell:
 
     python manage.py shell
 
-    >>> from phone_verify.services import send_security_code_and_generate_session_token
-    >>> from phone_verify.services import verify_security_code
+    >>> from phone_verify.backends.base import BaseBackend
+    >>> from phone_verify.services import (
+    ...     send_security_code_and_generate_session_token,
+    ...     verify_security_code,
+    ... )
     >>>
     >>> # Send verification code
     >>> phone = "+1234567890"  # Use your real phone number for testing
     >>> session_token = send_security_code_and_generate_session_token(phone)
     >>> print(f"Session token: {session_token}")
     >>>
-    >>> # Check your phone for the SMS, then verify
+    >>> # Check your phone for the SMS, then verify. verify_security_code
+    >>> # returns a (verification, status) tuple.
     >>> code = "123456"  # Enter the code you received
-    >>> verify_security_code(phone, code, session_token)
-    (<QuerySet []>, 'SECURITY_CODE_VALID')
+    >>> verification, status = verify_security_code(phone, code, session_token)
+    >>> status == BaseBackend.SECURITY_CODE_VALID
+    True
+    >>> status  # SECURITY_CODE_VALID is the integer 0
+    0
 
-If you see ``'SECURITY_CODE_VALID'``, congratulations! Your setup is working correctly.
+If ``status`` equals ``BaseBackend.SECURITY_CODE_VALID`` (the integer ``0``),
+congratulations! Your setup is working correctly.
 
 .. tip::
     **Testing Without Real SMS**: To test without sending actual SMS messages, use a sandbox backend.
