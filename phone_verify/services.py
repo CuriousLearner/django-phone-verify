@@ -14,12 +14,6 @@ from .constants import DEFAULT_MIN_TOKEN_LENGTH, DEFAULT_TOKEN_LENGTH
 
 logger = logging.getLogger(__name__)
 
-# iOS uses "session code" to parse the security code and support copying on clipboard.
-DEFAULT_MESSAGE = (
-    "Welcome to {app}, use session code {security_code} for authentication."
-)
-DEFAULT_APP_NAME = "Phone Verify"
-
 
 class PhoneVerificationService(object):
 
@@ -34,7 +28,7 @@ class PhoneVerificationService(object):
         else:
             self.backend = backend
 
-        self.verification_message = self.phone_settings.get("MESSAGE", DEFAULT_MESSAGE)
+        self.verification_message = self.phone_settings["MESSAGE"]
         self.language = language
 
     def send_verification(self, number, security_code, context=None):
@@ -57,7 +51,7 @@ class PhoneVerificationService(object):
 
         # Default fallback
         format_context = {
-            "app": settings.PHONE_VERIFICATION.get("APP_NAME", DEFAULT_APP_NAME),
+            "app": settings.PHONE_VERIFICATION["APP_NAME"],
             "security_code": security_code,
         }
         if context:
