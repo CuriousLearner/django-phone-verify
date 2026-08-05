@@ -172,11 +172,17 @@ Main service class that orchestrates verification:
 .. code-block:: python
 
     class PhoneVerificationService:
-        def send_verification(self, context=None)
-            # Generates code, sends SMS, returns session token
+        def send_verification(self, number, security_code, context=None):
+            """Formats the message and sends the SMS via the backend."""
+            ...
 
-        def verify(self, security_code, session_token)
-            # Validates code and token, returns success/failure
+Sending a code and generating a session token is done through the
+``send_security_code_and_generate_session_token()`` service function, which
+delegates to the backend's ``create_security_code_and_session_token()`` and
+``send_sms()``. Verification is done through the ``verify_security_code()``
+service function, or the ``SMSVerificationSerializer``; both of those delegate
+to the backend's ``validate_security_code()``. The service class itself has no
+``verify`` method.
 
 3. Backend Classes
 ^^^^^^^^^^^^^^^^^^
@@ -186,11 +192,13 @@ Abstract interface for SMS providers:
 .. code-block:: python
 
     class BaseBackend:
-        def send_sms(number, message)              # Send single SMS
-        def send_bulk_sms(numbers, message)        # Send bulk SMS
-        def generate_security_code()               # Generate random code
-        def generate_session_token(phone_number)   # Generate JWT token
-        def validate_security_code(...)            # Validate code
+        def send_sms(number, message): ...              # Send single SMS
+        def send_bulk_sms(numbers, message): ...        # Send bulk SMS
+        def generate_security_code(): ...               # Generate random code
+        def generate_session_token(phone_number): ...   # Generate JWT token
+        def validate_security_code(                     # Validate code
+            security_code, phone_number, session_token
+        ): ...
 
 Concrete implementations:
 
@@ -234,25 +242,23 @@ This prevents code reuse attacks.
 Database Schema
 ---------------
 
-The ``phone_verify_smsverification`` table structure:
+The ``sms_verification`` table structure:
 
 .. code-block:: sql
 
-    CREATE TABLE phone_verify_smsverification (
-        id               SERIAL PRIMARY KEY,
-        phone_number     VARCHAR(15) NOT NULL,  -- E.164 format
-        session_token    TEXT NOT NULL,         -- JWT token
-        security_code    VARCHAR(120) NOT NULL, -- Hashed or plain code
+    CREATE TABLE sms_verification (
+        id               UUID PRIMARY KEY,        -- uuid4, not auto-increment
+        security_code    VARCHAR(120) NOT NULL,   -- plain code sent via SMS
+        phone_number     VARCHAR(128) NOT NULL,   -- E.164 format
+        session_token    VARCHAR(500) NOT NULL,   -- JWT token
         is_verified      BOOLEAN DEFAULT FALSE,
-        created_at       TIMESTAMP DEFAULT NOW(),
+        failed_attempts  INTEGER DEFAULT 0,       -- brute-force counter
+        created_at       TIMESTAMP NOT NULL,
+        modified_at      TIMESTAMP NOT NULL,
 
-        CONSTRAINT unique_phone_session
-            UNIQUE (phone_number, session_token)
+        CONSTRAINT unique_code_phone_session
+            UNIQUE (security_code, phone_number, session_token)
     );
-
-    -- Index for fast lookups during verification
-    CREATE INDEX idx_phone_token
-        ON phone_verify_smsverification(phone_number, session_token);
 
 Configuration Flow
 ------------------

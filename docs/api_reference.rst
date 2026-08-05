@@ -60,6 +60,45 @@ PhoneVerificationService
       session_token = send_security_code_and_generate_session_token("+1234567890")
       # Returns: "eyJ0eXAiOiJKV1QiLCJhbGc..."
 
+.. py:function:: phone_verify.services.verify_security_code(phone_number, security_code, session_token)
+
+   Thin wrapper over the configured backend's ``validate_security_code()``. Looks up
+   the stored verification and validates the submitted code.
+
+   :param str phone_number: The phone number being verified
+   :param str security_code: The code the user submitted
+   :param str session_token: The session token returned during registration
+   :return: A ``(verification, status)`` tuple. ``status`` is one of the
+            ``BaseBackend`` status constants (e.g. ``BaseBackend.SECURITY_CODE_VALID``).
+            ``verification`` is the matching ``SMSVerification`` instance, ``None``
+            when no record matched the session token, or an empty ``QuerySet`` when a
+            sandbox backend bypassed the code check. Branch on ``status``, not on
+            ``verification``.
+   :rtype: tuple
+
+   **Example:**
+
+   .. code-block:: python
+
+      from phone_verify.backends.base import BaseBackend
+      from phone_verify.services import (
+          send_security_code_and_generate_session_token,
+          verify_security_code,
+      )
+
+      session_token = send_security_code_and_generate_session_token("+1234567890")
+
+      # ... user receives the SMS and submits the code back to you ...
+
+      verification, status = verify_security_code(
+          phone_number="+1234567890",
+          security_code="123456",
+          session_token=session_token,
+      )
+      if status == BaseBackend.SECURITY_CODE_VALID:
+          # Phone number verified
+          ...
+
 Backends
 --------
 
@@ -77,6 +116,7 @@ BaseBackend
    - ``SECURITY_CODE_EXPIRED = 2`` - Code has expired
    - ``SECURITY_CODE_VERIFIED = 3`` - Code already used (when ``VERIFY_SECURITY_CODE_ONLY_ONCE=True``)
    - ``SESSION_TOKEN_INVALID = 4`` - Session token doesn't match
+   - ``SECURITY_CODE_TOO_MANY_ATTEMPTS = 5`` - Too many failed attempts (when ``MAX_FAILED_ATTEMPTS`` is exceeded)
 
    **Abstract Methods (must be implemented):**
 

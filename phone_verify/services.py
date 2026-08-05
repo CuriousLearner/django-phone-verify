@@ -116,3 +116,18 @@ def send_security_code_and_generate_session_token(phone_number, language=None):
             "{error}".format(phone_number=phone_number, error=exc)
         )
     return session_token
+
+
+def verify_security_code(phone_number, security_code, session_token):
+    """Verify a security code for a phone number + session token.
+
+    Thin wrapper over the configured backend's validation. Returns a tuple of
+    ``(verification, status)`` where ``status`` is one of the ``BaseBackend``
+    status constants (e.g. ``BaseBackend.SECURITY_CODE_VALID``).
+    """
+    backend = get_sms_backend(phone_number)
+    return backend.validate_security_code(
+        security_code=security_code,
+        phone_number=phone_number,
+        session_token=session_token,
+    )

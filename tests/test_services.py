@@ -13,10 +13,13 @@ from twilio.base.exceptions import TwilioRestException
 
 # phone_verify Stuff
 import phone_verify.services
+from phone_verify.backends import get_sms_backend
+from phone_verify.backends.base import BaseBackend
 from phone_verify.constants import get_security_code_expiration
 from phone_verify.services import (
     PhoneVerificationService,
     send_security_code_and_generate_session_token,
+    verify_security_code,
 )
 
 from .test_backends import _get_backend_cls
@@ -184,6 +187,41 @@ def test_generate_message_from_custom_backend(settings):
     msg = svc._generate_message("999999", context={"extra": "runtime"})
 
     assert msg == "Custom: 999999 / runtime"
+
+
+def test_verify_security_code_valid(client, backend):
+    with override_settings(PHONE_VERIFICATION=backend):
+        phone_number = "+13478379634"
+        sms_backend = get_sms_backend(phone_number)
+        security_code, session_token = (
+            sms_backend.create_security_code_and_session_token(phone_number)
+        )
+
+        verification, status = verify_security_code(
+            phone_number=phone_number,
+            security_code=security_code,
+            session_token=session_token,
+        )
+
+        assert status == BaseBackend.SECURITY_CODE_VALID
+        assert verification is not None
+
+
+def test_verify_security_code_invalid(client, backend):
+    with override_settings(PHONE_VERIFICATION=backend):
+        phone_number = "+13478379634"
+        sms_backend = get_sms_backend(phone_number)
+        _, session_token = sms_backend.create_security_code_and_session_token(
+            phone_number
+        )
+
+        _, status = verify_security_code(
+            phone_number=phone_number,
+            security_code="000000",
+            session_token=session_token,
+        )
+
+        assert status == BaseBackend.SECURITY_CODE_INVALID
 
 
 @pytest.mark.django_db
