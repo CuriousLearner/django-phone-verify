@@ -177,10 +177,11 @@ Main service class that orchestrates verification:
             ...
 
 Sending a code and generating a session token is done through the
-``send_security_code_and_generate_session_token()`` service function, and
-verification is done through the ``verify_security_code()`` service function
-(or the ``SMSVerificationSerializer``), both of which delegate to the
-backend's ``validate_security_code()``. The service class itself has no
+``send_security_code_and_generate_session_token()`` service function, which
+delegates to the backend's ``create_security_code_and_session_token()`` and
+``send_sms()``. Verification is done through the ``verify_security_code()``
+service function, or the ``SMSVerificationSerializer``; both of those delegate
+to the backend's ``validate_security_code()``. The service class itself has no
 ``verify`` method.
 
 3. Backend Classes
