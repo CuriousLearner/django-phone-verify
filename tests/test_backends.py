@@ -118,11 +118,28 @@ def test_send_bulk_sms(client, mocker, backend):
         assert mock_send_sms.call_count == 3
         mock_send_sms.assert_has_calls(
             [
-                mocker.call(number=numbers[0], message=message),
-                mocker.call(number=numbers[1], message=message),
-                mocker.call(number=numbers[2], message=message),
+                mocker.call(numbers[0], message),
+                mocker.call(numbers[1], message),
+                mocker.call(numbers[2], message),
             ]
         )
+
+
+def test_send_bulk_sms_with_renamed_send_sms_params():
+    """The inherited default must work for backends that rename `send_sms` params."""
+
+    class RenamedParamsBackend(BaseBackend):
+        def __init__(self):
+            self.sent = []
+
+        def send_sms(self, phone_number, body):
+            self.sent.append((phone_number, body))
+
+    numbers = ["+13478379634", "+13478379633"]
+    cls_obj = RenamedParamsBackend()
+    cls_obj.send_bulk_sms(numbers, "Fake message")
+
+    assert cls_obj.sent == [(numbers[0], "Fake message"), (numbers[1], "Fake message")]
 
 
 class TestBaseBackend(BaseBackend):

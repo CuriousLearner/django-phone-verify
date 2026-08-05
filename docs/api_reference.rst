@@ -88,15 +88,15 @@ BaseBackend
       :param str number: Recipient phone number
       :param str message: Message content
 
-   .. py:method:: send_bulk_sms(numbers, message)
-      :abstractmethod:
+   **Concrete Methods:**
 
-      Send an SMS to multiple recipients.
+   .. py:method:: send_bulk_sms(numbers, message)
+
+      Send an SMS to multiple recipients. The default implementation loops over
+      ``send_sms()``. Override it if your provider has a native bulk API.
 
       :param list numbers: List of recipient phone numbers
       :param str message: Message content
-
-   **Concrete Methods:**
 
    .. py:classmethod:: generate_security_code()
 

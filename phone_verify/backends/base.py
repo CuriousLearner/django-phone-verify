@@ -7,13 +7,11 @@ from abc import ABCMeta, abstractmethod
 import jwt
 from django.conf import settings as django_settings
 from django.db import models
-from django.utils import timezone
 from django.utils.crypto import get_random_string
 
 from ..constants import (
     DEFAULT_MAX_FAILED_ATTEMPTS,
     DEFAULT_TOKEN_LENGTH,
-    get_security_code_expiration,
 )
 from ..models import SMSVerification
 
@@ -33,9 +31,11 @@ class BaseBackend(metaclass=ABCMeta):
     def send_sms(self, number, message):
         raise NotImplementedError()
 
-    @abstractmethod
     def send_bulk_sms(self, numbers, message):
-        raise NotImplementedError()
+        # Called positionally so backends that rename `send_sms` parameters
+        # still work with the inherited default.
+        for number in numbers:
+            self.send_sms(number, message)
 
     @classmethod
     def generate_security_code(cls):
@@ -66,14 +66,6 @@ class BaseBackend(metaclass=ABCMeta):
             return session_token.decode()
         except AttributeError:
             return session_token
-
-    @classmethod
-    def check_security_code_expiry(cls, stored_verification):
-        """
-        Returns True if the `security_code` for the `stored_verification` is expired.
-        """
-        time_difference = timezone.now() - stored_verification.created_at
-        return time_difference.total_seconds() > get_security_code_expiration()
 
     def create_security_code_and_session_token(self, number):
         """
@@ -181,7 +173,7 @@ class BaseBackend(metaclass=ABCMeta):
             return stored_verification, self.SECURITY_CODE_INVALID
 
         # check security_code is not expired
-        if self.check_security_code_expiry(stored_verification):
+        if stored_verification.is_expired:
             self._increment_failed_attempts(stored_verification)
             return stored_verification, self.SECURITY_CODE_EXPIRED
 

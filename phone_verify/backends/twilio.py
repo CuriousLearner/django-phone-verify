@@ -24,30 +24,13 @@ class TwilioBackend(BaseBackend):
     def send_sms(self, number, message):
         self.client.messages.create(to=number, body=message, from_=self._from)
 
-    def send_bulk_sms(self, numbers, message):
-        for number in numbers:
-            self.send_sms(number=number, message=message)
 
-
-class TwilioSandboxBackend(BaseBackend):
+class TwilioSandboxBackend(TwilioBackend):
     def __init__(self, **options):
         super(TwilioSandboxBackend, self).__init__(**options)
         # Lower case it just to be sure
         options = {key.lower(): value for key, value in options.items()}
-        self._sid = options.get("sid", None)
-        self._secret = options.get("secret", None)  # auth_token
-        self._from = options.get("from", None)
         self._token = options.get("sandbox_token")
-
-        self.client = TwilioRestClient(self._sid, self._secret)
-        self.exception_class = TwilioRestException
-
-    def send_sms(self, number, message):
-        self.client.messages.create(to=number, body=message, from_=self._from)
-
-    def send_bulk_sms(self, numbers, message):
-        for number in numbers:
-            self.send_sms(number=number, message=message)
 
     def generate_security_code(self):
         """
