@@ -25,7 +25,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ hashFiles('pyproject.toml') }}-${{ hashFiles('requirements/testing.txt') }}
+          key: ${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('requirements/testing.txt') }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
