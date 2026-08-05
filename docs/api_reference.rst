@@ -68,10 +68,12 @@ PhoneVerificationService
    :param str phone_number: The phone number being verified
    :param str security_code: The code the user submitted
    :param str session_token: The session token returned during registration
-   :return: A ``(verification, status)`` tuple. ``verification`` is the
-            ``SMSVerification`` instance (or ``None`` if no record matched), and
-            ``status`` is one of the ``BaseBackend`` status constants (e.g.
-            ``BaseBackend.SECURITY_CODE_VALID``).
+   :return: A ``(verification, status)`` tuple. ``status`` is one of the
+            ``BaseBackend`` status constants (e.g. ``BaseBackend.SECURITY_CODE_VALID``).
+            ``verification`` is the matching ``SMSVerification`` instance, ``None``
+            when no record matched the session token, or an empty ``QuerySet`` when a
+            sandbox backend bypassed the code check. Branch on ``status``, not on
+            ``verification``.
    :rtype: tuple
 
    **Example:**
@@ -79,7 +81,14 @@ PhoneVerificationService
    .. code-block:: python
 
       from phone_verify.backends.base import BaseBackend
-      from phone_verify.services import verify_security_code
+      from phone_verify.services import (
+          send_security_code_and_generate_session_token,
+          verify_security_code,
+      )
+
+      session_token = send_security_code_and_generate_session_token("+1234567890")
+
+      # ... user receives the SMS and submits the code back to you ...
 
       verification, status = verify_security_code(
           phone_number="+1234567890",

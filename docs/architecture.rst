@@ -172,8 +172,9 @@ Main service class that orchestrates verification:
 .. code-block:: python
 
     class PhoneVerificationService:
-        def send_verification(self, number, security_code, context=None)
-            # Formats the message and sends the SMS via the backend
+        def send_verification(self, number, security_code, context=None):
+            """Formats the message and sends the SMS via the backend."""
+            ...
 
 Sending a code and generating a session token is done through the
 ``send_security_code_and_generate_session_token()`` service function, and
@@ -190,11 +191,13 @@ Abstract interface for SMS providers:
 .. code-block:: python
 
     class BaseBackend:
-        def send_sms(number, message)              # Send single SMS
-        def send_bulk_sms(numbers, message)        # Send bulk SMS
-        def generate_security_code()               # Generate random code
-        def generate_session_token(phone_number)   # Generate JWT token
-        def validate_security_code(...)            # Validate code
+        def send_sms(number, message): ...              # Send single SMS
+        def send_bulk_sms(numbers, message): ...        # Send bulk SMS
+        def generate_security_code(): ...               # Generate random code
+        def generate_session_token(phone_number): ...   # Generate JWT token
+        def validate_security_code(                     # Validate code
+            security_code, phone_number, session_token
+        ): ...
 
 Concrete implementations:
 
