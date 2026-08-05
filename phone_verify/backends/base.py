@@ -32,8 +32,10 @@ class BaseBackend(metaclass=ABCMeta):
         raise NotImplementedError()
 
     def send_bulk_sms(self, numbers, message):
+        # Called positionally so backends that rename `send_sms` parameters
+        # still work with the inherited default.
         for number in numbers:
-            self.send_sms(number=number, message=message)
+            self.send_sms(number, message)
 
     @classmethod
     def generate_security_code(cls):
