@@ -24,8 +24,16 @@ class BaseBackend(metaclass=ABCMeta):
     SESSION_TOKEN_INVALID = 4
     SECURITY_CODE_TOO_MANY_ATTEMPTS = 5
 
-    def __init__(self, **settings):
-        self.exception_class = None
+    # Exception a provider raises from `send_sms`, caught and logged when
+    # sending a verification. Concrete backends narrow this to their provider's
+    # error type. Defaults to `Exception` so backends that never set it still
+    # get their errors logged rather than raising from the `except` clause.
+    exception_class = Exception
+
+    # Accepts and discards `**settings` so concrete backends can call
+    # `super().__init__(**options)`. Not abstract: there is nothing to override.
+    def __init__(self, **settings):  # noqa: B027
+        pass
 
     @abstractmethod
     def send_sms(self, number, message):

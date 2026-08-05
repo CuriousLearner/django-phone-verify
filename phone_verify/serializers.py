@@ -40,11 +40,14 @@ class SMSVerificationSerializer(serializers.Serializer):
             session_token=session_token,
         )
 
-        if verification is None:
-            raise serializers.ValidationError(_("Security code is not valid"))
-        elif token_validatation == backend.SESSION_TOKEN_INVALID:
-            raise serializers.ValidationError(_("Session Token mis-match"))
-        elif token_validatation == backend.SECURITY_CODE_INVALID:
+        # A missing record, SESSION_TOKEN_INVALID and SECURITY_CODE_INVALID all
+        # report the same way: the (phone_number, session_token) pair matched
+        # nothing, or the code was wrong. Any of the three fields could be at
+        # fault, so do not name one.
+        if verification is None or token_validatation in (
+            backend.SESSION_TOKEN_INVALID,
+            backend.SECURITY_CODE_INVALID,
+        ):
             raise serializers.ValidationError(_("Security code is not valid"))
         elif token_validatation == backend.SECURITY_CODE_EXPIRED:
             raise serializers.ValidationError(_("Security code has expired"))

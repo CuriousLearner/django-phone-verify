@@ -341,10 +341,11 @@ SMSVerificationSerializer
 
    Automatically validates the security code against the backend and raises appropriate errors:
 
-   - "Security code is not valid"
-   - "Session Token mis-match"
+   - "Security code is not valid" (also returned when the ``phone_number`` and
+     ``session_token`` pair matches no record, so no single field is named)
    - "Security code has expired"
    - "Security code is already verified"
+   - "Too many failed verification attempts. Please request a new code."
 
    **Usage:**
 
