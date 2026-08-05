@@ -153,10 +153,16 @@ Verification Issues
 - Increase expiration time if appropriate
 - Log verification attempts to debug
 
-"Session Token mis-match"
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Session token does not match
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Problem:** The session token provided doesn't match the one in the database.
+
+The API reports this as ``"Security code is not valid"``. The same error covers a
+wrong ``phone_number``, a wrong ``session_token``, and a wrong ``security_code``,
+so that a caller cannot tell which of the three was rejected. When calling
+``verify_security_code()`` directly, the returned status distinguishes them:
+this case is ``BaseBackend.SESSION_TOKEN_INVALID``.
 
 **Causes:**
 

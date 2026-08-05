@@ -140,6 +140,36 @@ def test_deprecation_warning_for_old_expiration_setting(backend):
             assert "SECURITY_CODE_EXPIRATION_TIME is deprecated" in str(w[0].message)
 
 
+class BackendWithoutExceptionClass(BaseBackend):
+    """A custom backend shaped like the ones in docs/customization.rst.
+
+    It never sets `exception_class`, so it relies on the BaseBackend default.
+    """
+
+    def send_sms(self, number, message):
+        raise RuntimeError("provider is down")
+
+
+def test_provider_error_is_logged_when_backend_omits_exception_class(mocker):
+    """A backend that never sets `exception_class` must still log, not raise TypeError."""
+    settings_dict = {
+        "BACKEND": "tests.test_services.BackendWithoutExceptionClass",
+        "OPTIONS": {},
+        "TOKEN_LENGTH": 6,
+        "MESSAGE": "Your code is {security_code}",
+        "APP_NAME": "Phone Verify",
+        "SECURITY_CODE_EXPIRATION_SECONDS": 600,
+        "VERIFY_SECURITY_CODE_ONLY_ONCE": True,
+    }
+    with override_settings(PHONE_VERIFICATION=settings_dict):
+        mock_logger = mocker.patch("phone_verify.services.logger")
+        session_token = send_security_code_and_generate_session_token("+13478379634")
+
+    assert session_token
+    mock_logger.error.assert_called_once()
+    assert "provider is down" in mock_logger.error.call_args[0][0]
+
+
 class DummyBackend:
     def __init__(self):
         self.sent_messages = []
