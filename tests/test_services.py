@@ -15,7 +15,10 @@ from twilio.base.exceptions import TwilioRestException
 import phone_verify.services
 from phone_verify.backends import get_sms_backend
 from phone_verify.backends.base import BaseBackend
-from phone_verify.constants import get_security_code_expiration
+from phone_verify.constants import (
+    DEFAULT_SECURITY_CODE_EXPIRATION_SECONDS,
+    get_security_code_expiration,
+)
 from phone_verify.services import (
     PhoneVerificationService,
     send_security_code_and_generate_session_token,
@@ -138,6 +141,21 @@ def test_deprecation_warning_for_old_expiration_setting(backend):
             assert len(w) == 1
             assert issubclass(w[0].category, DeprecationWarning)
             assert "SECURITY_CODE_EXPIRATION_TIME is deprecated" in str(w[0].message)
+
+
+@override_settings(
+    PHONE_VERIFICATION={
+        "BACKEND": "phone_verify.backends.twilio.TwilioBackend",
+        "OPTIONS": {},
+        "TOKEN_LENGTH": 6,
+        "MESSAGE": "Welcome to {app}, use {security_code}.",
+        "APP_NAME": "Phone Verify",
+        "VERIFY_SECURITY_CODE_ONLY_ONCE": False,
+    }
+)
+def test_expiration_falls_back_to_default_when_unset():
+    """Neither expiration setting configured, so the library default applies."""
+    assert get_security_code_expiration() == DEFAULT_SECURITY_CODE_EXPIRATION_SECONDS
 
 
 class DummyBackend:

@@ -711,8 +711,8 @@ The library accepts standard language codes:
 
 - Simple codes: ``en``, ``es``, ``fr``, ``de``, ``ja``, ``zh``
 - Locale-specific: ``en-US``, ``en-GB``, ``zh-Hans`` (Simplified Chinese), ``zh-Hant`` (Traditional Chinese)
-- The first language in comma-separated ``Accept-Language`` headers is used
-- Quality values (``q=``) are ignored; only the first language is considered
+- Comma-separated ``Accept-Language`` headers are ranked by their quality value (``q=``), and the highest priority language is used
+- Entries with an equal or absent ``q`` keep their header order; malformed entries are ignored
 
 Fallback Behavior
 ^^^^^^^^^^^^^^^^^

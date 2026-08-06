@@ -1,20 +1,12 @@
 # -*- coding: utf-8 -*-
 
-# Standard Library
-import logging
-
 # Third Party Stuff
-try:
-    from django.utils.translation import ugettext_lazy as _
-except ImportError:
-    from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
 
 # Phone Auth Stuff
 from .backends import get_sms_backend
-
-logger = logging.getLogger(__name__)
 
 
 class PhoneSerializer(serializers.Serializer):

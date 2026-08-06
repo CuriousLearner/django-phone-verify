@@ -6,6 +6,9 @@ from django.core.management import call_command
 from django.test import override_settings
 from django.utils import timezone
 
+from phone_verify.management.commands.cleanup_phone_verifications import (
+    DRY_RUN_PREVIEW_LIMIT,
+)
 from phone_verify.models import SMSVerification
 from tests import factories as f
 
@@ -108,3 +111,31 @@ def test_cleanup_phone_verifications_dry_run(backend):
         assert "DRY RUN" in output
         assert "Would delete 1 verification record(s)" in output
         assert SMSVerification.objects.count() == 1
+
+
+def test_cleanup_phone_verifications_dry_run_truncates_preview(backend):
+    """Test dry-run previews a capped number of records and counts the rest."""
+    backend_copy = backend.copy()
+    backend_copy["RECORD_RETENTION_DAYS"] = 30
+    extra = 3
+    total = DRY_RUN_PREVIEW_LIMIT + extra
+
+    with override_settings(PHONE_VERIFICATION=backend_copy):
+        for index in range(total):
+            verification = f.create_verification(
+                security_code=SECURITY_CODE,
+                phone_number=PHONE_NUMBER,
+                session_token=f"{SESSION_TOKEN}-{index}",
+            )
+            SMSVerification.objects.filter(id=verification.id).update(
+                created_at=timezone.now() - timedelta(days=31)
+            )
+
+        out = StringIO()
+        call_command("cleanup_phone_verifications", dry_run=True, stdout=out)
+
+        output = out.getvalue()
+        assert f"Would delete {total} verification record(s)" in output
+        assert output.count(f"  - {PHONE_NUMBER} (created:") == DRY_RUN_PREVIEW_LIMIT
+        assert f"... and {extra} more" in output
+        assert SMSVerification.objects.count() == total

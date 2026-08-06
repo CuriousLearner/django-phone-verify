@@ -43,9 +43,11 @@ class PhoneVerificationService(object):
         self.backend.send_sms(number, message)
 
     def _generate_message(self, security_code, context=None):
-        # If the backend has its own message generator, prefer it
-        if hasattr(self.backend, "generate_message") and callable(self.backend.generate_message):
-            message = self.backend.generate_message(security_code, context=context)
+        # If the backend has its own message generator, prefer it. Backends
+        # inheriting `BaseBackend` always do; duck-typed ones may not.
+        generate_message = getattr(self.backend, "generate_message", None)
+        if generate_message:
+            message = generate_message(security_code, context=context)
             if message:
                 return message
 

@@ -268,3 +268,67 @@ def test_phone_registration_with_accept_language_header(client, mocker, backend)
             security_code=sms_verification.security_code
         )
         mock_backend_send_sms.assert_called_with("+13478379634", actual_message)
+
+
+@pytest.mark.parametrize(
+    "accept_language, expected_language",
+    [
+        # Highest quality value wins, regardless of position in the header.
+        ("de;q=0.5,en;q=0.9", "en"),
+        ("en-US,en;q=0.9,es;q=0.8", "en-US"),
+        # A single language without a quality value is used as-is.
+        ("es", "es"),
+        # Equal or absent quality values keep the order of the header.
+        ("fr,de", "fr"),
+        ("fr;q=0.8,de;q=0.8", "fr"),
+        # Malformed entries are skipped instead of raising.
+        ("de;q=high,en", "en"),
+        ("de;q=,en;q=0.1", "en"),
+        (";q=0.9,en", "en"),
+        ("de;lang=de", None),
+        # `q=0` means "not acceptable", so such entries are never selected.
+        ("de;q=0,en;q=0.1", "en"),
+        ("de;q=0", None),
+        ("de;q=0,fr;q=0", None),
+        # An empty header leaves the message unlocalized.
+        ("", None),
+    ],
+)
+def test_accept_language_header_picks_highest_quality_language(
+    client, mocker, accept_language, expected_language
+):
+    mock_send = mocker.patch(
+        "phone_verify.api.send_security_code_and_generate_session_token",
+        return_value=SESSION_TOKEN,
+    )
+    url = reverse("phone-register")
+
+    response = client.post(
+        url, {"phone_number": PHONE_NUMBER}, HTTP_ACCEPT_LANGUAGE=accept_language
+    )
+
+    assert response.status_code == 200
+    assert mock_send.call_args.kwargs["language"] == expected_language
+
+
+def test_phone_registration_without_accept_language_header_is_not_translated(
+    client, mocker, backend
+):
+    with override_settings(PHONE_VERIFICATION=backend):
+        mock_gettext = mocker.patch("phone_verify.services.gettext")
+        mock_backend_send_sms = mocker.patch(f"{backend['BACKEND']}.send_sms")
+
+        url = reverse("phone-register")
+        response = client.post(url, {"phone_number": PHONE_NUMBER})
+
+        assert response.status_code == 200
+        assert not mock_gettext.called
+
+        SMSVerification = apps.get_model("phone_verify", "SMSVerification")
+        sms_verification = SMSVerification.objects.get(
+            session_token=response.data["session_token"], phone_number=PHONE_NUMBER
+        )
+        expected_message = backend["MESSAGE"].format(
+            app=backend["APP_NAME"], security_code=sms_verification.security_code
+        )
+        mock_backend_send_sms.assert_called_with(PHONE_NUMBER, expected_message)

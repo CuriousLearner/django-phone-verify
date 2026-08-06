@@ -10,6 +10,39 @@ from .serializers import PhoneSerializer, SMSVerificationSerializer
 from .services import send_security_code_and_generate_session_token
 
 
+def _preferred_language(accept_language):
+    """Return the highest priority language of an ``Accept-Language`` header.
+
+    Entries are ranked by their ``q`` weight (RFC 7231), defaulting to 1.0 when
+    absent. A weight of 0 means "not acceptable", so those entries are dropped.
+    Ties keep the order they appear in the header, and malformed entries are
+    ignored. Returns ``None`` when the header carries no usable language, so
+    that the message is sent unlocalized.
+    """
+    candidates = []
+    for entry in accept_language.split(","):
+        language, _, params = entry.strip().partition(";")
+        language = language.strip()
+        if not language:
+            continue
+        weight = 1.0
+        if params:
+            key, _, value = params.partition("=")
+            if key.strip().lower() != "q":
+                continue
+            try:
+                weight = float(value)
+            except ValueError:
+                continue
+        if weight <= 0:
+            continue
+        candidates.append((language, weight))
+
+    # `sort` is stable, so entries of equal weight keep their header order.
+    candidates.sort(key=lambda candidate: candidate[1], reverse=True)
+    return candidates[0][0] if candidates else None
+
+
 class VerificationViewSet(viewsets.GenericViewSet):
     @action(
         detail=False,
@@ -21,13 +54,7 @@ class VerificationViewSet(viewsets.GenericViewSet):
         serializer = PhoneSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # Extract language from Accept-Language header
-        # Format: "en-US,en;q=0.9,es;q=0.8" -> take first language "en-US"
-        accept_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
-        language = None
-        if accept_language:
-            # Take first language, strip quality params (e.g., "en-US;q=0.9" -> "en-US")
-            language = accept_language.split(',')[0].split(';')[0].strip() or None
+        language = _preferred_language(request.META.get("HTTP_ACCEPT_LANGUAGE", ""))
 
         session_token = send_security_code_and_generate_session_token(
             str(serializer.validated_data["phone_number"]),
