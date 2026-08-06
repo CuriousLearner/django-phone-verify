@@ -3,6 +3,7 @@ DJANGO_SETTINGS = {
     "DATABASES": {"default": {"ENGINE": "django.db.backends.sqlite3"}},
     "ROOT_URLCONF": "phone_verify.urls",
     "INSTALLED_APPS": [
+        "django.contrib.admin",
         "django.contrib.auth",
         "django.contrib.contenttypes",
         "phone_verify",

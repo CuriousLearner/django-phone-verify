@@ -17,9 +17,10 @@ from django.conf import settings
 
 from tests import test_settings
 
-backends = {"twilio.TwilioBackend", "nexmo.NexmoBackend"}
-sandbox_backends = {"twilio.TwilioSandboxBackend", "nexmo.NexmoSandboxBackend"}
-all_backends = list(backends) + list(sandbox_backends)
+# Lists, not sets: parametrization order must be reproducible across runs.
+backends = ["twilio.TwilioBackend", "nexmo.NexmoBackend"]
+sandbox_backends = ["twilio.TwilioSandboxBackend", "nexmo.NexmoSandboxBackend"]
+all_backends = backends + sandbox_backends
 
 
 class PartialMethodCaller:
