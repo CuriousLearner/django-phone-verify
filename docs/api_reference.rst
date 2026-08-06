@@ -11,13 +11,18 @@ Services
 PhoneVerificationService
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: phone_verify.services.PhoneVerificationService(phone_number, backend=None)
+.. py:class:: phone_verify.services.PhoneVerificationService(phone_number, backend=None, language=None)
 
    Main service class for sending and managing phone verification messages.
 
    :param str phone_number: The phone number to verify (E.164 format recommended)
    :param backend: Optional backend instance. If None, uses the configured backend from settings
    :type backend: BaseBackend or None
+   :param language: Optional language code (e.g. ``"es"``, ``"en-US"``) used to translate the
+                    ``MESSAGE`` template via ``django.utils.translation.override``. Applies only
+                    to the default message; a backend's own ``generate_message()`` takes
+                    precedence and is not translated here. If None, the message is used as-is
+   :type language: str or None
 
    **Methods:**
 
@@ -43,12 +48,18 @@ PhoneVerificationService
              context={"username": "Alice"}
          )
 
-.. py:function:: phone_verify.services.send_security_code_and_generate_session_token(phone_number)
+.. py:function:: phone_verify.services.send_security_code_and_generate_session_token(phone_number, language=None)
 
    High-level function that generates a security code, creates a session token, and sends the SMS.
+   The database record is written before the SMS is dispatched, and send failures matching the
+   backend's ``exception_class`` are logged rather than raised.
 
    :param str phone_number: The phone number to send the code to
-   :return: The generated session token (JWT)
+   :param language: Optional language code for the SMS message, forwarded to
+                    ``PhoneVerificationService``. The DRF ``register`` endpoint fills this in
+                    from the request's ``Accept-Language`` header
+   :type language: str or None
+   :return: The generated session token
    :rtype: str
 
    **Example:**
@@ -59,6 +70,11 @@ PhoneVerificationService
 
       session_token = send_security_code_and_generate_session_token("+1234567890")
       # Returns: "eyJ0eXAiOiJKV1QiLCJhbGc..."
+
+      # Send the message in Spanish
+      session_token = send_security_code_and_generate_session_token(
+          "+1234567890", language="es"
+      )
 
 .. py:function:: phone_verify.services.verify_security_code(phone_number, security_code, session_token)
 

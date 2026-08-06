@@ -53,6 +53,7 @@ Step 3: Implement the Backend Class
 .. code-block:: python
 
     import nexmo
+    from nexmo.errors import ClientError
     from phone_verify.backends.base import BaseBackend
 
     class NexmoBackend(BaseBackend):
@@ -63,6 +64,8 @@ Step 3: Implement the Backend Class
             self._secret = options.get("secret")
             self._from = options.get("from")
             self.client = nexmo.Client(key=self._key, secret=self._secret)
+            # Errors of this type raised while sending are logged and swallowed.
+            self.exception_class = ClientError
 
         def send_sms(self, number, message):
             self.client.send_message({
@@ -80,9 +83,25 @@ Step 3: Implement the Backend Class
             username = context.get("username", "User") if context else "User"
             return f"Hi {username}, your OTP is {security_code}."
 
-        def send_bulk_sms(self, numbers, message):
-            for number in numbers:
-                self.send_sms(number, message)
+``send_sms`` is the only abstract method on ``BaseBackend``; it is the one method every
+backend must implement.
+
+What ``exception_class`` Is For
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+``send_security_code_and_generate_session_token()`` wraps the send call in
+``except backend.exception_class``, logging the failure rather than letting it bubble up to
+the caller. Set ``exception_class`` to your provider client's exception type so that only
+provider errors are swallowed. ``BaseBackend`` defaults it to ``Exception``, which catches
+everything, including bugs in your own code, so it is worth narrowing.
+
+Do You Need ``send_bulk_sms``?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+No. ``BaseBackend.send_bulk_sms()`` is concrete: it loops over the numbers and calls your
+``send_sms()`` for each one. Override it only if your provider exposes a native bulk send
+endpoint, so that one API call replaces N. An override whose body is just that same loop is
+redundant and should be deleted.
 
 
 Creating a Sandbox SMS Backend
@@ -93,45 +112,38 @@ A sandbox backend is useful for testing flows without sending real SMS messages.
 Step 1: Implement the Sandbox Backend
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Subclass your production backend and override only two hooks. This is the pattern the
+shipped ``TwilioSandboxBackend`` and ``NexmoSandboxBackend`` use.
+
 .. code-block:: python
 
-    import nexmo
-    from phone_verify.backends.base import BaseBackend
-    from phone_verify.models import SMSVerification
-
-    class NexmoSandboxBackend(BaseBackend):
+    class NexmoSandboxBackend(NexmoBackend):
         def __init__(self, **options):
             super().__init__(**options)
             options = {key.lower(): value for key, value in options.items()}
-            self._key = options.get("key")
-            self._secret = options.get("secret")
-            self._from = options.get("from")
             self._token = options.get("sandbox_token")
-            self.client = nexmo.Client(key=self._key, secret=self._secret)
-
-        def send_sms(self, number, message):
-            self.client.send_message({
-                'from': self._from,
-                'to': number,
-                'text': message,
-            })
-
-        def generate_message(self, security_code, context=None):
-            return f"[SANDBOX] Your code is {security_code}"
-
-        def send_bulk_sms(self, numbers, message):
-            for number in numbers:
-                self.send_sms(number, message)
 
         def generate_security_code(self):
+            """Always issue the fixed sandbox token instead of a random code."""
             return self._token
 
-        def validate_security_code(self, security_code, phone_number, session_token):
-            return SMSVerification.objects.none(), self.SECURITY_CODE_VALID
+        def _should_bypass_code_check(self, security_code):
+            """Accept the sandbox token without a database code comparison."""
+            return security_code == self._token
 
-.. note::
-   - ``generate_security_code`` returns a constant token for predictable testing.
-   - ``validate_security_code`` always treats the token as valid.
+Because it subclasses ``NexmoBackend``, the sandbox inherits ``send_sms``,
+``generate_message`` and ``exception_class`` unchanged. Nothing else needs restating.
+
+.. warning::
+   Do not override ``validate_security_code()`` wholesale to return
+   ``SECURITY_CODE_VALID`` unconditionally. That method is where expiry, one-time use and
+   the ``MAX_FAILED_ATTEMPTS`` brute-force lockout are enforced, so replacing it silently
+   disables all three. It also accepts *any* code from *any* session token, not just the
+   sandbox token, so the sandbox stops exercising the real flow.
+
+   ``_should_bypass_code_check()`` exists precisely to avoid this: it skips only the code
+   comparison, and ``validate_security_code()`` still applies the failed-attempts limit
+   before honouring the bypass.
 
 Step 2: Configure Django to Use the Sandbox Backend
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

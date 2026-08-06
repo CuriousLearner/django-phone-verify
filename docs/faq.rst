@@ -29,7 +29,7 @@ You can also write custom backends for any SMS provider (AWS SNS, MessageBird, P
 
 **Q: Do I need Django REST Framework?**
 
-Not necessarily. DRF is only required if you want to use the built-in API viewsets (``/api/phone/register/`` and ``/api/phone/verify/``).
+Not necessarily. DRF is only required if you want to use the built-in API viewsets (``POST /api/phone/register`` and ``POST /api/phone/verify``).
 
 You can use the core services directly in standard Django views without DRF. See :doc:`integration` for non-DRF examples.
 
@@ -77,7 +77,25 @@ Security & Best Practices
 
 **Q: How do I prevent brute-force attacks on security codes?**
 
-You should implement **rate limiting** on your verification endpoints. See the :doc:`security` guide for multiple rate limiting strategies using:
+Two layers, and you want both.
+
+**1. Per-record lockout (built in, on by default).** Every ``SMSVerification`` row carries a
+``failed_attempts`` counter. Each wrong, expired or already-used code increments it; once it
+reaches ``MAX_FAILED_ATTEMPTS`` (default ``5``) that record is locked and every further
+attempt returns ``SECURITY_CODE_TOO_MANY_ATTEMPTS`` until the user requests a new code. A
+successful verification resets the counter to zero.
+
+.. code-block:: python
+
+    PHONE_VERIFICATION = {
+        'MAX_FAILED_ATTEMPTS': 5,
+        # ... other settings
+    }
+
+**2. Request rate limiting (your job).** The lockout is scoped to one verification record, so
+it does not stop an attacker from repeatedly hitting ``register`` to burn your SMS budget, nor
+from spraying codes across many phone numbers. Rate limit the endpoints themselves. See the
+:doc:`security` guide for strategies using:
 
 - Django Ratelimit
 - DRF Throttling
@@ -140,15 +158,27 @@ See :doc:`advanced_examples` for more details.
 
 **Q: How do I test without sending real SMS?**
 
-Create a **sandbox backend** that returns a fixed code. Example:
+Use the shipped ``phone_verify.backends.twilio.TwilioSandboxBackend`` (or
+``NexmoSandboxBackend``) and set ``SANDBOX_TOKEN`` in ``OPTIONS``. To roll your own, subclass
+your production backend and override the two sandbox hooks:
 
 .. code-block:: python
 
     class TwilioSandboxBackend(TwilioBackend):
-        def generate_security_code(self):
-            return self.options.get('SANDBOX_TOKEN', '123456')
+        def __init__(self, **options):
+            super().__init__(**options)
+            options = {key.lower(): value for key, value in options.items()}
+            self._token = options.get('sandbox_token')
 
-Then use this backend in development/testing environments. See :doc:`customization`.
+        def generate_security_code(self):
+            return self._token
+
+        def _should_bypass_code_check(self, security_code):
+            return security_code == self._token
+
+Then use this backend in development/testing environments. Do not override
+``validate_security_code()`` instead: it enforces expiry, one-time use and the brute-force
+lockout. See :doc:`customization`.
 
 **Q: Can I use this for 2FA (two-factor authentication)?**
 
@@ -195,10 +225,14 @@ See the "SMS Sending Problems" section in :doc:`troubleshooting`.
 
 Common causes:
 
-1. **Code expired**: Check ``SECURITY_CODE_EXPIRATION_SECONDS`` setting
-2. **Session token mismatch**: Ensure you're using the same ``session_token`` from registration
-3. **Already verified**: If ``VERIFY_SECURITY_CODE_ONLY_ONCE`` is True, codes can only be used once
-4. **Clock skew**: Ensure server time is accurate (for JWT token validation)
+1. **Locked out**: After ``MAX_FAILED_ATTEMPTS`` (default ``5``) failures the record is locked
+   and returns ``SECURITY_CODE_TOO_MANY_ATTEMPTS`` even for the correct code. The counter only
+   clears on a successful verification, so the user must request a new code
+2. **Code expired**: Check ``SECURITY_CODE_EXPIRATION_SECONDS`` setting
+3. **Session token mismatch**: Ensure you're using the same ``session_token`` from registration
+4. **Already verified**: If ``VERIFY_SECURITY_CODE_ONLY_ONCE`` is True, codes can only be used once
+5. **Clock skew**: Expiry compares the record's ``created_at`` against ``timezone.now()``, so a
+   server clock that jumps can expire codes early
 
 See :doc:`troubleshooting` for debugging steps.
 
@@ -236,12 +270,15 @@ Yes! Use Celery or another task queue. Example:
 
     # tasks.py
     from celery import shared_task
-    from phone_verify.services import PhoneVerificationService
+    from phone_verify.services import send_security_code_and_generate_session_token
 
     @shared_task
     def send_verification_code_async(phone_number):
-        service = PhoneVerificationService(phone_number)
-        return service.send_verification()
+        # Creates the record, sends the SMS, and returns the session token.
+        return send_security_code_and_generate_session_token(phone_number)
+
+Note that the session token is only available once the task runs, so the caller has to collect
+it from the task result rather than from the request that queued it.
 
 See :doc:`advanced_examples` for a complete async implementation.
 
@@ -255,17 +292,28 @@ See :doc:`advanced_examples` for a complete async implementation.
 
 **Q: Should I delete old SMSVerification records?**
 
-Yes, for both performance and privacy reasons. Create a management command or periodic task:
+Yes, for both performance and privacy reasons. There is no need to write your own; the package
+ships a management command:
+
+.. code-block:: shell
+
+    # Delete records older than RECORD_RETENTION_DAYS (default 30)
+    python manage.py cleanup_phone_verifications
+
+    # Preview what would be deleted, without deleting
+    python manage.py cleanup_phone_verifications --dry-run
+
+    # Override the retention window for a single run
+    python manage.py cleanup_phone_verifications --days 7
+
+Set the default window in settings and run the command from cron or a periodic task:
 
 .. code-block:: python
 
-    from django.utils import timezone
-    from datetime import timedelta
-    from phone_verify.models import SMSVerification
-
-    # Delete records older than 30 days
-    cutoff = timezone.now() - timedelta(days=30)
-    SMSVerification.objects.filter(created_at__lt=cutoff).delete()
+    PHONE_VERIFICATION = {
+        'RECORD_RETENTION_DAYS': 30,
+        # ... other settings
+    }
 
 Advanced Usage
 --------------
@@ -293,13 +341,14 @@ Yes! After social login, you can still verify the phone number:
 
 .. code-block:: python
 
+    from phone_verify.services import send_security_code_and_generate_session_token
+
     # After successful OAuth login
     user = request.user
     phone_number = request.data.get('phone_number')
 
     # Send verification
-    service = PhoneVerificationService(phone_number)
-    session_token = service.send_verification()
+    session_token = send_security_code_and_generate_session_token(phone_number)
 
     # Later, after verification succeeds, link to user
     user.phone_number = phone_number

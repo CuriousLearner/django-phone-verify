@@ -5,15 +5,57 @@ Security Best Practices
 
 Phone number verification is often used for security-sensitive operations like authentication and account recovery. This guide covers security best practices when using ``django-phone-verify``.
 
+Built-in Brute-Force Protection
+-------------------------------
+
+``django-phone-verify`` ships a per-record failed-attempt lockout, enabled by default. You do
+not have to build it, but you do need to know its limits.
+
+How It Works
+^^^^^^^^^^^^
+
+Every ``SMSVerification`` row carries a ``failed_attempts`` counter:
+
+- Any wrong, expired or already-verified code increments it, atomically via an ``F()``
+  expression so concurrent guesses cannot race past the limit
+- Once it reaches ``MAX_FAILED_ATTEMPTS`` (default ``5``), ``validate_security_code()``
+  short-circuits and returns ``SECURITY_CODE_TOO_MANY_ATTEMPTS`` before even comparing the
+  code. The record is dead; the user must request a new one
+- A successful verification resets the counter to ``0``
+- Sandbox backends are subject to the same check: the token bypass is only honoured after the
+  limit has been tested
+
+.. code-block:: python
+
+    PHONE_VERIFICATION = {
+        "MAX_FAILED_ATTEMPTS": 5,  # default
+        # ... other settings
+    }
+
+Raising this weakens the guarantee directly: with a 6-digit code, 5 attempts means roughly a
+1 in 200,000 chance per issued code.
+
+What It Does Not Cover
+^^^^^^^^^^^^^^^^^^^^^^
+
+The lockout is scoped to a single verification record. It does nothing about:
+
+- Repeated calls to ``register``, each of which replaces the row, resets the counter and sends
+  a billable SMS
+- An attacker spreading guesses across many phone numbers
+- Phone number enumeration
+
+Those need request rate limiting, which is your responsibility. Configure both.
+
 Rate Limiting
 -------------
 
 Why Rate Limiting is Critical
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Without rate limiting, attackers can:
+Without rate limiting on your endpoints, attackers can:
 
-1. **Brute-force verification codes** by trying many combinations
+1. **Reset the lockout at will** by re-registering to get a fresh record and counter
 2. **Abuse SMS sending** to rack up costs or spam users
 3. **Enumerate phone numbers** to discover which are registered
 
@@ -99,7 +141,8 @@ Apply rate limiting to your endpoints:
 
 - **Code requests**: 3-5 per hour per phone number
 - **Verification attempts**: 5-10 per hour per phone number
-- **Failed verifications**: Lock after 5 consecutive failures
+- **Failed verifications**: already handled by ``MAX_FAILED_ATTEMPTS`` (default ``5``); leave
+  it at the default rather than reimplementing it
 
 Security Code Settings
 ----------------------
@@ -228,26 +271,44 @@ Database Security
 
 1. **Encrypt sensitive data at rest** (use Django's database encryption or field-level encryption)
 2. **Limit access** to the ``sms_verification`` table
-3. **Regularly clean up** old verification records:
+3. **Regularly clean up** old verification records with the shipped management command:
+
+.. code-block:: shell
+
+    # Deletes rows older than RECORD_RETENTION_DAYS (default 30)
+    python manage.py cleanup_phone_verifications
+
+    # Check the blast radius before deleting
+    python manage.py cleanup_phone_verifications --dry-run
+
+    # Override the window for a single run
+    python manage.py cleanup_phone_verifications --days 7
+
+Set the retention window in settings and schedule the command with cron or Celery beat:
 
 .. code-block:: python
 
-    from django.utils import timezone
-    from datetime import timedelta
-    from phone_verify.models import SMSVerification
-
-    # Delete records older than 30 days
-    cutoff = timezone.now() - timedelta(days=30)
-    SMSVerification.objects.filter(created_at__lt=cutoff).delete()
+    PHONE_VERIFICATION = {
+        "RECORD_RETENTION_DAYS": 30,
+        # ... other settings
+    }
 
 Session Token Security
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Session tokens are JWTs signed with Django's ``SECRET_KEY``:
+Session tokens are produced with ``jwt.encode()`` over Django's ``SECRET_KEY``, but the library
+never decodes or signature-checks them. A token is matched as a plain string against the
+``session_token`` column, so treat it as an opaque bearer value rather than a verified
+credential:
 
-1. **Keep SECRET_KEY secret** and rotate it periodically
-2. **Use a long, random SECRET_KEY** (at least 50 characters)
-3. **Don't expose session tokens** in URLs or logs
+1. **Don't expose session tokens** in URLs, logs, or client storage that outlives the flow.
+   Anyone holding one can attempt the verify step for that phone number
+2. **Use a long, random SECRET_KEY** (at least 50 characters), so tokens are unguessable
+3. **Serve the endpoints over HTTPS only**, since the token travels in both responses and
+   requests
+4. Note that rotating ``SECRET_KEY`` does **not** invalidate outstanding session tokens; they
+   are already stored in the database and are compared by value. Clearing them means deleting
+   the rows, which ``cleanup_phone_verifications`` does on your retention schedule
 
 .. code-block:: python
 
@@ -567,15 +628,18 @@ Use this checklist before going to production:
 .. code-block:: text
 
     ☐ Rate limiting implemented (per IP and per phone number)
+    ☐ MAX_FAILED_ATTEMPTS left at 5, or lowered (never disabled)
+    ☐ Sandbox backends override _should_bypass_code_check, not validate_security_code
     ☐ TOKEN_LENGTH >= 6
     ☐ SECURITY_CODE_EXPIRATION_SECONDS <= 600 (10 minutes)
     ☐ VERIFY_SECURITY_CODE_ONLY_ONCE = True
     ☐ Credentials stored in environment variables or secrets manager
     ☐ Django SECRET_KEY is strong and secret
+    ☐ Session tokens kept out of URLs and logs
     ☐ Sandbox backend used in development/test
     ☐ Production backend used in production
     ☐ Phone numbers masked in logs
-    ☐ Old verification records regularly deleted
+    ☐ cleanup_phone_verifications scheduled, RECORD_RETENTION_DAYS set
     ☐ Monitoring and alerting set up
     ☐ Spending limits configured with SMS provider
     ☐ User consent obtained before sending SMS

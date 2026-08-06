@@ -81,12 +81,16 @@ Include the phone verification URLs in your project's ``urls.py``:
     from django.urls import path, include
 
     urlpatterns = [
-        ...
-        path('api/phone/', include('phone_verify.urls')),
-        ...
+        # ... your other URLs
+        path('api/', include('phone_verify.urls')),
     ]
 
-This provides the ``/api/phone/register/`` and ``/api/phone/verify/`` endpoints.
+This provides the ``POST /api/phone/register`` and ``POST /api/phone/verify`` endpoints.
+
+.. note::
+    ``phone_verify.urls`` already registers the ``phone`` prefix on its router, so mount it
+    at ``api/`` rather than ``api/phone/``. The router uses ``trailing_slash=False``, so the
+    endpoints have no trailing slash; requesting ``/api/phone/register/`` returns a ``404``.
 
 Step 4: Configure PHONE_VERIFICATION Settings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

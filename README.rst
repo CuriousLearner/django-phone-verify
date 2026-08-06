@@ -40,7 +40,7 @@ What It Does
 
 1. **Send Verification Code** - User requests verification, receives SMS with security code
 2. **Verify Code** - User submits code, system validates and confirms phone number
-3. **Session Management** - Secure JWT-based session tokens prevent tampering
+3. **Session Management** - A session token ties the verify step to the device that registered
 4. **Multiple Use Cases** - Registration, 2FA, password reset, marketing opt-in, and more
 
 Key Features
@@ -48,7 +48,7 @@ Key Features
 
 **Security & Flexibility**
 
-- 🔐 **Secure verification flow** - JWT session tokens, configurable code expiration, one-time use options
+- 🔐 **Secure verification flow** - Per-device session tokens, configurable code expiration, brute-force lockout, one-time use options
 - 🔧 **Highly customizable** - Token length, expiration time, message templates, custom backends
 - 🔒 **Production-ready** - Rate limiting support, security best practices, GDPR/CCPA compliance guidance
 
@@ -109,10 +109,13 @@ Configuration
     from django.urls import path, include
 
     urlpatterns = [
-        ...
-        path("api/phone/", include("phone_verify.urls")),
-        ...
+        # ... your other URLs
+        path("api/", include("phone_verify.urls")),
     ]
+
+The router registers the ``phone`` prefix itself, so mounting at ``api/`` gives
+``POST /api/phone/register`` and ``POST /api/phone/verify``. The router is built with
+``trailing_slash=False``, so these URLs have no trailing slash.
 
 4. Configure ``PHONE_VERIFICATION`` settings in your ``settings.py``:
 
@@ -161,21 +164,20 @@ Quick Start
 
 .. code-block:: bash
 
-    curl -X POST http://localhost:8000/api/phone/register/ \
+    curl -X POST http://localhost:8000/api/phone/register \
       -H "Content-Type: application/json" \
       -d '{"phone_number": "+1234567890"}'
 
     # Response:
     # {
-    #   "session_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-    #   "phone_number": "+1234567890"
+    #   "session_token": "eyJ0eXAiOiJKV1QiLCJhbGc..."
     # }
 
 **Step 2: Verify the code**
 
 .. code-block:: bash
 
-    curl -X POST http://localhost:8000/api/phone/verify/ \
+    curl -X POST http://localhost:8000/api/phone/verify \
       -H "Content-Type: application/json" \
       -d '{
         "phone_number": "+1234567890",
@@ -185,8 +187,7 @@ Quick Start
 
     # Response:
     # {
-    #   "message": "Security code is valid",
-    #   "phone_number": "+1234567890"
+    #   "message": "Security code is valid."
     # }
 
 **Using in Python/Django code:**

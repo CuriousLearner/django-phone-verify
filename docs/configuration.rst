@@ -367,9 +367,16 @@ Sandbox backends are useful for development and testing without sending real SMS
 
 **Behavior:**
 
-- ``generate_security_code()`` returns the fixed ``SANDBOX_TOKEN``
-- ``validate_security_code()`` always returns valid (if code matches ``SANDBOX_TOKEN``)
-- No actual SMS is sent (but ``send_sms`` may still be called)
+Each sandbox backend subclasses its production counterpart and overrides exactly two hooks:
+
+- ``generate_security_code()`` returns the fixed ``SANDBOX_TOKEN`` instead of a random code
+- ``_should_bypass_code_check()`` returns True when the submitted code equals the
+  ``SANDBOX_TOKEN``, which skips the database code comparison
+
+Everything else in ``validate_security_code()`` still runs, including the
+``MAX_FAILED_ATTEMPTS`` lockout: a locked record returns
+``SECURITY_CODE_TOO_MANY_ATTEMPTS`` even for the sandbox token. Sending is inherited
+unchanged, so the provider client is still exercised.
 
 Environment-Based Configuration
 -------------------------------
@@ -476,6 +483,9 @@ If you need to support multiple SMS providers (e.g., Twilio as primary, Nexmo as
             super().__init__(**options)
             self.primary = TwilioBackend(**options.get("primary", {}))
             self.fallback = NexmoBackend(**options.get("fallback", {}))
+            # Both providers failing re-raises the fallback's own error, which can
+            # be either provider type, so keep the broad base default here.
+            self.exception_class = Exception
 
         def send_sms(self, number, message):
             try:
@@ -484,9 +494,8 @@ If you need to support multiple SMS providers (e.g., Twilio as primary, Nexmo as
                 logger.warning(f"Primary backend failed: {e}, using fallback")
                 self.fallback.send_sms(number, message)
 
-        def send_bulk_sms(self, numbers, message):
-            # Similar logic
-            pass
+``send_sms`` is the only method you have to define. ``BaseBackend.send_bulk_sms()`` already
+loops over it, so the fallback logic above applies to bulk sends for free.
 
 .. code-block:: python
 
