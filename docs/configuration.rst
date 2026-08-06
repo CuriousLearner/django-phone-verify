@@ -171,7 +171,7 @@ The name of your application, used in the ``MESSAGE`` template.
 This value is available as ``{app}`` in the message template.
 
 SECURITY_CODE_EXPIRATION_SECONDS
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Type:** ``int`` (seconds)
 

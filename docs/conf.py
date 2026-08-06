@@ -27,7 +27,7 @@ try:
     from phone_verify import __version__
     release = __version__
 except ImportError:
-    release = "3.1.0"
+    release = "3.3.0"
 
 # The short X.Y version
 version = ".".join(release.split(".")[:2])
@@ -56,15 +56,6 @@ exclude_patterns = ["_build", ".DS_Store"]
 # a list of builtin themes.
 #
 html_theme = "sphinx_book_theme"
-
-# Theme options for Read the Docs theme
-html_theme_options = {
-    "collapse_navigation": False,
-    "sticky_navigation": True,
-    "navigation_depth": 4,
-    "includehidden": True,
-    "titles_only": False,
-}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
