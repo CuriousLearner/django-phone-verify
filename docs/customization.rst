@@ -157,4 +157,3 @@ Step 2: Configure Django to Use the Sandbox Backend
 
 You’re now ready to use your own backend with ``django-phone-verify``.
 In production, configure the ``BACKEND`` setting to point to your real backend class.
-

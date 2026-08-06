@@ -284,4 +284,3 @@ def test_min_token_length_validation(backend):
         with pytest.raises(ImproperlyConfigured) as exc:
             PhoneVerificationService(phone_number=PHONE_NUMBER)
         assert "TOKEN_LENGTH (4) cannot be less than MIN_TOKEN_LENGTH (6)" in str(exc.value)
-
