@@ -6,9 +6,9 @@ We actively support the following versions of django-phone-verify with security 
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 3.1.x   | :white_check_mark: |
-| 3.0.x   | :white_check_mark: |
-| < 3.0   | :x:                |
+| 3.3.x   | :white_check_mark: |
+| 3.2.x   | :white_check_mark: |
+| < 3.2   | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -51,22 +51,28 @@ After submitting a vulnerability report, you can expect:
 
 When using django-phone-verify in production, we recommend:
 
-1. **Rate Limiting**: Always implement rate limiting on verification endpoints to prevent:
-   - Brute force attacks on security codes
+1. **Failed Attempt Lockout**: `MAX_FAILED_ATTEMPTS` (default: `5`) is enabled out of the box. Each `SMSVerification` record counts wrong, expired and already-used codes in a `failed_attempts` column; once the limit is reached the record returns `SECURITY_CODE_TOO_MANY_ATTEMPTS` and the user must request a new code. Leave it enabled, and do not raise it without a concrete reason. Note this is per-record protection, so it does not replace request rate limiting.
+
+2. **Rate Limiting**: Always implement rate limiting on verification endpoints. The built-in lockout caps guesses against one issued code, but an attacker can reset it by re-registering, so you still need limits to prevent:
    - SMS sending abuse
    - Cost-based DoS attacks
+   - Phone number enumeration
 
-2. **Environment Variables**: Store sensitive credentials (Twilio/Nexmo keys) in environment variables, never in code
+3. **Environment Variables**: Store sensitive credentials (Twilio/Nexmo keys) in environment variables, never in code
 
-3. **HTTPS Only**: Always use HTTPS in production to protect session tokens and security codes in transit
+4. **HTTPS Only**: Always use HTTPS in production to protect session tokens and security codes in transit. Session tokens are bearer values: they are matched against the database as opaque strings and are never decoded or signature-checked, so anyone holding one can attempt the verify step for that phone number
 
-4. **Token Expiration**: Set reasonable `SECURITY_CODE_EXPIRATION_SECONDS` values (recommended: 300-600 seconds)
+5. **Token Expiration**: Set reasonable `SECURITY_CODE_EXPIRATION_SECONDS` values (recommended: 300-600 seconds)
 
-5. **One-Time Codes**: Consider enabling `VERIFY_SECURITY_CODE_ONLY_ONCE: True` for high-security applications
+6. **One-Time Codes**: Consider enabling `VERIFY_SECURITY_CODE_ONLY_ONCE: True` for high-security applications
 
-6. **Input Validation**: Validate phone numbers on the client side before sending to prevent malformed requests
+7. **Sandbox Backends**: If you write your own sandbox backend, override `_should_bypass_code_check()`, not `validate_security_code()`. The latter is where expiry, one-time use and the failed-attempt lockout are enforced
 
-7. **Monitoring**: Monitor for unusual patterns like:
+8. **Input Validation**: Validate phone numbers on the client side before sending to prevent malformed requests
+
+9. **Record Retention**: Schedule the `cleanup_phone_verifications` management command and set `RECORD_RETENTION_DAYS` so old records, and the phone numbers in them, do not accumulate indefinitely
+
+10. **Monitoring**: Monitor for unusual patterns like:
    - High SMS sending rates from single IPs
    - Multiple failed verification attempts
    - Verification attempts for many different phone numbers from one source

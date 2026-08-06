@@ -521,6 +521,10 @@ Implementation
             self.primary = TwilioBackend(**options.get('primary', {}))
             self.fallback = NexmoBackend(**options.get('fallback', {}))
 
+            # send_sms below re-raises a plain Exception once every provider has
+            # failed, so the base default of Exception is the right catch here.
+            self.exception_class = Exception
+
         def send_sms(self, number, message):
             try:
                 logger.info(f"Attempting to send SMS via primary provider")
@@ -661,7 +665,7 @@ the verification message in the user's preferred language:
 .. code-block:: javascript
 
     // Frontend: Set Accept-Language header
-    fetch('/api/phone/register/', {
+    fetch('/api/phone/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -74,21 +74,23 @@ Step 1: Request Verification Code
      │                        │  2. Call Service     │                   │                    │
      │                        ├────────────────────►│                   │                    │
      │                        │                      │ 3. Generate Code  │                    │
+     │                        │                      │    + Session      │                    │
+     │                        │                      │    Token          │                    │
      │                        │                      ├──────────────────►│                    │
-     │                        │                      │                   │ 4. Send SMS        │
+     │                        │                      │                   │                    │
+     │                        │                      │ 4. Replace any    │                    │
+     │                        │                      │    prior row and  │                    │
+     │                        │                      │    save to DB     │                    │
+     │                        │                      │    (SMSVerification)                   │
+     │                        │                      │                   │                    │
+     │                        │                      │                   │ 5. Send SMS        │
      │                        │                      │                   ├───────────────────►│
      │                        │                      │                   │                    │
-     │                        │                      │ 5. Create Session │                    │
-     │                        │                      │    Token (JWT)    │                    │
-     │                        │                      │                   │                    │
-     │                        │  6. Save to DB       │                   │                    │
-     │                        │  (SMSVerification)   │                   │                    │
-     │                        │                      │                   │                    │
-     │  7. Return             │◄─────────────────────┤                   │                    │
+     │  6. Return             │◄─────────────────────┤                   │                    │
      │     Session Token      │                      │                   │                    │
      │◄───────────────────────┤                      │                   │                    │
      │                        │                      │                   │                    │
-     │  8. Receive SMS        │                      │                   │                    │
+     │  7. Receive SMS        │                      │                   │                    │
      │◄─────────────────────────────────────────────────────────────────────────────────────┤
      │                        │                      │                   │                    │
 
@@ -96,12 +98,16 @@ Step 1: Request Verification Code
 
 1. User submits their phone number via API/form
 2. Application calls ``send_security_code_and_generate_session_token(phone_number)``
-3. Backend generates a random security code (e.g., 6-digit number)
-4. Backend sends SMS via provider (Twilio/Nexmo)
-5. Service generates a JWT session token containing phone number + nonce
-6. Creates ``SMSVerification`` record in database with code and token
-7. Returns ``session_token`` to user
-8. User receives SMS with security code on their phone
+3. ``create_security_code_and_session_token()`` generates a random security code
+   (e.g., 6-digit number) and a session token for this device
+4. Any existing ``SMSVerification`` row for that phone number is deleted, then a fresh one is
+   created holding the code and token. The record is written **before** the SMS goes out, so a
+   provider failure still leaves a usable record
+5. ``PhoneVerificationService.send_verification()`` formats the message and hands it to the
+   backend's ``send_sms()``. Errors matching the backend's ``exception_class`` are logged and
+   swallowed, so a provider outage does not surface as a 500
+6. Returns ``session_token`` to the caller
+7. User receives SMS with security code on their phone
 
 Step 2: Verify Security Code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -115,21 +121,22 @@ Step 2: Verify Security Code
      ├──────────────────────►│                      │                   │                 │
      │                        │  2. Call Service     │                   │                 │
      │                        ├────────────────────►│                   │                 │
-     │                        │                      │ 3. Validate Token │                 │
-     │                        │                      │    (JWT verify)   │                 │
-     │                        │                      │                   │                 │
-     │                        │                      │ 4. Query DB       │                 │
+     │                        │                      │ 3. Look up row by │                 │
+     │                        │                      │    (phone_number, │                 │
+     │                        │                      │     session_token)│                 │
      │                        │                      ├───────────────────────────────────►│
      │                        │                      │                   │                 │
-     │                        │                      │ 5. Check:         │                 │
+     │                        │                      │ 4. Check:         │                 │
+     │                        │                      │    - Too many     │                 │
+     │                        │                      │      attempts?    │                 │
      │                        │                      │    - Code match?  │                 │
      │                        │                      │    - Expired?     │                 │
      │                        │                      │    - Already used?│                 │
      │                        │                      │                   │                 │
-     │                        │  6. Mark as Verified │                   │                 │
+     │                        │  5. Mark as Verified │                   │                 │
      │                        │     (if valid)       ├───────────────────────────────────►│
      │                        │                      │                   │                 │
-     │  7. Return Status      │◄─────────────────────┤                   │                 │
+     │  6. Return Status      │◄─────────────────────┤                   │                 │
      │     (Valid/Invalid)    │                      │                   │                 │
      │◄───────────────────────┤                      │                   │                 │
      │                        │                      │                   │                 │
@@ -138,14 +145,22 @@ Step 2: Verify Security Code
 
 1. User submits security code + session token from Step 1
 2. Application calls ``verify_security_code(phone_number, code, session_token)``
-3. Service validates the JWT session token (checks signature, expiration)
-4. Queries database for matching ``SMSVerification`` record
-5. Backend validates:
-   - Does the code match?
+3. The backend queries for the ``SMSVerification`` row matching both ``phone_number`` and
+   ``session_token``. The session token is used as an opaque lookup key here; it is never
+   decoded, and no signature check is performed. No matching row means
+   ``SESSION_TOKEN_INVALID``
+4. Backend validates, in order:
+
+   - Has ``failed_attempts`` reached ``MAX_FAILED_ATTEMPTS``? If so the record is locked and
+     returns ``SECURITY_CODE_TOO_MANY_ATTEMPTS`` without looking at the code
+   - Does the code match? A mismatch increments ``failed_attempts``
    - Has it expired (based on ``SECURITY_CODE_EXPIRATION_SECONDS``)?
    - Has it already been used (if ``VERIFY_SECURITY_CODE_ONLY_ONCE`` is True)?
-6. If valid, marks record as verified in database
-7. Returns validation status (``SECURITY_CODE_VALID`` or error)
+
+   Expired and already-used outcomes also increment ``failed_attempts``
+5. If valid, marks the record as verified and resets ``failed_attempts`` to ``0``
+6. Returns a ``(verification, status)`` tuple where ``status`` is ``SECURITY_CODE_VALID`` or
+   one of the error constants
 
 Key Components
 --------------
@@ -159,9 +174,10 @@ Stores verification attempts in the database:
 
     class SMSVerification:
         phone_number          # E.164 format phone number
-        session_token         # JWT token for this verification
+        session_token         # Opaque per-device token for this verification
         security_code         # The code sent via SMS
         is_verified           # Has this been verified?
+        failed_attempts       # Wrong/expired/reused code count, for lockout
         created_at            # When was this created?
 
 2. PhoneVerificationService
@@ -192,10 +208,13 @@ Abstract interface for SMS providers:
 .. code-block:: python
 
     class BaseBackend:
-        def send_sms(number, message): ...              # Send single SMS
-        def send_bulk_sms(numbers, message): ...        # Send bulk SMS
+        def send_sms(number, message): ...              # ABSTRACT: the only method
+                                                        # a custom backend must implement
+        def send_bulk_sms(numbers, message): ...        # Concrete: loops over send_sms
         def generate_security_code(): ...               # Generate random code
-        def generate_session_token(phone_number): ...   # Generate JWT token
+        def generate_session_token(phone_number): ...   # Generate per-device token
+        def _should_bypass_code_check(security_code):   # Sandbox hook, default False
+            ...
         def validate_security_code(                     # Validate code
             security_code, phone_number, session_token
         ): ...
@@ -209,21 +228,30 @@ Concrete implementations:
 Security Features
 -----------------
 
-JWT Session Tokens
-^^^^^^^^^^^^^^^^^^
+Session Tokens
+^^^^^^^^^^^^^^
 
-Session tokens are JWTs (JSON Web Tokens) containing:
+``generate_session_token()`` builds the token with ``jwt.encode()`` over a payload of:
 
 - **phone_number**: The phone being verified
-- **nonce**: Random value to ensure uniqueness
-- **iat**: Issued at timestamp
-- **exp**: Expiration timestamp
+- **nonce**: Random value, so two tokens for the same number never collide
 
-This prevents:
+Understand what this does and does not give you:
 
-- ✓ Token reuse across different phones
-- ✓ Token tampering (signatures are validated)
-- ✓ Replay attacks (nonces ensure uniqueness)
+- It is stored verbatim on the ``SMSVerification`` row and matched as a plain string at verify
+  time. The package calls ``jwt.encode()`` and never ``jwt.decode()``, so the token is an
+  opaque signed string used as a lookup key, not a set of claims the library reads back
+- Because the signature is never checked, a tampered token does not fail validation, it simply
+  fails to match any stored row and returns ``SESSION_TOKEN_INVALID``
+- The payload carries no ``iat`` or ``exp``, and the token has no independent expiry. What
+  expires is the ``SMSVerification`` record, governed by
+  ``SECURITY_CODE_EXPIRATION_SECONDS`` and measured from the row's ``created_at``
+- It is a **bearer value**. Anyone holding it can attempt the verify step for that phone
+  number, so treat it like a short-lived credential: send it over HTTPS only, and keep it out
+  of URLs, logs and client-side storage that outlives the flow
+
+What it does buy you is binding: the verify request has to come from whoever received the
+register response, so a code guessed or intercepted in isolation is not enough.
 
 Code Expiration
 ^^^^^^^^^^^^^^^
@@ -231,6 +259,18 @@ Code Expiration
 Security codes expire after ``SECURITY_CODE_EXPIRATION_SECONDS`` seconds (recommended: 300-600).
 
 This limits the window for brute-force attacks.
+
+Failed Attempt Lockout
+^^^^^^^^^^^^^^^^^^^^^^
+
+Each ``SMSVerification`` row tracks ``failed_attempts``. Once it reaches
+``MAX_FAILED_ATTEMPTS`` (default ``5``) the record stops accepting codes entirely and returns
+``SECURITY_CODE_TOO_MANY_ATTEMPTS``; the user must request a new code. The counter is
+incremented atomically with an ``F()`` expression, so concurrent guesses cannot race past the
+limit, and it resets on a successful verification.
+
+This caps guesses against a single code. It is per-record, not per-IP or per-endpoint, so it
+does not replace request rate limiting. See :doc:`security`.
 
 One-Time Use
 ^^^^^^^^^^^^
@@ -250,7 +290,7 @@ The ``sms_verification`` table structure:
         id               UUID PRIMARY KEY,        -- uuid4, not auto-increment
         security_code    VARCHAR(120) NOT NULL,   -- plain code sent via SMS
         phone_number     VARCHAR(128) NOT NULL,   -- E.164 format
-        session_token    VARCHAR(500) NOT NULL,   -- JWT token
+        session_token    VARCHAR(500) NOT NULL,   -- opaque per-device token
         is_verified      BOOLEAN DEFAULT FALSE,
         failed_attempts  INTEGER DEFAULT 0,       -- brute-force counter
         created_at       TIMESTAMP NOT NULL,
@@ -293,7 +333,9 @@ You can extend ``django-phone-verify`` at multiple levels:
 2. **Custom Viewsets**: Extend ``VerificationViewSet`` for custom API logic
 3. **Custom Services**: Wrap ``PhoneVerificationService`` for custom flows
 4. **Custom Messages**: Override ``generate_message()`` for dynamic messages
-5. **Custom Validation**: Override ``validate_security_code()`` for custom rules
+5. **Sandbox Bypass**: Override ``_should_bypass_code_check()`` to accept a fixed test code
+   while keeping expiry, one-time use and the failed-attempt lockout intact. Prefer this over
+   replacing ``validate_security_code()``, which is where all three are enforced
 
 See :doc:`customization` and :doc:`advanced_examples` for detailed examples.
 
@@ -305,7 +347,7 @@ Bottlenecks
 
 1. **SMS API calls** - Typically 100-500ms per SMS
 2. **Database writes** - Usually fast (<10ms) but can be a bottleneck at scale
-3. **JWT generation/validation** - Minimal overhead (<1ms)
+3. **Session token generation** - Minimal overhead (<1ms); there is no decode step at verify time
 
 Optimizations
 ^^^^^^^^^^^^^
@@ -314,7 +356,8 @@ Optimizations
 2. **Database connection pooling** - Reuse connections
 3. **Caching** - Cache backend instances (they're stateless)
 4. **Bulk operations** - Use ``send_bulk_sms()`` for multiple recipients
-5. **Cleanup old records** - Periodically delete old ``SMSVerification`` records
+5. **Cleanup old records** - Run the shipped ``cleanup_phone_verifications`` management
+   command periodically to delete old ``SMSVerification`` rows
 
 Monitoring & Observability
 ---------------------------

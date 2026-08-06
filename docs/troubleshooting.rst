@@ -206,6 +206,21 @@ Verification Issues
 - If you need reusable codes, set ``VERIFY_SECURITY_CODE_ONLY_ONCE`` to ``False``
 - Implement proper form/button disabling to prevent double submission
 
+"Too many failed verification attempts. Please request a new code."
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Problem:** The verification record hit ``MAX_FAILED_ATTEMPTS`` (default ``5``) and is locked.
+Every wrong, expired or already-verified code increments the counter, so a user who mistyped
+several times will see this even once they finally type the right code.
+
+**Solution:**
+
+- This is the built-in brute-force protection working as intended. The lock clears only on a
+  successful verification, so the user has to request a new code, which replaces the row
+- Surface a "resend code" action as soon as this error appears
+- Raise ``MAX_FAILED_ATTEMPTS`` only if you have a concrete usability reason; it is the only
+  guard against guessing a single code
+
 Database Issues
 ---------------
 
@@ -256,22 +271,27 @@ Example for a backend in ``myapp/backends/sms.py``:
 
 **Problem:** Your custom backend's ``send_sms`` method signature is incorrect.
 
-**Solution:** Ensure your backend implements the required methods with correct signatures:
+**Solution:** ``send_sms`` is the only abstract method on ``BaseBackend``. Implement it with
+exactly this signature:
 
 .. code-block:: python
 
     from phone_verify.backends.base import BaseBackend
 
     class CustomBackend(BaseBackend):
+        def __init__(self, **options):
+            super().__init__(**options)
+            # Restrict what the service swallows when sending fails. Without this,
+            # the base default of Exception hides bugs in your own send_sms.
+            self.exception_class = MyProviderError
+
         def send_sms(self, number, message):
             # number is a single phone number string
             # message is the SMS content
             pass
 
-        def send_bulk_sms(self, numbers, message):
-            # numbers is a list of phone number strings
-            # message is the SMS content
-            pass
+There is no need to define ``send_bulk_sms``. ``BaseBackend`` provides it and it loops over
+your ``send_sms``. Only override it if your provider has a native bulk send endpoint.
 
 Integration Issues
 ------------------
@@ -353,8 +373,8 @@ Tests Sending Real SMS
         def send_sms(self, number, message):
             pass  # No-op
 
-        def send_bulk_sms(self, numbers, message):
-            pass
+``send_bulk_sms`` is inherited and calls this no-op ``send_sms`` per number, so there is
+nothing to override.
 
 Performance Issues
 ------------------
@@ -378,7 +398,12 @@ Slow API Responses
           service = PhoneVerificationService(phone_number)
           service.send_verification(phone_number, security_code)
 
-2. **Database queries** - Ensure your database has appropriate indexes (they're included in migrations)
+2. **Database queries** - The shipped migrations create only one index: the unique constraint
+   on ``(security_code, phone_number, session_token)``. That leading column is the security
+   code, so the constraint cannot serve the hot-path lookup on ``(phone_number,
+   session_token)``, and the ``created_at`` column used by cleanup has no index at all. If the
+   ``sms_verification`` table is large enough for this to matter, add the indexes you need in
+   your own project's migrations
 
 3. **Network issues** - Check connectivity to your SMS provider
 
@@ -387,19 +412,21 @@ Too Many Database Records
 
 **Problem:** ``sms_verification`` table growing too large.
 
-**Solution:** Implement a cleanup task to delete old verifications:
+**Solution:** Run the shipped ``cleanup_phone_verifications`` management command:
 
-.. code-block:: python
+.. code-block:: shell
 
-    from django.utils import timezone
-    from datetime import timedelta
-    from phone_verify.models import SMSVerification
+    # Uses RECORD_RETENTION_DAYS (default 30)
+    python manage.py cleanup_phone_verifications
 
-    # Delete verifications older than 7 days
-    cutoff = timezone.now() - timedelta(days=7)
-    SMSVerification.objects.filter(created_at__lt=cutoff).delete()
+    # Preview first
+    python manage.py cleanup_phone_verifications --dry-run
 
-Run this periodically with a cron job or Celery beat task.
+    # Trim harder for one run
+    python manage.py cleanup_phone_verifications --days 7
+
+Set the default window with ``RECORD_RETENTION_DAYS`` in ``PHONE_VERIFICATION``, and run the
+command periodically with a cron job or Celery beat task.
 
 Getting Help
 ------------

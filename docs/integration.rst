@@ -97,6 +97,10 @@ This process happens in **two steps**:
 1. First, the user submits their phone number to request a verification code.
 2. Then, on a second form, they enter the code they received to verify their number and proceed with registration.
 
+The two steps are linked by a session token. ``send_security_code_and_generate_session_token()``
+returns it, and ``verify_security_code()`` needs it back, so stash it in the Django session
+between the two requests.
+
 1. **Forms**
 
 .. code-block:: python
@@ -117,9 +121,16 @@ This process happens in **two steps**:
 
 .. code-block:: python
 
-    from django.shortcuts import render, redirect
-    from phone_verify.services import PhoneVerificationService
+    from django.contrib import messages
     from django.contrib.auth import get_user_model
+    from django.shortcuts import redirect, render
+
+    from phone_verify.backends.base import BaseBackend
+    from phone_verify.services import (
+        send_security_code_and_generate_session_token,
+        verify_security_code,
+    )
+
     from .forms import PhoneRequestForm, VerificationForm
 
     def request_code_view(request):
@@ -127,8 +138,10 @@ This process happens in **two steps**:
             form = PhoneRequestForm(request.POST)
             if form.is_valid():
                 phone = form.cleaned_data['phone_number']
-                verifier = PhoneVerificationService(phone)
-                verifier.send_verification()
+                # Sends the SMS and returns the session token for this device.
+                session_token = send_security_code_and_generate_session_token(phone)
+                # Keep the token server-side so the verify step can reuse it.
+                request.session['phone_verify_session_token'] = session_token
                 return redirect(f'/verify/?phone_number={phone}')
         else:
             form = PhoneRequestForm()
@@ -140,14 +153,23 @@ This process happens in **two steps**:
             if form.is_valid():
                 phone = form.cleaned_data['phone_number']
                 code = form.cleaned_data['security_code']
-                verifier = PhoneVerificationService(phone)
-                if verifier.verify(code):
+                session_token = request.session.get('phone_verify_session_token')
+
+                # Returns a (verification, status) tuple; status is a
+                # BaseBackend constant.
+                verification, status = verify_security_code(phone, code, session_token)
+                if status == BaseBackend.SECURITY_CODE_VALID:
+                    request.session.pop('phone_verify_session_token', None)
                     get_user_model().objects.create_user(
                         username=form.cleaned_data['username'],
                         email=form.cleaned_data['email'],
                         password=form.cleaned_data['password'],
                     )
                     return redirect('login')
+                if status == BaseBackend.SECURITY_CODE_TOO_MANY_ATTEMPTS:
+                    messages.error(request, 'Too many failed attempts. Request a new code.')
+                else:
+                    messages.error(request, 'That code is not valid.')
         else:
             phone = request.GET.get('phone_number', '')
             form = VerificationForm(initial={'phone_number': phone})
